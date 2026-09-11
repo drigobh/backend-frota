@@ -9,11 +9,12 @@ fastify.register(require('./routes/acoplamentos'));
 fastify.register(require('./routes/km'));
 fastify.register(require('./routes/financeiro'));
 fastify.register(require('./routes/dashboard'));
-fastify.register(require('./routes/auth')); // <-- Nova rota de Autenticação
+fastify.register(require('./routes/auth')); // <-- Rota de Autenticação
 
 const start = async () => {
   try {
-    await fastify.listen({ port: process.env.PORT || 3000 });
+    // Adicionado o host '0.0.0.0' para liberar o acesso na nuvem do Render
+    await fastify.listen({ port: process.env.PORT || 3000, host: '0.0.0.0' });
     console.log(`🚀 Servidor rodando na porta ${fastify.server.address().port}`);
   } catch (err) {
     fastify.log.error(err);
