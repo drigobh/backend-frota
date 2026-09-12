@@ -3709,6 +3709,33 @@
       });
     }, 500);
 
+
+    // =========================================================================
+    // BINDS_MODAL_APLICADO - Binds dos botoes do modal de usuario
+    // =========================================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      const btnCancel = document.getElementById('modal-user-cancel');
+      const btnSave = document.getElementById('modal-user-save');
+      const btnAdd = document.getElementById('btn-add-usuario');
+
+      if (btnCancel) btnCancel.addEventListener('click', fecharModalUsuario);
+      if (btnSave) btnSave.addEventListener('click', salvarUsuario);
+      if (btnAdd) btnAdd.addEventListener('click', abrirModalUsuarioNovo);
+
+      // Fechar modal com ESC
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') fecharModalUsuario();
+      });
+
+      // Fechar modal clicando no overlay (fora do card)
+      const modal = document.getElementById('modal-usuario');
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) fecharModalUsuario();
+        });
+      }
+    });
+
     // =========================================================================
     // SIDEBAR RETRATIL - Toggle e submenus (Fase 3 - Etapa 2.3)
     // =========================================================================
