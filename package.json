@@ -1,20 +1,34 @@
 {
   "name": "projeto-caderninho-frota",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "2.0.0",
+  "description": "Sistema Corporativo de Gestão de Frota — Caderninho de Motorista",
+  "main": "src/server.js",
   "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "frota",
+    "logistica",
+    "transporte",
+    "dre"
+  ],
+  "author": "Drigo",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "@fastify/cors": "^11.3.0",
+    "@fastify/jwt": "^10.2.2",
     "@fastify/static": "^10.1.3",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^17.4.2",
     "fastify": "^5.12.4",
+    "jsonwebtoken": "^9.0.2",
     "pg": "^8.23.0"
+  },
+  "allowScripts": {
+    "bcrypt@6.0.0": true
   }
 }
