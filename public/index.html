@@ -1733,6 +1733,70 @@
         </div>
       </section>
 
+
+      <!-- TAB: USUARIOS (Fase 3 - Etapa 4.2) -->
+      <section id="tab-usuarios" class="tab-content">
+        <div class="bar-controls">
+          <div class="bar-controls-left">
+            <span class="label-month-select">Gestao de Usuarios:</span>
+          </div>
+          <div class="bar-controls-right">
+            <button class="btn-action btn-action-primary" id="btn-add-usuario">+ Novo Usuario</button>
+          </div>
+        </div>
+
+        <div class="section-title-wrap">
+          <h2 class="section-title"><span>&#128101;</span> Usuarios do Sistema</h2>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="table-usuarios">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Perfil</th>
+                <th style="width: 130px;">Ultimo Login</th>
+                <th style="width: 100px;" class="col-center">Status</th>
+                <th style="width: 220px;" class="col-center">Acoes</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-usuarios"></tbody>
+          </table>
+        </div>
+
+        <!-- Modal de Usuario -->
+        <div id="modal-usuario" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(9,27,48,0.85); z-index:9999; align-items:center; justify-content:center;">
+          <div class="login-card" style="max-width:520px; text-align:left;">
+            <h2 style="margin-top:0; color:#0f2a4a;" id="modal-usuario-title">Novo Usuario</h2>
+            <div style="margin-bottom:0.75rem;">
+              <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Nome completo</label>
+              <input type="text" id="modal-user-nome" class="login-input" style="margin-bottom:0;">
+            </div>
+            <div style="margin-bottom:0.75rem;">
+              <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">E-mail</label>
+              <input type="email" id="modal-user-email" class="login-input" style="margin-bottom:0;">
+            </div>
+            <div style="margin-bottom:0.75rem;">
+              <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Senha <span id="modal-user-senha-hint" style="color:#64748b; font-weight:400;"></span></label>
+              <input type="password" id="modal-user-senha" class="login-input" style="margin-bottom:0;">
+            </div>
+            <div style="margin-bottom:0.75rem;">
+              <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Perfil de acesso</label>
+              <select id="modal-user-perfil" class="login-input" style="margin-bottom:0;"></select>
+            </div>
+            <div style="margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
+              <input type="checkbox" id="modal-user-ativo" checked>
+              <label for="modal-user-ativo" style="font-size:0.875rem; font-weight:600;">Usuario ativo</label>
+            </div>
+            <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+              <button class="btn-action btn-action-secondary" id="modal-user-cancel">Cancelar</button>
+              <button class="btn-action btn-action-primary" id="modal-user-save">Salvar</button>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer class="app-footer no-print">
@@ -3406,6 +3470,228 @@
         exportTableToCSV('Relatorio_Documentos.csv', 'table-documentos');
       });
     });
+
+    // =========================================================================
+    // USUARIOS - Carregar, criar, editar, desativar (Fase 3 - Etapa 4.2)
+    // =========================================================================
+    let modalUsuarioEditandoId = null;
+
+    async function loadUsuariosDaAPI() {
+      try {
+        const res = await apiFetch('/usuarios');
+        if (!res.ok) return;
+        const data = await res.json();
+        renderUsuarios(data);
+      } catch (err) {
+        console.error('Erro ao carregar usuarios:', err);
+      }
+    }
+
+    async function loadPerfisParaSelect() {
+      try {
+        const res = await apiFetch('/perfis');
+        if (!res.ok) return [];
+        return await res.json();
+      } catch (err) {
+        console.error('Erro ao carregar perfis:', err);
+        return [];
+      }
+    }
+
+    function renderUsuarios(lista) {
+      const tbody = document.getElementById('tbody-usuarios');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!lista || lista.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhum usuario cadastrado.</td></tr>';
+        return;
+      }
+
+      lista.forEach((u, idx) => {
+        const ultimo = u.ultimo_login ? new Date(u.ultimo_login).toLocaleDateString('pt-BR') : '-';
+        const statusBadge = u.ativo
+          ? '<span class="badge-pos">Ativo</span>'
+          : '<span class="badge-neg">Inativo</span>';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><strong>${u.nome}</strong></td>
+          <td>${u.email}</td>
+          <td>${u.perfil || '-'}</td>
+          <td>${ultimo}</td>
+          <td class="col-center">${statusBadge}</td>
+          <td class="col-center">
+            <button class="btn-action btn-action-secondary" onclick="abrirModalUsuarioEditar('${u.id}')">Editar</button>
+            <button class="btn-action btn-action-secondary" onclick="resetarSenhaUsuario('${u.id}', '${u.nome}')">Resetar senha</button>
+            ${u.ativo ? `<button class="btn-action btn-action-danger" onclick="desativarUsuario('${u.id}', '${u.nome}')">Desativar</button>` : ''}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function abrirModalUsuarioNovo() {
+      modalUsuarioEditandoId = null;
+      document.getElementById('modal-usuario-title').textContent = 'Novo Usuario';
+      document.getElementById('modal-user-nome').value = '';
+      document.getElementById('modal-user-email').value = '';
+      document.getElementById('modal-user-senha').value = '';
+      document.getElementById('modal-user-senha-hint').textContent = '(minimo 6 caracteres)';
+      document.getElementById('modal-user-ativo').checked = true;
+
+      const perfis = await loadPerfisParaSelect();
+      const sel = document.getElementById('modal-user-perfil');
+      sel.innerHTML = '<option value="">-- Selecione --</option>';
+      perfis.filter(p => p.ativo).forEach(p => {
+        sel.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
+      });
+
+      document.getElementById('modal-usuario').style.display = 'flex';
+    }
+
+    async function abrirModalUsuarioEditar(id) {
+      try {
+        const res = await apiFetch(`/usuarios/${id}`);
+        if (!res.ok) {
+          alert('Erro ao carregar usuario');
+          return;
+        }
+        const u = await res.json();
+
+        modalUsuarioEditandoId = id;
+        document.getElementById('modal-usuario-title').textContent = 'Editar Usuario';
+        document.getElementById('modal-user-nome').value = u.nome || '';
+        document.getElementById('modal-user-email').value = u.email || '';
+        document.getElementById('modal-user-senha').value = '';
+        document.getElementById('modal-user-senha-hint').textContent = '(deixe em branco para nao alterar)';
+        document.getElementById('modal-user-ativo').checked = u.ativo;
+
+        const perfis = await loadPerfisParaSelect();
+        const sel = document.getElementById('modal-user-perfil');
+        sel.innerHTML = '<option value="">-- Selecione --</option>';
+        perfis.filter(p => p.ativo || p.id === u.perfil_id).forEach(p => {
+          const selected = p.id === u.perfil_id ? 'selected' : '';
+          sel.innerHTML += `<option value="${p.id}" ${selected}>${p.nome}</option>`;
+        });
+
+        document.getElementById('modal-usuario').style.display = 'flex';
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao abrir edicao');
+      }
+    }
+
+    function fecharModalUsuario() {
+      document.getElementById('modal-usuario').style.display = 'none';
+      modalUsuarioEditandoId = null;
+    }
+
+    async function salvarUsuario() {
+      const nome = document.getElementById('modal-user-nome').value.trim();
+      const email = document.getElementById('modal-user-email').value.trim();
+      const senha = document.getElementById('modal-user-senha').value;
+      const perfil_id = document.getElementById('modal-user-perfil').value;
+      const ativo = document.getElementById('modal-user-ativo').checked;
+
+      if (!nome || !email || !perfil_id) {
+        alert('Preencha nome, email e perfil.');
+        return;
+      }
+
+      if (!modalUsuarioEditandoId && senha.length < 6) {
+        alert('Senha deve ter no minimo 6 caracteres.');
+        return;
+      }
+
+      try {
+        if (modalUsuarioEditandoId) {
+          const payload = { nome, email, perfil_id, ativo };
+          const res = await apiFetch(`/usuarios/${modalUsuarioEditandoId}`, {
+            method: 'PUT',
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) {
+            const err = await res.json();
+            alert(err.erro || 'Erro ao salvar');
+            return;
+          }
+
+          if (senha && senha.length >= 6) {
+            await apiFetch(`/usuarios/${modalUsuarioEditandoId}/resetar-senha`, {
+              method: 'PUT',
+              body: JSON.stringify({ nova_senha: senha })
+            });
+          }
+
+          alert('Usuario atualizado com sucesso.');
+        } else {
+          const payload = { nome, email, senha, perfil_id };
+          const res = await apiFetch('/usuarios', {
+            method: 'POST',
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) {
+            const err = await res.json();
+            alert(err.erro || 'Erro ao criar usuario');
+            return;
+          }
+
+          alert('Usuario criado com sucesso.');
+        }
+
+        fecharModalUsuario();
+        loadUsuariosDaAPI();
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao salvar usuario');
+      }
+    }
+
+    async function resetarSenhaUsuario(id, nome) {
+      const nova = prompt(`Nova senha para "${nome}" (minimo 6 caracteres):`);
+      if (!nova || nova.length < 6) {
+        if (nova) alert('Senha muito curta.');
+        return;
+      }
+
+      try {
+        const res = await apiFetch(`/usuarios/${id}/resetar-senha`, {
+          method: 'PUT',
+          body: JSON.stringify({ nova_senha: nova })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          alert(err.erro || 'Erro ao resetar senha');
+          return;
+        }
+
+        alert('Senha resetada com sucesso.');
+      } catch (err) {
+        console.error(err);
+        alert('Erro ao resetar senha');
+      }
+    }
+
+    async function desativarUsuario(id, nome) {
+      if (!confirm(`Desativar o usuario "${nome}"?`)) return;
+
+      try {
+        const res = await apiFetch(`/usuarios/${id}`, { method: 'DELETE' });
+        if (!res.ok) {
+          const err = await res.json();
+          alert(err.erro || 'Erro ao desativar');
+          return;
+        }
+        loadUsuariosDaAPI();
+      } catch (err) {
+        console.error(err);
+      }
+    }
     // =========================================================================
     // SIDEBAR RETRATIL - Toggle e submenus (Fase 3 - Etapa 2.3)
     // =========================================================================
