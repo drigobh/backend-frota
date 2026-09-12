@@ -1119,6 +1119,79 @@
         margin-left: 64px;
       }
     }
+
+    /* ========================================================================
+       CSS_BOTOES_ACAO_APLICADO - Botoes de acao em icones (layout premium)
+       ======================================================================== */
+    .action-group {
+      display: inline-flex;
+      gap: 6px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .action-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      transition: all 0.15s ease;
+      position: relative;
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+    }
+
+    .action-btn:active {
+      transform: translateY(0);
+    }
+
+    .action-btn-edit {
+      background: #eff6ff;
+      color: #1e40af;
+    }
+    .action-btn-edit:hover {
+      background: #dbeafe;
+    }
+
+    .action-btn-key {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .action-btn-key:hover {
+      background: #fde68a;
+    }
+
+    .action-btn-delete {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .action-btn-delete:hover {
+      background: #fecaca;
+    }
+
+    .action-btn-disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .action-btn-disabled:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Tooltip nativo (atributo title) ja funciona, mas vamos deixar mais visivel */
+    .action-btn[title] {
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -3500,6 +3573,7 @@
     }
 
     function renderUsuarios(lista) {
+      // RENDER_USUARIOS_PREMIUM
       const tbody = document.getElementById('tbody-usuarios');
       if (!tbody) return;
       tbody.innerHTML = '';
@@ -3508,6 +3582,36 @@
         tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhum usuario cadastrado.</td></tr>';
         return;
       }
+
+      lista.forEach((u, idx) => {
+        const ultimo = u.ultimo_login ? new Date(u.ultimo_login).toLocaleDateString('pt-BR') : '-';
+        const statusBadge = u.ativo
+          ? '<span class="badge-pos">Ativo</span>'
+          : '<span class="badge-neg">Inativo</span>';
+
+        const btnDesativar = u.ativo
+          ? `<button class="action-btn action-btn-delete" title="Desativar usuario" onclick="desativarUsuario('${u.id}', '${u.nome}')">&#128465;&#65039;</button>`
+          : `<button class="action-btn action-btn-delete action-btn-disabled" title="Usuario ja inativo" disabled>&#128465;&#65039;</button>`;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><strong>${u.nome}</strong></td>
+          <td>${u.email}</td>
+          <td>${u.perfil || '-'}</td>
+          <td>${ultimo}</td>
+          <td class="col-center">${statusBadge}</td>
+          <td class="col-center">
+            <div class="action-group">
+              <button class="action-btn action-btn-edit" title="Editar usuario" onclick="abrirModalUsuarioEditar('${u.id}')">&#9999;&#65039;</button>
+              <button class="action-btn action-btn-key" title="Resetar senha" onclick="resetarSenhaUsuario('${u.id}', '${u.nome}')">&#128273;</button>
+              ${btnDesativar}
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
 
       lista.forEach((u, idx) => {
         const ultimo = u.ultimo_login ? new Date(u.ultimo_login).toLocaleDateString('pt-BR') : '-';
