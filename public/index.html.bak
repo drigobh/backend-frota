@@ -1625,30 +1625,6 @@
 
   <script>
     const API_URL = '/api';
-
-    function apiFetch(endpoint, options = {}) {
-      const token = localStorage.getItem('token');
-      const headers = {
-        'Content-Type': 'application/json',
-        ...(options.headers || {}),
-      };
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      return fetch(`${API_URL}${endpoint}`, {
-        ...options,
-        headers,
-      }).then((res) => {
-        if (res.status === 401) {
-          localStorage.removeItem('token');
-          const loginScreen = document.getElementById('login-screen');
-          if (loginScreen) loginScreen.style.display = 'flex';
-          throw new Error('Sessao expirada. Faca login novamente.');
-        }
-        return res;
-      });
-    }
-
     const INITIAL_MONTHS = ['Julho/2026', 'Agosto/2026', 'Setembro/2026'];
     const CATEGORIAS = [
       'Faturamento', 'Operacionais', 'Pedágio', 'Manutenção', 'Combustível', 
@@ -1816,7 +1792,7 @@
         if (!res.ok) {
           throw new Error(data.erro || 'Falha no login');
         }
-        localStorage.setItem('token', data.token);
+        
         state.user = data.usuario;
         document.getElementById('current-user-badge').textContent = `👤 ${state.user.nome} (${state.user.perfil})`;
         document.getElementById('login-screen').style.display = 'none';
@@ -1826,8 +1802,8 @@
         alert('Erro: ' + err.message);
       }
     }
+
     function fazerLogout() {
-      localStorage.removeItem('token');
       state.user = null;
       document.getElementById('login-screen').style.display = 'flex';
     }
@@ -1885,7 +1861,7 @@
     async function loadDashboardData() {
       const monthKey = getFirstDayOfMonth(state.currentMonth);
       try {
-        const res = await apiFetch(`/dashboard/${monthKey}`);
+        const res = await fetch(`${API_URL}/dashboard/${monthKey}`);
         const data = await res.json();
         
         document.getElementById('dash-veiculos').textContent = data.totalVeiculos;
@@ -1922,13 +1898,13 @@
     // =========================================================================
     async function loadCadastrosDaAPI() {
       try {
-        const resCavalos = await apiFetch(`/veiculos`);
+        const resCavalos = await fetch(`${API_URL}/veiculos`);
         const cavalos = await resCavalos.json();
         
-        const resCarretas = await apiFetch(`/carretas`);
+        const resCarretas = await fetch(`${API_URL}/carretas`);
         const carretas = await resCarretas.json();
         
-        const resMotoristas = await apiFetch(`/motoristas`);
+        const resMotoristas = await fetch(`${API_URL}/motoristas`);
         const motoristas = await resMotoristas.json();
         
         state.cavalos = cavalos;
@@ -2110,7 +2086,7 @@
 
     async function updateCadastro(tipo, id, payload) {
       try {
-        await apiFetch(`/${tipo}/${id}`, {
+        await fetch(`${API_URL}/${tipo}/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -2123,7 +2099,7 @@
     async function deleteItem(tipo, id) {
       if (!confirm('Deseja excluir este registro?')) return;
       try {
-        await apiFetch(`/${tipo}/${id}`, { method: 'DELETE' });
+        await fetch(`${API_URL}/${tipo}/${id}`, { method: 'DELETE' });
         loadCadastrosDaAPI();
         loadDashboardData();
       } catch (error) {
@@ -2135,7 +2111,7 @@
       const placa = prompt('Digite a placa do cavalo:');
       if (!placa) return;
       try {
-        await apiFetch(`/veiculos`, {
+        await fetch(`${API_URL}/veiculos`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ placa: placa.toUpperCase(), modelo: 'Trator' })
@@ -2151,7 +2127,7 @@
       const codigo = prompt('Digite a placa ou código da carreta:');
       if (!codigo) return;
       try {
-        await apiFetch(`/carretas`, {
+        await fetch(`${API_URL}/carretas`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ codigo: codigo.toUpperCase(), tipo: 'Baú' })
@@ -2166,7 +2142,7 @@
       const nome = prompt('Nome do Motorista:');
       if (!nome) return;
       try {
-        await apiFetch(`/motoristas`, {
+        await fetch(`${API_URL}/motoristas`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ nome: nome })
@@ -2184,7 +2160,7 @@
     async function loadAcoplamentosDaAPI() {
       try {
         const monthKey = getFirstDayOfMonth(state.currentMonth);
-        const res = await apiFetch(`/acoplamentos/${monthKey}`);
+        const res = await fetch(`${API_URL}/acoplamentos/${monthKey}`);
         const data = await res.json();
         state.acoplamentos[state.currentMonth] = data;
         renderAcoplamento();
@@ -2261,7 +2237,7 @@
       match[field] = val || null;
       
       try {
-        const res = await apiFetch(`/acoplamentos/${id}`, {
+        const res = await fetch(`${API_URL}/acoplamentos/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(match)
@@ -2283,7 +2259,7 @@
     async function deleteAcop(id) {
       if (!confirm('Remover acoplamento?')) return;
       try {
-        await apiFetch(`/acoplamentos/${id}`, { method: 'DELETE' });
+        await fetch(`${API_URL}/acoplamentos/${id}`, { method: 'DELETE' });
         loadAcoplamentosDaAPI();
         loadDashboardData();
       } catch (error) {
@@ -2293,7 +2269,7 @@
 
     async function addAcoplamentoRow() {
       try {
-        await apiFetch(`/acoplamentos`, {
+        await fetch(`${API_URL}/acoplamentos`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ mes_referencia: getFirstDayOfMonth(state.currentMonth) })
@@ -2311,7 +2287,7 @@
     async function loadKmDaAPI() {
       try {
         const monthKey = getFirstDayOfMonth(state.currentMonth);
-        const res = await apiFetch(`/km/${monthKey}`);
+        const res = await fetch(`${API_URL}/km/${monthKey}`);
         const data = await res.json();
         
         if (!state.kmData[state.currentMonth]) {
@@ -2426,7 +2402,7 @@
       };
       
       try {
-        const res = await apiFetch(`/km`, {
+        const res = await fetch(`${API_URL}/km`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -2450,7 +2426,7 @@
     async function loadAbastecimentosDaAPI() {
       try {
         const monthKey = getFirstDayOfMonth(state.currentMonth);
-        const res = await apiFetch(`/abastecimentos/${monthKey}`);
+        const res = await fetch(`${API_URL}/abastecimentos/${monthKey}`);
         const data = await res.json();
         state.abastecimentos = data;
         renderAbastecimentos();
@@ -2541,7 +2517,7 @@
       };
 
       try {
-        await apiFetch(`/abastecimentos`, {
+        await fetch(`${API_URL}/abastecimentos`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -2555,7 +2531,7 @@
     async function deleteAbastecimento(id) {
       if (!confirm('Deseja excluir este registro de abastecimento?')) return;
       try {
-        await apiFetch(`/abastecimentos/${id}`, { method: 'DELETE' });
+        await fetch(`${API_URL}/abastecimentos/${id}`, { method: 'DELETE' });
         loadAbastecimentosDaAPI();
       } catch (err) {
         console.error(err);
@@ -2568,7 +2544,7 @@
     async function loadLancamentosDaAPI() {
       try {
         const monthKey = getFirstDayOfMonth(state.currentMonth);
-        const res = await apiFetch(`/financeiro/${monthKey}`);
+        const res = await fetch(`${API_URL}/financeiro/${monthKey}`);
         const data = await res.json();
         state.lancamentos = data;
         
@@ -2679,7 +2655,7 @@
       item[field] = val;
       
       try {
-        await apiFetch(`/financeiro/${id}`, {
+        await fetch(`${API_URL}/financeiro/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(item)
@@ -2695,7 +2671,7 @@
       if (!confirm('Deseja excluir este lançamento financeiro?')) return;
       
       try {
-        await apiFetch(`/financeiro/${id}`, { method: 'DELETE' });
+        await fetch(`${API_URL}/financeiro/${id}`, { method: 'DELETE' });
         loadLancamentosDaAPI();
         loadDashboardData();
       } catch (error) {
@@ -2725,7 +2701,7 @@
       };
       
       try {
-        await apiFetch(`/financeiro`, {
+        await fetch(`${API_URL}/financeiro`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -2801,7 +2777,7 @@
     // =========================================================================
     async function loadManutencoesDaAPI() {
       try {
-        const res = await apiFetch(`/manutencoes`);
+        const res = await fetch(`${API_URL}/manutencoes`);
         const data = await res.json();
         state.manutencoes = data;
         renderManutencoes();
@@ -2859,7 +2835,7 @@
       };
 
       try {
-        await apiFetch(`/manutencoes`, {
+        await fetch(`${API_URL}/manutencoes`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -2873,7 +2849,7 @@
     async function deleteManutencao(id) {
       if (!confirm('Deseja excluir este registro de manutenção?')) return;
       try {
-        await apiFetch(`/manutencoes/${id}`, { method: 'DELETE' });
+        await fetch(`${API_URL}/manutencoes/${id}`, { method: 'DELETE' });
         loadManutencoesDaAPI();
       } catch (err) {
         console.error(err);
@@ -2885,7 +2861,7 @@
     // =========================================================================
     async function loadDocumentosDaAPI() {
       try {
-        const res = await apiFetch(`/documentos`);
+        const res = await fetch(`${API_URL}/documentos`);
         const data = await res.json();
         state.documentos = data;
         renderDocumentos();
@@ -2935,7 +2911,7 @@
       };
 
       try {
-        await apiFetch(`/documentos`, {
+        await fetch(`${API_URL}/documentos`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
@@ -2949,7 +2925,7 @@
     async function deleteDocumento(id) {
       if (!confirm('Deseja excluir este documento?')) return;
       try {
-        await apiFetch(`/documentos/${id}`, { method: 'DELETE' });
+        await fetch(`${API_URL}/documentos/${id}`, { method: 'DELETE' });
         loadDocumentosDaAPI();
       } catch (err) {
         console.error(err);
