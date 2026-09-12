@@ -14,20 +14,8 @@ module.exports = async function (fastify, options) {
     return rows;
   });
 
-  // 2. Criar uma nova linha de acoplamento vazia
-  fastify.post('/api/acoplamentos', async (request, reply) => {
-    const { mes_referencia } = request.body; // Formato: '2026-08-01'
-    try {
-      const { rows } = await db.query(
-        `INSERT INTO acoplamentos (data_inicio, status) VALUES ($1, 'ATIVO') RETURNING id, veiculo_id, carreta_id, motorista_id`,
-        [mes_referencia]
-      );
-      return reply.status(201).send(rows[0]);
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.status(500).send({ erro: 'Erro interno ao criar acoplamento' });
-    }
-  });
+  // ⚠️ O POST foi movido para o server.js (com validações de integridade)
+  // Não declare POST aqui para evitar FST_ERR_DUPLICATED_ROUTE
 
   // 3. Atualizar o acoplamento (quando o usuário escolhe no select)
   fastify.put('/api/acoplamentos/:id', async (request, reply) => {

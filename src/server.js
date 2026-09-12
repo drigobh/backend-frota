@@ -30,28 +30,28 @@ fastify.post('/api/acoplamentos', async (req, reply) => {
   try {
     if (veiculo_id) {
       const checkCavalo = await pool.query(
-        'SELECT id FROM acoplamentos WHERE mes_referencia = $1 AND veiculo_id = $2 AND status = \'ATIVO\'',
+        'SELECT id FROM acoplamentos WHERE data_inicio = $1 AND veiculo_id = $2 AND status = \'ATIVO\'',
         [mes_referencia, veiculo_id]
       );
       if (checkCavalo.rows.length > 0) return reply.code(400).send({ erro: 'Este cavalo já está em uso em outro acoplamento ativo neste mês!' });
     }
     if (carreta_id) {
       const checkCarreta = await pool.query(
-        'SELECT id FROM acoplamentos WHERE mes_referencia = $1 AND carreta_id = $2 AND status = \'ATIVO\'',
+        'SELECT id FROM acoplamentos WHERE data_inicio = $1 AND carreta_id = $2 AND status = \'ATIVO\'',
         [mes_referencia, carreta_id]
       );
       if (checkCarreta.rows.length > 0) return reply.code(400).send({ erro: 'Esta carreta já está acoplada a outro conjunto ativo neste mês!' });
     }
     if (motorista_id) {
       const checkMotorista = await pool.query(
-        'SELECT id FROM acoplamentos WHERE mes_referencia = $1 AND motorista_id = $2 AND status = \'ATIVO\'',
+        'SELECT id FROM acoplamentos WHERE data_inicio = $1 AND motorista_id = $2 AND status = \'ATIVO\'',
         [mes_referencia, motorista_id]
       );
       if (checkMotorista.rows.length > 0) return reply.code(400).send({ erro: 'Este motorista já está escalado para outro conjunto ativo neste mês!' });
     }
 
     const result = await pool.query(
-      `INSERT INTO acoplamentos (mes_referencia, veiculo_id, carreta_id, motorista_id, status) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      `INSERT INTO acoplamentos (data_inicio, veiculo_id, carreta_id, motorista_id, status) VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [mes_referencia, veiculo_id || null, carreta_id || null, motorista_id || null, status]
     );
     return reply.code(201).send(result.rows[0]);
