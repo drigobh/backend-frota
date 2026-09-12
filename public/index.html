@@ -924,7 +924,10 @@
       #tab-cadastro, 
       #tab-acoplamento, 
       #tab-km, 
+      #tab-abastecimentos,
       #tab-dre, 
+      #tab-manutencoes,
+      #tab-documentos,
       #tab-graficos {
         display: none !important;
       }
@@ -1034,10 +1037,19 @@
       <button class="nav-tab-btn" data-tab="tab-km">
         <span>🛣️</span> KM Mensal
       </button>
+      <button class="nav-tab-btn" data-tab="tab-abastecimentos">
+        <span>⛽</span> Abastecimentos
+      </button>
 
-      <div class="nav-group-title">Financeiro</div>
+      <div class="nav-group-title">Financeiro & Frota</div>
       <button class="nav-tab-btn" data-tab="tab-dre" id="nav-tab-dre">
         <span>📊</span> DRE por Veículo
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-manutencoes">
+        <span>🔧</span> Manutenção
+      </button>
+      <button class="nav-tab-btn" data-tab="tab-documentos">
+        <span>📄</span> Documentos
       </button>
 
       <div class="nav-group-title">Indicadores</div>
@@ -1075,9 +1087,7 @@
         <p style="margin:0; font-size: 0.9rem; color: #475569;" id="print-header-meta">Mês de Referência: -</p>
       </div>
 
-      <!-- ==========================================
-          TAB 0: DASHBOARD (PORTA DE ENTRADA)
-      =========================================== -->
+      <!-- TAB 0: DASHBOARD -->
       <section id="tab-dashboard" class="tab-content active">
         <div class="bar-controls">
           <div class="bar-controls-left">
@@ -1139,9 +1149,7 @@
         </div>
       </section>
 
-      <!-- ==========================================
-          TAB 1: CADASTRO
-      =========================================== -->
+      <!-- TAB 1: CADASTRO -->
       <section id="tab-cadastro" class="tab-content">
         <div class="bar-controls">
           <div class="bar-controls-left">
@@ -1219,9 +1227,7 @@
         </div>
       </section>
 
-      <!-- ==========================================
-          TAB 2: ACOPLAMENTO
-      =========================================== -->
+      <!-- TAB 2: ACOPLAMENTO -->
       <section id="tab-acoplamento" class="tab-content">
         <div class="bar-controls">
           <div class="bar-controls-left">
@@ -1255,9 +1261,7 @@
         </div>
       </section>
 
-      <!-- ==========================================
-          TAB 3: KM MENSAL
-      =========================================== -->
+      <!-- TAB 3: KM MENSAL -->
       <section id="tab-km" class="tab-content">
         <div class="bar-controls">
           <div class="bar-controls-left">
@@ -1294,9 +1298,46 @@
         </div>
       </section>
 
-      <!-- ==========================================
-          TAB 4: DRE POR VEÍCULO
-      =========================================== -->
+      <!-- TAB: ABASTECIMENTOS DETALHADOS (Prioridade 11) -->
+      <section id="tab-abastecimentos" class="tab-content">
+        <div class="bar-controls">
+          <div class="bar-controls-left">
+            <span class="label-month-select">Mês de Referência:</span>
+            <select class="select-month select-mes-global" id="select-mes-abastecimentos"></select>
+          </div>
+          <div class="bar-controls-right">
+            <button class="btn-action btn-action-secondary" id="btn-export-abast"><span>⬇️</span> Exportar CSV</button>
+            <button class="btn-action btn-action-primary" id="btn-add-abastecimento">+ Novo Abastecimento</button>
+          </div>
+        </div>
+
+        <div class="section-title-wrap">
+          <h2 class="section-title"><span>⛽</span> Registro Unitário de Abastecimentos</h2>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="table-abastecimentos">
+            <thead>
+              <tr>
+                <th style="width: 120px;">Data</th>
+                <th style="width: 140px;">Veículo</th>
+                <th>Posto / Fornecedor</th>
+                <th>Cidade / UF</th>
+                <th class="col-num" style="width: 120px;">KM Atual</th>
+                <th class="col-num" style="width: 110px;">Litros</th>
+                <th class="col-num" style="width: 120px;">R$/Litro</th>
+                <th class="col-num" style="width: 130px;">Total (R$)</th>
+                <th style="width: 120px;">Nota Fiscal</th>
+                <th style="width: 80px;" class="col-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-abastecimentos"></tbody>
+            <tfoot id="tfoot-abastecimentos"></tfoot>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 4: DRE POR VEÍCULO -->
       <section id="tab-dre" class="tab-content">
         <div class="bar-controls">
           <div class="bar-controls-left">
@@ -1376,9 +1417,75 @@
         </div>
       </section>
 
-      <!-- ==========================================
-          TAB 5: RESUMO EXECUTIVO
-      =========================================== -->
+      <!-- TAB: MANUTENÇÃO (Prioridade 15) -->
+      <section id="tab-manutencoes" class="tab-content">
+        <div class="bar-controls">
+          <div class="bar-controls-left">
+            <span class="label-month-select">Gestão de Manutenção:</span>
+          </div>
+          <div class="bar-controls-right">
+            <button class="btn-action btn-action-secondary" id="btn-export-manut"><span>⬇️</span> Exportar CSV</button>
+            <button class="btn-action btn-action-primary" id="btn-add-manutencao">+ Registrar Manutenção</button>
+          </div>
+        </div>
+
+        <div class="section-title-wrap">
+          <h2 class="section-title"><span>🔧</span> Manutenções Preventivas e Corretivas da Frota</h2>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="table-manutencoes">
+            <thead>
+              <tr>
+                <th style="width: 130px;">Veículo</th>
+                <th style="width: 130px;">Tipo</th>
+                <th>Descrição dos Serviços / Peças</th>
+                <th>Fornecedor / Oficina</th>
+                <th class="col-num" style="width: 130px;">Valor (R$)</th>
+                <th class="col-num" style="width: 120px;">KM Atual</th>
+                <th class="col-num" style="width: 130px;">Próximo KM</th>
+                <th style="width: 80px;" class="col-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-manutencoes"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB: DOCUMENTOS (Prioridade 16) -->
+      <section id="tab-documentos" class="tab-content">
+        <div class="bar-controls">
+          <div class="bar-controls-left">
+            <span class="label-month-select">Vencimentos & Licenças:</span>
+          </div>
+          <div class="bar-controls-right">
+            <button class="btn-action btn-action-secondary" id="btn-export-doc"><span>⬇️</span> Exportar CSV</button>
+            <button class="btn-action btn-action-primary" id="btn-add-documento">+ Novo Documento</button>
+          </div>
+        </div>
+
+        <div class="section-title-wrap">
+          <h2 class="section-title"><span>📄</span> Controle de Documentação de Veículos e Motoristas</h2>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="table-documentos">
+            <thead>
+              <tr>
+                <th style="width: 180px;">Entidade / Placa</th>
+                <th style="width: 180px;">Documento</th>
+                <th style="width: 130px;">Data Emissão</th>
+                <th style="width: 130px;">Data Vencimento</th>
+                <th style="width: 140px;">Status / Alerta</th>
+                <th style="width: 80px;" class="col-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-documentos"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 5: RESUMO EXECUTIVO -->
       <section id="tab-resumo" class="tab-content">
         <div class="bar-controls no-print">
           <div class="bar-controls-left">
@@ -1479,9 +1586,7 @@
         </div>
       </section>
 
-      <!-- ==========================================
-          TAB 6: GRÁFICOS
-      =========================================== -->
+      <!-- TAB 6: GRÁFICOS -->
       <section id="tab-graficos" class="tab-content">
         <div class="bar-controls">
           <div class="bar-controls-left">
@@ -1536,7 +1641,10 @@
       motoristas: [],
       acoplamentos: {}, 
       kmData: {}, 
-      lancamentos: []
+      lancamentos: [],
+      abastecimentos: [],
+      manutencoes: [],
+      documentos: []
     };
 
     // =========================================================================
@@ -1727,6 +1835,7 @@
       loadAcoplamentosDaAPI();
       loadKmDaAPI();
       loadLancamentosDaAPI();
+      loadAbastecimentosDaAPI();
     }
 
     function promptNewMonth() {
@@ -2312,6 +2421,124 @@
     }
 
     // =========================================================================
+    // API E RENDERIZAÇÃO: ABASTECIMENTOS DETALHADOS (Prioridade 11)
+    // =========================================================================
+    async function loadAbastecimentosDaAPI() {
+      try {
+        const monthKey = getFirstDayOfMonth(state.currentMonth);
+        const res = await fetch(`${API_URL}/abastecimentos/${monthKey}`);
+        const data = await res.json();
+        state.abastecimentos = data;
+        renderAbastecimentos();
+      } catch (error) {
+        console.error('Erro ao carregar abastecimentos:', error);
+      }
+    }
+
+    function renderAbastecimentos() {
+      const tbody = document.getElementById('tbody-abastecimentos');
+      const tfoot = document.getElementById('tfoot-abastecimentos');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!state.abastecimentos || state.abastecimentos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhum abastecimento detalhado registrado neste mês.</td></tr>`;
+        if (tfoot) tfoot.innerHTML = '';
+        return;
+      }
+
+      let totLitros = 0;
+      let totValor = 0;
+
+      state.abastecimentos.forEach(a => {
+        const litros = Number(a.litros) || 0;
+        const total = Number(a.valor_total) || 0;
+        const vLitro = Number(a.valor_litro) || 0;
+        totLitros += litros;
+        totValor += total;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${a.data_abastecimento ? new Date(a.data_abastecimento).toLocaleDateString('pt-BR') : '-'}</td>
+          <td><span class="vehicle-tag">${a.placa}</span></td>
+          <td>${a.posto || '-'}</td>
+          <td>${a.cidade || '-'}</td>
+          <td class="col-num">${formatNum(a.km_atual)} km</td>
+          <td class="col-num">${formatNum(litros, 2)} L</td>
+          <td class="col-num">${formatBRL(vLitro)}</td>
+          <td class="col-num"><strong>${formatBRL(total)}</strong></td>
+          <td>${a.nota_fiscal || '-'}</td>
+          <td class="col-center">
+            <button class="btn-action btn-action-danger" onclick="deleteAbastecimento('${a.id}')">Excluir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      if (tfoot) {
+        tfoot.innerHTML = `
+          <tr>
+            <td colspan="5"><strong>TOTAIS DO MÊS</strong></td>
+            <td class="col-num"><strong>${formatNum(totLitros, 2)} L</strong></td>
+            <td></td>
+            <td class="col-num"><strong>${formatBRL(totValor)}</strong></td>
+            <td colspan="2"></td>
+          </tr>
+        `;
+      }
+    }
+
+    async function addAbastecimentoRow() {
+      const placa = prompt('Placa do Cavalo / Veículo:');
+      if (!placa) return;
+      const posto = prompt('Nome do Posto:') || 'Posto Rota';
+      const cidade = prompt('Cidade:') || 'Contagem';
+      const kmAtual = prompt('KM Atual do Veículo:') || '0';
+      const litros = prompt('Quantidade de Litros abastecidos:');
+      if (!litros) return;
+      const valorTotal = prompt('Valor Total Pago (R$):');
+      if (!valorTotal) return;
+      const nf = prompt('Número da Nota Fiscal (Opcional):') || '';
+
+      const nLitros = parsePtNumber(litros);
+      const nTotal = parsePtNumber(valorTotal);
+      const nValorLitro = nLitros > 0 ? (nTotal / nLitros) : 0;
+
+      const payload = {
+        placa: placa.toUpperCase(),
+        data_abastecimento: getFirstDayOfMonth(state.currentMonth),
+        posto,
+        cidade,
+        km_atual: Number(kmAtual) || 0,
+        litros: nLitros,
+        valor_litro: nValorLitro,
+        valor_total: nTotal,
+        nota_fiscal: nf
+      };
+
+      try {
+        await fetch(`${API_URL}/abastecimentos`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        loadAbastecimentosDaAPI();
+      } catch (err) {
+        console.error('Erro ao salvar abastecimento:', err);
+      }
+    }
+
+    async function deleteAbastecimento(id) {
+      if (!confirm('Deseja excluir este registro de abastecimento?')) return;
+      try {
+        await fetch(`${API_URL}/abastecimentos/${id}`, { method: 'DELETE' });
+        loadAbastecimentosDaAPI();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // =========================================================================
     // API E RENDERIZAÇÃO: FINANCEIRO (DRE)
     // =========================================================================
     async function loadLancamentosDaAPI() {
@@ -2546,6 +2773,166 @@
     }
 
     // =========================================================================
+    // API E RENDERIZAÇÃO: MANUTENÇÃO (Prioridade 15)
+    // =========================================================================
+    async function loadManutencoesDaAPI() {
+      try {
+        const res = await fetch(`${API_URL}/manutencoes`);
+        const data = await res.json();
+        state.manutencoes = data;
+        renderManutencoes();
+      } catch (error) {
+        console.error('Erro ao carregar manutenções:', error);
+      }
+    }
+
+    function renderManutencoes() {
+      const tbody = document.getElementById('tbody-manutencoes');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!state.manutencoes || state.manutencoes.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhuma manutenção registrada no momento.</td></tr>`;
+        return;
+      }
+
+      state.manutencoes.forEach(m => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="vehicle-tag">${m.placa}</span></td>
+          <td>${m.tipo}</td>
+          <td>${m.descricao}</td>
+          <td>${m.fornecedor || '-'}</td>
+          <td class="col-num">${formatBRL(m.valor)}</td>
+          <td class="col-num">${formatNum(m.km)} km</td>
+          <td class="col-num">${m.proxima_manutencao_km ? formatNum(m.proxima_manutencao_km) + ' km' : '-'}</td>
+          <td class="col-center">
+            <button class="btn-action btn-action-danger" onclick="deleteManutencao('${m.id}')">Excluir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function addManutencaoRow() {
+      const placa = prompt('Placa do Veículo:');
+      if (!placa) return;
+      const desc = prompt('Descrição dos Serviços / Peças:');
+      if (!desc) return;
+      const fornecedor = prompt('Oficina / Fornecedor:') || 'Oficina Geral';
+      const valor = prompt('Valor do Serviço (R$):') || '0';
+      const kmAtual = prompt('KM Atual do Veículo:') || '0';
+      const proxKm = prompt('Próximo KM Recomendado:') || '0';
+
+      const payload = {
+        placa: placa.toUpperCase(),
+        tipo: 'Preventiva',
+        descricao: desc,
+        fornecedor,
+        valor: parsePtNumber(valor),
+        km: Number(kmAtual) || 0,
+        proxima_manutencao_km: Number(proxKm) || 0
+      };
+
+      try {
+        await fetch(`${API_URL}/manutencoes`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        loadManutencoesDaAPI();
+      } catch (err) {
+        console.error('Erro ao cadastrar manutenção:', err);
+      }
+    }
+
+    async function deleteManutencao(id) {
+      if (!confirm('Deseja excluir este registro de manutenção?')) return;
+      try {
+        await fetch(`${API_URL}/manutencoes/${id}`, { method: 'DELETE' });
+        loadManutencoesDaAPI();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // =========================================================================
+    // API E RENDERIZAÇÃO: DOCUMENTOS (Prioridade 16)
+    // =========================================================================
+    async function loadDocumentosDaAPI() {
+      try {
+        const res = await fetch(`${API_URL}/documentos`);
+        const data = await res.json();
+        state.documentos = data;
+        renderDocumentos();
+      } catch (error) {
+        console.error('Erro ao carregar documentos:', error);
+      }
+    }
+
+    function renderDocumentos() {
+      const tbody = document.getElementById('tbody-documentos');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!state.documentos || state.documentos.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhum documento ou certidão cadastrada.</td></tr>`;
+        return;
+      }
+
+      state.documentos.forEach(d => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${d.entidade_nome}</strong></td>
+          <td>${d.tipo_documento}</td>
+          <td>${d.data_emissao ? new Date(d.data_emissao).toLocaleDateString('pt-BR') : '-'}</td>
+          <td>${d.data_vencimento ? new Date(d.data_vencimento).toLocaleDateString('pt-BR') : '-'}</td>
+          <td><span class="badge-pos">🟢 Válido</span></td>
+          <td class="col-center">
+            <button class="btn-action btn-action-danger" onclick="deleteDocumento('${d.id}')">Excluir</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function addDocumentoRow() {
+      const nome = prompt('Nome ou Placa da Entidade:');
+      if (!nome) return;
+      const tipo = prompt('Tipo de Documento (CNH, CRLV, Tacógrafo, Seguro, ANTT):');
+      if (!tipo) return;
+
+      const payload = {
+        entidade_tipo: 'Veiculo',
+        entidade_nome: nome.toUpperCase(),
+        tipo_documento: tipo,
+        data_emissao: new Date().toISOString().substring(0, 10),
+        data_vencimento: new Date(Date.now() + 45 * 86400000).toISOString().substring(0, 10)
+      };
+
+      try {
+        await fetch(`${API_URL}/documentos`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        loadDocumentosDaAPI();
+      } catch (err) {
+        console.error('Erro ao salvar documento:', err);
+      }
+    }
+
+    async function deleteDocumento(id) {
+      if (!confirm('Deseja excluir este documento?')) return;
+      try {
+        await fetch(`${API_URL}/documentos/${id}`, { method: 'DELETE' });
+        loadDocumentosDaAPI();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // =========================================================================
     // API E RENDERIZAÇÃO: RESUMO EXECUTIVO
     // =========================================================================
     function renderResumo() {
@@ -2627,10 +3014,8 @@
           let d = 0;
           
           state.lancamentos.forEach(l => {
-            if (l.placa === c.placa) {
-              const v = Number(l.valor) || 0;
-              if (l.tipo === 'Receita') r += v;
-              if (l.tipo === 'Despesa') d += v;
+            if (l.placa === c.placa && l.tipo === 'Receita') {
+              r += Number(l.valor) || 0;
             }
           });
           
@@ -2652,7 +3037,7 @@
         if (isCurrent) tr.style.backgroundColor = '#eff6ff';
         
         tr.innerHTML = `
-          <td><strong>${m}</strong> ${isCurrent ? '<span class="badge-pos" style="font-size:0.7rem; margin-left:6px;">Atual</span>' : ''}</td>
+          <td><strong>${m}</strong>${isCurrent ? '<span class="badge-pos" style="font-size:0.7rem; margin-left:6px;">Atual</span>' : ''}</td>
           <td class="col-num">${formatBRL(mRec)}</td>
           <td class="col-num">${formatBRL(mDesp)}</td>
           <td class="col-num ${mRes >= 0 ? 'pos' : 'neg'}">${formatBRL(mRes)}</td>
@@ -2706,7 +3091,7 @@
         window.skipChart.bar(elRes, { labels: labels, values: valsRes, color: '#0f2a4a', format: 'brl' });
       }
 
-      // Montando gráfico de Despesas (Donut)
+      // Gráfico de Despesas (Donut)
       const elDesp = document.getElementById('chart-despesas');
       if (elDesp) {
         elDesp.innerHTML = '';
@@ -2748,7 +3133,7 @@
         });
       }
 
-      // Montando Gráfico de Evolução (Linha)
+      // Gráfico de Evolução (Linha)
       const elEvol = document.getElementById('chart-evolucao');
       if (elEvol) {
         elEvol.innerHTML = '';
@@ -2778,7 +3163,10 @@
       renderCadastroMotoristas();
       renderAcoplamento();
       renderKm();
+      renderAbastecimentos();
       renderDre();
+      renderManutencoes();
+      renderDocumentos();
       renderResumo();
       renderGraficos();
     }
@@ -2791,6 +3179,9 @@
         loadAcoplamentosDaAPI();
         loadKmDaAPI();
         loadLancamentosDaAPI();
+        loadAbastecimentosDaAPI();
+        loadManutencoesDaAPI();
+        loadDocumentosDaAPI();
       });
     }
 
@@ -2805,7 +3196,8 @@
           
           btn.classList.add('active');
           const targetId = btn.getAttribute('data-tab');
-          document.getElementById(targetId).classList.add('active');
+          const targetSection = document.getElementById(targetId);
+          if (targetSection) targetSection.classList.add('active');
           
           if (targetId === 'tab-graficos') {
             setTimeout(renderGraficos, 50);
@@ -2820,7 +3212,8 @@
           
           btn.classList.add('active');
           const targetId = btn.getAttribute('data-subtab');
-          document.getElementById(targetId).style.display = 'block';
+          const targetSub = document.getElementById(targetId);
+          if (targetSub) targetSub.style.display = 'block';
         });
       });
       
@@ -2835,7 +3228,10 @@
       document.getElementById('btn-add-carreta').onclick = addCarreta;
       document.getElementById('btn-add-motorista').onclick = addMotorista;
       document.getElementById('btn-add-acoplamento').onclick = addAcoplamentoRow;
+      document.getElementById('btn-add-abastecimento').onclick = addAbastecimentoRow;
       document.getElementById('btn-add-lancamento').onclick = addLancamentoRow;
+      document.getElementById('btn-add-manutencao').onclick = addManutencaoRow;
+      document.getElementById('btn-add-documento').onclick = addDocumentoRow;
       
       document.getElementById('btn-print-report').addEventListener('click', () => {
         const resumoBtn = document.querySelector('[data-tab="tab-resumo"]');
@@ -2843,16 +3239,29 @@
         window.print();
       });
 
-      // Binders de Exportação CSV
+      // Exportações CSV
       document.getElementById('btn-export-km')?.addEventListener('click', () => {
         const month = state.currentMonth.replace('/', '_');
         exportTableToCSV(`Relatorio_KM_${month}.csv`, 'table-km-mensal');
+      });
+
+      document.getElementById('btn-export-abast')?.addEventListener('click', () => {
+        const month = state.currentMonth.replace('/', '_');
+        exportTableToCSV(`Relatorio_Abastecimentos_${month}.csv`, 'table-abastecimentos');
       });
 
       document.getElementById('btn-export-dre')?.addEventListener('click', () => {
         const month = state.currentMonth.replace('/', '_');
         const plate = state.activeDrePlate || 'Geral';
         exportTableToCSV(`Relatorio_DRE_${plate}_${month}.csv`, 'table-dre-lancamentos');
+      });
+
+      document.getElementById('btn-export-manut')?.addEventListener('click', () => {
+        exportTableToCSV('Relatorio_Manutencoes.csv', 'table-manutencoes');
+      });
+
+      document.getElementById('btn-export-doc')?.addEventListener('click', () => {
+        exportTableToCSV('Relatorio_Documentos.csv', 'table-documentos');
       });
     });
   </script>
