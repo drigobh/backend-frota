@@ -1,46 +1,64 @@
-const { Pool } = require('pg');
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const db = require('../database');
 
-async function routes(fastify, options) {
-  // Listar abastecimentos
-  fastify.get('/api/abastecimentos/:mes', async (req, reply) => {
-    const { mes } = req.params;
+module.exports = async function (fastify, options) {
+
+  fastify.get('/api/abastecimentos/:mes', {
+    preHandler: [fastify.autenticar],
+  }, async (request, reply) => {
+    const { mes } = request.params;
     try {
-      const result = await pool.query(
-        'SELECT * FROM abastecimentos WHERE TO_CHAR(data_abastecimento, \'YYYY-MM\') = TO_CHAR(TO_DATE($1, \'YYYY-MM-DD\'), \'YYYY-MM\') ORDER BY data_abastecimento DESC',
-        [mes]
-      );
+      const result = await db.query(`
+        SELECT * FROM abastecimentos 
+        WHERE TO_CHAR(data_abastecimento, 'YYYY-MM') = TO_CHAR(TO_DATE($1, 'YYYY-MM-DD'), 'YYYY-MM')
+          AND deleted_at IS NULL
+        ORDER BY data_abastecimento DESC
+      `, [mes]);
       return result.rows;
     } catch (err) {
+      fastify.log.error(err);
       return reply.code(500).send({ erro: err.message });
     }
   });
 
-  // Criar abastecimento
-  fastify.post('/api/abastecimentos', async (req, reply) => {
-    const { placa, data_abastecimento, posto, cidade, km_atual, litros, valor_litro, valor_total, nota_fiscal } = req.body;
+  fastify.post('/api/abastecimentos', {
+    preHandler: [fastify.autenticar],
+  }, async (request, reply) => {
+    const {
+      placa, data_abastecimento, posto, cidade, km_atual,
+      litros, valor_litro, valor_total, nota_fiscal,
+    } = request.body;
+
     try {
-      const result = await pool.query(
-        `INSERT INTO abastecimentos (placa, data_abastecimento, posto, cidade, km_atual, litros, valor_litro, valor_total, nota_fiscal) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
-        [placa, data_abastecimento, posto, cidade, km_atual, litros, valor_litro, valor_total, nota_fiscal]
+      const result = await db.query(`
+        INSERT INTO abastecimentos 
+          (placa, data_abastecimento, posto, cidade, km_atual, litros, 
+           valor_litro, valor_total, nota_fiscal, created_by) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) 
+        RETURNING *`,
+        [placa, data_abastecimento, posto, cidade, km_atual, litros,
+         valor_litro, valor_total, nota_fiscal, request.user.id]
       );
       return reply.code(201).send(result.rows[0]);
     } catch (err) {
+      fastify.log.error(err);
       return reply.code(500).send({ erro: err.message });
     }
   });
 
-  // Deletar abastecimento
-  fastify.delete('/api/abastecimentos/:id', async (req, reply) => {
-    const { id } = req.params;
+  fastify.delete('/api/abastecimentos/:id', {
+    preHandler: [fastify.autenticar],
+  }, async (request, reply) => {
+    const { id } = request.params;
     try {
-      await pool.query('DELETE FROM abastecimentos WHERE id = $1', [id]);
+      await db.query(
+        `UPDATE abastecimentos SET deleted_at = CURRENT_TIMESTAMP, deleted_by = $1 WHERE id = $2`,
+        [request.user.id, id]
+      );
       return { sucesso: true };
     } catch (err) {
+      fastify.log.error(err);
       return reply.code(500).send({ erro: err.message });
     }
   });
-}
 
-module.exports = routes;
+};
