@@ -993,6 +993,132 @@
       align-items: center;
       justify-content: center;
     }
+    
+    /* ========================================================================
+       SIDEBAR RETRÁTIL COM SUBMENUS (Fase 3 — Etapa 2)
+       ======================================================================== */
+    .app-sidebar {
+      width: 280px;
+      transition: width 0.25s ease;
+    }
+
+    .app-sidebar.collapsed {
+      width: 64px;
+    }
+
+    .app-sidebar.collapsed .sidebar-brand h1,
+    .app-sidebar.collapsed .sidebar-brand p,
+    .app-sidebar.collapsed .nav-group-title,
+    .app-sidebar.collapsed .nav-tab-btn .nav-label,
+    .app-sidebar.collapsed .nav-tab-btn .nav-arrow,
+    .app-sidebar.collapsed .nav-submenu {
+      display: none;
+    }
+
+    .app-sidebar.collapsed .nav-tab-btn {
+      justify-content: center;
+      padding: 0.65rem 0;
+    }
+
+    .app-sidebar.collapsed .sidebar-brand {
+      justify-content: center;
+      padding: 1.25rem 0.5rem;
+    }
+
+    .sidebar-brand {
+      justify-content: space-between;
+    }
+
+    .sidebar-toggle-btn {
+      background: rgba(255,255,255,0.08);
+      border: none;
+      color: #cbd5e1;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+    }
+
+    .sidebar-toggle-btn:hover {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+    }
+
+    .nav-tab-btn {
+      position: relative;
+    }
+
+    .nav-tab-btn .nav-arrow {
+      margin-left: auto;
+      font-size: 0.7rem;
+      transition: transform 0.2s ease;
+      opacity: 0.6;
+    }
+
+    .nav-tab-btn.expanded .nav-arrow {
+      transform: rotate(90deg);
+    }
+
+    .nav-submenu {
+      display: none;
+      flex-direction: column;
+      padding-left: 1.5rem;
+      margin-bottom: 2px;
+    }
+
+    .nav-submenu.open {
+      display: flex;
+    }
+
+    .nav-submenu .nav-tab-btn {
+      font-size: 0.83rem;
+      padding: 0.5rem 0.85rem;
+      color: #94a3b8;
+    }
+
+    .nav-submenu .nav-tab-btn:hover {
+      color: #fff;
+      background-color: rgba(255,255,255,0.06);
+    }
+
+    .nav-submenu .nav-tab-btn.active {
+      color: #fff;
+      background-color: #2563eb;
+      font-weight: 600;
+    }
+
+    .app-wrapper {
+      transition: margin-left 0.25s ease;
+    }
+
+    .app-sidebar.collapsed ~ .app-wrapper {
+      margin-left: 64px;
+    }
+
+    @media (max-width: 768px) {
+      .app-sidebar {
+        width: 64px;
+      }
+      .app-sidebar .sidebar-brand h1,
+      .app-sidebar .sidebar-brand p,
+      .app-sidebar .nav-group-title,
+      .app-sidebar .nav-tab-btn .nav-label,
+      .app-sidebar .nav-tab-btn .nav-arrow,
+      .app-sidebar .nav-submenu {
+        display: none;
+      }
+      .app-sidebar .nav-tab-btn {
+        justify-content: center;
+      }
+      .app-wrapper {
+        margin-left: 64px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1011,54 +1137,46 @@
   </div>
 
   <!-- Sidebar Retrátil (Prioridade 1) -->
-  <aside class="app-sidebar no-print">
+    <aside class="app-sidebar no-print">
     <div class="sidebar-brand">
-      <div class="sidebar-brand-icon">🚛</div>
+      <div class="sidebar-brand-icon">C</div>
       <div>
         <h1>Caderninho</h1>
-        <p>Gestão de Frota Corporativa</p>
+        <p>Gestao de Frota</p>
       </div>
+      <button class="sidebar-toggle-btn" id="sidebar-toggle" title="Recolher/Expandir menu">=</button>
     </div>
     <nav class="sidebar-nav" role="tablist">
-      <div class="nav-group-title">Menu Principal</div>
-      <button class="nav-tab-btn active" data-tab="tab-dashboard">
-        <span>🏠</span> Dashboard
-      </button>
-
-      <div class="nav-group-title">Cadastros</div>
-      <button class="nav-tab-btn" data-tab="tab-cadastro">
-        <span>📋</span> Gestão de Cadastros
-      </button>
-
-      <div class="nav-group-title">Operação</div>
-      <button class="nav-tab-btn" data-tab="tab-acoplamento">
-        <span>🔗</span> Acoplamentos
-      </button>
-      <button class="nav-tab-btn" data-tab="tab-km">
-        <span>🛣️</span> KM Mensal
-      </button>
-      <button class="nav-tab-btn" data-tab="tab-abastecimentos">
-        <span>⛽</span> Abastecimentos
-      </button>
-
-      <div class="nav-group-title">Financeiro & Frota</div>
-      <button class="nav-tab-btn" data-tab="tab-dre" id="nav-tab-dre">
-        <span>📊</span> DRE por Veículo
-      </button>
-      <button class="nav-tab-btn" data-tab="tab-manutencoes">
-        <span>🔧</span> Manutenção
-      </button>
-      <button class="nav-tab-btn" data-tab="tab-documentos">
-        <span>📄</span> Documentos
-      </button>
-
-      <div class="nav-group-title">Indicadores</div>
-      <button class="nav-tab-btn" data-tab="tab-resumo" id="nav-tab-resumo">
-        <span>📈</span> Resumo Executivo
-      </button>
-      <button class="nav-tab-btn" data-tab="tab-graficos" id="nav-tab-graficos">
-        <span>📉</span> Gráficos & Evolução
-      </button>
+      <button class="nav-tab-btn active" data-tab="tab-dashboard"><span>&#127968;</span><span class="nav-label">Dashboard</span></button>
+      <button class="nav-tab-btn nav-group-toggle" data-group="grupo-cadastros"><span>&#128203;</span><span class="nav-label">Cadastros</span><span class="nav-arrow">&#9654;</span></button>
+      <div class="nav-submenu" id="grupo-cadastros">
+        <button class="nav-tab-btn" data-tab="tab-cadastro" data-subtab-target="subtab-cavalos"><span>&#128667;</span><span class="nav-label">Veiculos</span></button>
+        <button class="nav-tab-btn" data-tab="tab-cadastro" data-subtab-target="subtab-carretas"><span>&#128666;</span><span class="nav-label">Carretas</span></button>
+        <button class="nav-tab-btn" data-tab="tab-cadastro" data-subtab-target="subtab-motoristas"><span>&#128100;</span><span class="nav-label">Motoristas</span></button>
+      </div>
+      <button class="nav-tab-btn nav-group-toggle" data-group="grupo-operacao"><span>&#128279;</span><span class="nav-label">Operacao</span><span class="nav-arrow">&#9654;</span></button>
+      <div class="nav-submenu" id="grupo-operacao">
+        <button class="nav-tab-btn" data-tab="tab-acoplamento"><span>&#128279;</span><span class="nav-label">Acoplamentos</span></button>
+        <button class="nav-tab-btn" data-tab="tab-km"><span>&#128739;</span><span class="nav-label">KM Mensal</span></button>
+        <button class="nav-tab-btn" data-tab="tab-abastecimentos"><span>&#9981;</span><span class="nav-label">Abastecimentos</span></button>
+      </div>
+      <button class="nav-tab-btn nav-group-toggle" data-group="grupo-financeiro"><span>&#128176;</span><span class="nav-label">Financeiro</span><span class="nav-arrow">&#9654;</span></button>
+      <div class="nav-submenu" id="grupo-financeiro">
+        <button class="nav-tab-btn" data-tab="tab-dre" id="nav-tab-dre"><span>&#128202;</span><span class="nav-label">DRE por Veiculo</span></button>
+        <button class="nav-tab-btn" data-tab="tab-manutencoes"><span>&#128295;</span><span class="nav-label">Manutencao</span></button>
+        <button class="nav-tab-btn" data-tab="tab-documentos"><span>&#128196;</span><span class="nav-label">Documentos</span></button>
+      </div>
+      <button class="nav-tab-btn nav-group-toggle" data-group="grupo-indicadores"><span>&#128200;</span><span class="nav-label">Indicadores</span><span class="nav-arrow">&#9654;</span></button>
+      <div class="nav-submenu" id="grupo-indicadores">
+        <button class="nav-tab-btn" data-tab="tab-resumo" id="nav-tab-resumo"><span>&#128200;</span><span class="nav-label">Resumo Executivo</span></button>
+        <button class="nav-tab-btn" data-tab="tab-graficos" id="nav-tab-graficos"><span>&#128201;</span><span class="nav-label">Graficos</span></button>
+      </div>
+      <button class="nav-tab-btn nav-group-toggle" data-group="grupo-admin"><span>&#128274;</span><span class="nav-label">Administracao</span><span class="nav-arrow">&#9654;</span></button>
+      <div class="nav-submenu" id="grupo-admin">
+        <button class="nav-tab-btn" data-tab="tab-usuarios" id="nav-tab-usuarios"><span>&#128101;</span><span class="nav-label">Usuarios</span></button>
+        <button class="nav-tab-btn" data-tab="tab-perfis" id="nav-tab-perfis"><span>&#128737;</span><span class="nav-label">Perfis</span></button>
+        <button class="nav-tab-btn" data-tab="tab-auditoria" id="nav-tab-auditoria"><span>&#128373;</span><span class="nav-label">Auditoria</span></button>
+      </div>
     </nav>
   </aside>
 
