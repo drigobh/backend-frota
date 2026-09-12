@@ -14,7 +14,7 @@ module.exports = async function (fastify, options) {
       // 1. Documentos vencendo (próximos 30 dias)
       const docsVencendo = await db.query(`
         SELECT entidade_nome, tipo_documento, data_vencimento,
-               EXTRACT(DAY FROM (data_vencimento - CURRENT_DATE)) AS dias_restantes
+                              (data_vencimento - CURRENT_DATE) AS dias_restantes
         FROM documentos
         WHERE data_vencimento BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '30 days'
         ORDER BY data_vencimento ASC
