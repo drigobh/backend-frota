@@ -1173,7 +1173,7 @@
       </div>
       <button class="nav-tab-btn nav-group-toggle" data-group="grupo-admin"><span>&#128274;</span><span class="nav-label">Administracao</span><span class="nav-arrow">&#9654;</span></button>
       <div class="nav-submenu" id="grupo-admin">
-        <button class="nav-tab-btn" data-tab="tab-usuarios" id="nav-tab-usuarios"><span>&#128101;</span><span class="nav-label">Usuarios</span></button>
+        <button class="nav-tab-btn" data-tab="tab-usuarios" id="nav-tab-usuarios" onclick="setTimeout(loadUsuariosDaAPI, 100)"><span>&#128101;</span><span class="nav-label">Usuarios</span></button>
         <button class="nav-tab-btn" data-tab="tab-perfis" id="nav-tab-perfis"><span>&#128737;</span><span class="nav-label">Perfis</span></button>
         <button class="nav-tab-btn" data-tab="tab-auditoria" id="nav-tab-auditoria"><span>&#128373;</span><span class="nav-label">Auditoria</span></button>
       </div>
@@ -3388,6 +3388,7 @@
         loadAbastecimentosDaAPI();
         loadManutencoesDaAPI();
         loadDocumentosDaAPI();
+        loadUsuariosDaAPI();
       });
     }
 
@@ -3692,6 +3693,22 @@
         console.error(err);
       }
     }
+    // FIX_USUARIOS_LOAD_APLICADO
+    // =========================================================================
+    // Binds diretos para as telas de Administracao
+    // =========================================================================
+    setTimeout(() => {
+      document.querySelectorAll('[data-tab="tab-usuarios"]').forEach(btn => {
+        btn.addEventListener('click', () => setTimeout(loadUsuariosDaAPI, 100));
+      });
+      document.querySelectorAll('[data-tab="tab-perfis"]').forEach(btn => {
+        btn.addEventListener('click', () => setTimeout(typeof loadPerfisDaAPI === 'function' ? loadPerfisDaAPI : (() => {}), 100));
+      });
+      document.querySelectorAll('[data-tab="tab-auditoria"]').forEach(btn => {
+        btn.addEventListener('click', () => setTimeout(typeof loadAuditoriaDaAPI === 'function' ? loadAuditoriaDaAPI : (() => {}), 100));
+      });
+    }, 500);
+
     // =========================================================================
     // SIDEBAR RETRATIL - Toggle e submenus (Fase 3 - Etapa 2.3)
     // =========================================================================
