@@ -76,6 +76,10 @@ fastify.register(require('./routes/dashboard'));
 fastify.register(require('./routes/auth'));
 fastify.register(require('./routes/abastecimentos'));
 fastify.register(require('./routes/frota_avancada'));
+fastify.register(require('./routes/usuarios'));
+fastify.register(require('./routes/perfis'));
+fastify.register(require('./routes/auditoria'));
+fastify.register(require('./routes/alertas'));
 
 // =========================================================================
 // ROTA PRINCIPAL — Serve o index.html
