@@ -3573,7 +3573,6 @@
     }
 
     function renderUsuarios(lista) {
-      // RENDER_USUARIOS_PREMIUM
       const tbody = document.getElementById('tbody-usuarios');
       if (!tbody) return;
       tbody.innerHTML = '';
@@ -3583,7 +3582,37 @@
         return;
       }
 
-      async function abrirModalUsuarioNovo() {
+      lista.forEach((u, idx) => {
+        const ultimo = u.ultimo_login ? new Date(u.ultimo_login).toLocaleDateString('pt-BR') : '-';
+        const statusBadge = u.ativo
+          ? '<span class="badge-pos">Ativo</span>'
+          : '<span class="badge-neg">Inativo</span>';
+
+        const btnDesativar = u.ativo
+          ? `<button class="action-btn action-btn-delete" title="Desativar usuario" onclick="desativarUsuario('${u.id}', '${u.nome}')">&#128465;&#65039;</button>`
+          : `<button class="action-btn action-btn-delete action-btn-disabled" title="Usuario ja inativo" disabled>&#128465;&#65039;</button>`;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><strong>${u.nome}</strong></td>
+          <td>${u.email}</td>
+          <td>${u.perfil || '-'}</td>
+          <td>${ultimo}</td>
+          <td class="col-center">${statusBadge}</td>
+          <td class="col-center">
+            <div class="action-group">
+              <button class="action-btn action-btn-edit" title="Editar usuario" onclick="abrirModalUsuarioEditar('${u.id}')">&#9999;&#65039;</button>
+              <button class="action-btn action-btn-key" title="Resetar senha" onclick="resetarSenhaUsuario('${u.id}', '${u.nome}')">&#128273;</button>
+              ${btnDesativar}
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function abrirModalUsuarioNovo() {
       modalUsuarioEditandoId = null;
       document.getElementById('modal-usuario-title').textContent = 'Novo Usuario';
       document.getElementById('modal-user-nome').value = '';
