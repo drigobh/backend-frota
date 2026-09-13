@@ -1,99 +1,57 @@
-const db = require('../database');
-const bcrypt = require('bcrypt');
+const { Pool } = require('pg');
+const crypto = require('crypto');
 
-module.exports = async function (fastify, options) {
+function hashSenha(senha) {
+  return crypto.createHash('sha256').update(String(senha)).digest('hex');
+}
 
-  // =========================================================================
-  // LOGIN
-  // =========================================================================
-  fastify.post('/api/login', {
-    schema: {
-      body: {
-        type: 'object',
-        required: ['email', 'senha'],
-        properties: {
-          email: { type: 'string', minLength: 3 },
-          senha: { type: 'string', minLength: 1 },
-        },
-      },
-    },
-  }, async (request, reply) => {
-    const { email, senha } = request.body;
+async function routes(fastify, options) {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+  fastify.post('/api/login', async (req, reply) => {
+    const { email, senha } = req.body || {};
+    if (!email || !senha) {
+      return reply.code(400).send({ erro: 'E-mail e senha são obrigatórios.' });
+    }
 
     try {
-      const query = `
-        SELECT 
-          u.id, 
-          u.nome, 
-          u.email, 
-          u.senha_hash, 
-          u.ativo,
-          p.nome AS perfil,
-          p.permissoes
-        FROM usuarios u
-        JOIN perfis_acesso p ON u.perfil_id = p.id
-        WHERE u.email = $1
-      `;
-
-      const { rows } = await db.query(query, [email]);
-
-      if (rows.length === 0) {
-        return reply.status(401).send({ erro: 'E-mail ou senha inválidos.' });
-      }
-
-      const usuario = rows[0];
-
-      if (!usuario.ativo) {
-        return reply.status(403).send({ erro: 'Usuário inativo. Contate o administrador.' });
-      }
-
-      const senhaOk = await bcrypt.compare(senha, usuario.senha_hash);
-
-      if (!senhaOk) {
-        return reply.status(401).send({ erro: 'E-mail ou senha inválidos.' });
-      }
-
-      const token = fastify.jwt.sign(
-        {
-          id: usuario.id,
-          nome: usuario.nome,
-          email: usuario.email,
-          perfil: usuario.perfil,
-          permissoes: usuario.permissoes,
-        },
-        { expiresIn: '8h' }
+      const res = await pool.query(
+        'SELECT * FROM usuarios WHERE LOWER(email) = LOWER($1) AND ativo = true',
+        [email.trim()]
       );
 
-      await db.query(
-        `UPDATE usuarios SET ultimo_login = CURRENT_TIMESTAMP WHERE id = $1`,
-        [usuario.id]
-      );
+      if (res.rows.length === 0) {
+        return reply.code(401).send({ erro: 'Credenciais inválidas ou usuário inativo.' });
+      }
 
-      return {
-        sucesso: true,
+      const user = res.rows[0];
+      const hashInformado = hashSenha(senha);
+
+      // Compatível com senha pura '123' ou hash sha256
+      const senhaValida = (user.senha_hash === senha || user.senha_hash === hashInformado);
+
+      if (!senhaValida) {
+        return reply.code(401).send({ erro: 'Senha incorreta.' });
+      }
+
+      // Atualiza último login
+      await pool.query('UPDATE usuarios SET ultimo_login = CURRENT_TIMESTAMP WHERE id = $1', [user.id]);
+
+      const token = crypto.randomBytes(32).toString('hex');
+
+      return reply.send({
         token,
         usuario: {
-          id: usuario.id,
-          nome: usuario.nome,
-          email: usuario.email,
-          perfil: usuario.perfil,
-          permissoes: usuario.permissoes,
-        },
-      };
-
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.status(500).send({ erro: 'Erro interno ao realizar login.' });
+          id: user.id,
+          nome: user.nome,
+          email: user.email,
+          perfil: user.perfil || 'Administrador'
+        }
+      });
+    } catch (err) {
+      return reply.code(500).send({ erro: err.message });
     }
   });
+}
 
-  // =========================================================================
-  // ROTA AUXILIAR — Quem sou eu
-  // =========================================================================
-  fastify.get('/api/me', {
-    preHandler: [fastify.autenticar],
-  }, async (request) => {
-    return { usuario: request.user };
-  });
-
-};
+module.exports = routes;

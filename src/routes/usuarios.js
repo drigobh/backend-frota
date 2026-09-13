@@ -1,220 +1,133 @@
-const db = require('../database');
-const bcrypt = require('bcrypt');
+const { Pool } = require('pg');
+const crypto = require('crypto');
 
-module.exports = async function (fastify, options) {
-
-  // =========================================================================
-  // LISTAR USUÁRIOS
-  // =========================================================================
-  fastify.get('/api/usuarios', {
-    preHandler: [fastify.autenticar],
-  }, async (request, reply) => {
-    try {
-      const { rows } = await db.query(`
-        SELECT 
-          u.id, u.nome, u.email, u.ativo,
-          u.ultimo_login, u.created_at,
-          p.nome AS perfil,
-          p.id AS perfil_id
-        FROM usuarios u
-        LEFT JOIN perfis_acesso p ON u.perfil_id = p.id
-        ORDER BY u.created_at ASC
-      `);
-      return rows;
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.status(500).send({ erro: 'Erro ao listar usuários.' });
-    }
-  });
-
-  // =========================================================================
-  // BUSCAR USUÁRIO POR ID
-  // =========================================================================
-  fastify.get('/api/usuarios/:id', {
-    preHandler: [fastify.autenticar],
-  }, async (request, reply) => {
-    try {
-      const { rows } = await db.query(`
-        SELECT 
-          u.id, u.nome, u.email, u.ativo,
-          u.ultimo_login, u.created_at,
-          p.nome AS perfil,
-          p.id AS perfil_id
-        FROM usuarios u
-        LEFT JOIN perfis_acesso p ON u.perfil_id = p.id
-        WHERE u.id = $1
-      `, [request.params.id]);
-
-      if (rows.length === 0) {
-        return reply.status(404).send({ erro: 'Usuário não encontrado.' });
-      }
-      return rows[0];
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.status(500).send({ erro: 'Erro ao buscar usuário.' });
-    }
-  });
-
-  // =========================================================================
-  // CRIAR USUÁRIO
-  // =========================================================================
-  fastify.post('/api/usuarios', {
-    preHandler: [fastify.autenticar],
-    schema: {
-      body: {
-        type: 'object',
-        required: ['nome', 'email', 'senha', 'perfil_id'],
-        properties: {
-          nome: { type: 'string', minLength: 2 },
-          email: { type: 'string', minLength: 5 },
-          senha: { type: 'string', minLength: 6 },
-          perfil_id: { type: 'string' },
-          filial_id: { type: 'string' },
-        },
-      },
-    },
-  }, async (request, reply) => {
-    const { nome, email, senha, perfil_id, filial_id } = request.body;
-
-    try {
-      const existe = await db.query(
-        `SELECT id FROM usuarios WHERE email = $1`,
-        [email]
-      );
-      if (existe.rows.length > 0) {
-        return reply.status(409).send({ erro: 'E-mail já cadastrado.' });
-      }
-
-      const senha_hash = await bcrypt.hash(senha, 12);
-
-      const { rows } = await db.query(
-        `INSERT INTO usuarios (nome, email, senha_hash, perfil_id, filial_id)
-         VALUES ($1, $2, $3, $4, $5)
-         RETURNING id, nome, email, ativo, created_at`,
-        [nome, email, senha_hash, perfil_id, filial_id || null]
-      );
-
-      await registrarAuditoria(fastify, request, 'CRIAR', 'usuarios', rows[0].id, null, rows[0]);
-
-      return reply.status(201).send({ sucesso: true, usuario: rows[0] });
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.status(500).send({ erro: 'Erro ao criar usuário.' });
-    }
-  });
-
-  // =========================================================================
-  // ATUALIZAR USUÁRIO
-  // =========================================================================
-  fastify.put('/api/usuarios/:id', {
-    preHandler: [fastify.autenticar],
-  }, async (request, reply) => {
-    const { id } = request.params;
-    const { nome, email, perfil_id, ativo } = request.body;
-
-    try {
-      const anterior = await db.query(
-        `SELECT id, nome, email, ativo, perfil_id FROM usuarios WHERE id = $1`,
-        [id]
-      );
-      if (anterior.rows.length === 0) {
-        return reply.status(404).send({ erro: 'Usuário não encontrado.' });
-      }
-
-      await db.query(
-        `UPDATE usuarios 
-         SET nome = $1, email = $2, perfil_id = $3, ativo = $4, updated_at = CURRENT_TIMESTAMP 
-         WHERE id = $5`,
-        [nome, email, perfil_id, ativo, id]
-      );
-
-      await registrarAuditoria(fastify, request, 'ALTERAR', 'usuarios', id, anterior.rows[0], { nome, email, perfil_id, ativo });
-
-      return { sucesso: true };
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.status(500).send({ erro: 'Erro ao atualizar usuário.' });
-    }
-  });
-
-  // =========================================================================
-  // RESETAR SENHA (admin redefine senha de qualquer usuário)
-  // =========================================================================
-  fastify.put('/api/usuarios/:id/resetar-senha', {
-    preHandler: [fastify.autenticar],
-  }, async (request, reply) => {
-    const { id } = request.params;
-    const { nova_senha } = request.body;
-
-    if (!nova_senha || nova_senha.length < 6) {
-      return reply.status(400).send({ erro: 'A senha deve ter no mínimo 6 caracteres.' });
-    }
-
-    try {
-      const senha_hash = await bcrypt.hash(nova_senha, 12);
-      await db.query(
-        `UPDATE usuarios SET senha_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
-        [senha_hash, id]
-      );
-
-      await registrarAuditoria(fastify, request, 'RESETAR_SENHA', 'usuarios', id, null, { resetado: true });
-
-      return { sucesso: true };
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.status(500).send({ erro: 'Erro ao resetar senha.' });
-    }
-  });
-
-  // =========================================================================
-  // DESATIVAR USUÁRIO (soft delete)
-  // =========================================================================
-  fastify.delete('/api/usuarios/:id', {
-    preHandler: [fastify.autenticar],
-  }, async (request, reply) => {
-    const { id } = request.params;
-
-    if (request.user.id === id) {
-      return reply.status(400).send({ erro: 'Você não pode desativar seu próprio usuário.' });
-    }
-
-    try {
-      await db.query(
-        `UPDATE usuarios SET ativo = false, updated_at = CURRENT_TIMESTAMP WHERE id = $1`,
-        [id]
-      );
-
-      await registrarAuditoria(fastify, request, 'DESATIVAR', 'usuarios', id, null, { ativo: false });
-
-      return { sucesso: true };
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.status(500).send({ erro: 'Erro ao desativar usuário.' });
-    }
-  });
-
-};
-
-// =========================================================================
-// Função auxiliar de auditoria
-// =========================================================================
-async function registrarAuditoria(fastify, request, acao, modulo, registroId, valorAnterior, valorNovo) {
-  try {
-    await db.query(
-      `INSERT INTO auditoria (usuario_id, usuario_nome, acao, modulo, registro_id, valor_anterior, valor_novo, ip)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [
-        request.user?.id || null,
-        request.user?.nome || 'Desconhecido',
-        acao,
-        modulo,
-        registroId,
-        valorAnterior ? JSON.stringify(valorAnterior) : null,
-        valorNovo ? JSON.stringify(valorNovo) : null,
-        request.ip || null,
-      ]
-    );
-  } catch (err) {
-    fastify.log.warn('Erro ao registrar auditoria: ' + err.message);
-  }
+function hashSenha(senha) {
+  return crypto.createHash('sha256').update(String(senha)).digest('hex');
 }
+
+async function routes(fastify, options) {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+
+  // Listar usuários
+  fastify.get('/api/usuarios', async (req, reply) => {
+    try {
+      const res = await pool.query(`
+        SELECT u.id, u.nome, u.email, u.perfil_id, COALESCE(p.nome, u.perfil) as perfil, u.ativo, u.ultimo_login, u.created_at
+        FROM usuarios u
+        LEFT JOIN perfis p ON u.perfil_id = p.id
+        ORDER BY u.id ASC
+      `);
+      return reply.send(res.rows);
+    } catch (err) {
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+
+  // Detalhes do usuário
+  fastify.get('/api/usuarios/:id', async (req, reply) => {
+    const { id } = req.params;
+    try {
+      const res = await pool.query(`
+        SELECT u.id, u.nome, u.email, u.perfil_id, COALESCE(p.nome, u.perfil) as perfil, u.ativo, u.ultimo_login, u.created_at
+        FROM usuarios u
+        LEFT JOIN perfis p ON u.perfil_id = p.id
+        WHERE u.id = $1
+      `, [id]);
+      if (res.rows.length === 0) return reply.code(404).send({ erro: 'Usuário não encontrado' });
+      return reply.send(res.rows[0]);
+    } catch (err) {
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+
+  // Criar novo usuário
+  fastify.post('/api/usuarios', async (req, reply) => {
+    const { nome, email, senha, perfil_id, ativo = true } = req.body || {};
+    if (!nome || !email) return reply.code(400).send({ erro: 'Nome e e-mail são obrigatórios.' });
+    
+    const senhaFinal = senha || '123456';
+    const senhaHash = hashSenha(senhaFinal);
+
+    try {
+      let perfilNome = 'Operador';
+      if (perfil_id) {
+        const pRes = await pool.query('SELECT nome FROM perfis WHERE id = $1', [perfil_id]);
+        if (pRes.rows.length > 0) perfilNome = pRes.rows[0].nome;
+      }
+
+      const res = await pool.query(`
+        INSERT INTO usuarios (nome, email, senha_hash, perfil_id, perfil, ativo)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING id, nome, email, perfil_id, perfil, ativo, ultimo_login, created_at
+      `, [nome, email.toLowerCase().trim(), senhaHash, perfil_id || null, perfilNome, ativo]);
+
+      return reply.code(201).send(res.rows[0]);
+    } catch (err) {
+      if (err.code === '23505') {
+        return reply.code(400).send({ erro: 'Já existe um usuário com este e-mail.' });
+      }
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+
+  // Atualizar usuário
+  fastify.put('/api/usuarios/:id', async (req, reply) => {
+    const { id } = req.params;
+    const { nome, email, perfil_id, ativo } = req.body || {};
+    try {
+      let perfilNome = null;
+      if (perfil_id) {
+        const pRes = await pool.query('SELECT nome FROM perfis WHERE id = $1', [perfil_id]);
+        if (pRes.rows.length > 0) perfilNome = pRes.rows[0].nome;
+      }
+
+      const res = await pool.query(`
+        UPDATE usuarios
+        SET nome = COALESCE($1, nome),
+            email = COALESCE($2, email),
+            perfil_id = COALESCE($3, perfil_id),
+            perfil = COALESCE($4, perfil),
+            ativo = COALESCE($5, ativo)
+        WHERE id = $6
+        RETURNING id, nome, email, perfil_id, perfil, ativo, ultimo_login, created_at
+      `, [nome, email ? email.toLowerCase().trim() : null, perfil_id || null, perfilNome, ativo, id]);
+
+      if (res.rows.length === 0) return reply.code(404).send({ erro: 'Usuário não encontrado' });
+      return reply.send(res.rows[0]);
+    } catch (err) {
+      if (err.code === '23505') {
+        return reply.code(400).send({ erro: 'Este e-mail já está em uso por outro usuário.' });
+      }
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+
+  // Resetar senha
+  fastify.put('/api/usuarios/:id/resetar-senha', async (req, reply) => {
+    const { id } = req.params;
+    const { nova_senha } = req.body || {};
+    if (!nova_senha || nova_senha.length < 6) {
+      return reply.code(400).send({ erro: 'A senha deve conter no mínimo 6 caracteres.' });
+    }
+    const senhaHash = hashSenha(nova_senha);
+    try {
+      await pool.query('UPDATE usuarios SET senha_hash = $1 WHERE id = $2', [senhaHash, id]);
+      return reply.send({ mensagem: 'Senha resetada com sucesso!' });
+    } catch (err) {
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+
+  // Desativar usuário
+  fastify.delete('/api/usuarios/:id', async (req, reply) => {
+    const { id } = req.params;
+    try {
+      await pool.query('UPDATE usuarios SET ativo = false WHERE id = $1', [id]);
+      return reply.send({ mensagem: 'Usuário desativado com sucesso!' });
+    } catch (err) {
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+}
+
+module.exports = routes;
