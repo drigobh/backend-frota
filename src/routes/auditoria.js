@@ -57,10 +57,10 @@ async function routes(fastify, options) {
 
       if (tipo === 'usuario' && usuario) {
         params.push(usuario.trim());
-        query += ' WHERE LOWER(COALESCE(usuario_nome, usuario)) = LOWER($1) OR LOWER(COALESCE(usuario_email, '')) = LOWER($1)';
+        query += ' WHERE LOWER(COALESCE(usuario_nome, usuario)) = LOWER($1) OR LOWER(COALESCE(usuario_email, CAST("" AS text))) = LOWER($1)'.replace('CAST("" AS text)', "''");
       } else if (tipo === 'mes' && mes) {
         params.push(mes.trim().substring(0, 7) + '%');
-        query += ' WHERE TO_CHAR(created_at, 'YYYY-MM') LIKE $1';
+        query += ' WHERE TO_CHAR(created_at, ' + "'YYYY-MM'" + ') LIKE $1';
       } else if (tipo === 'periodo' && data_inicio && data_fim) {
         params.push(data_inicio + ' 00:00:00');
         params.push(data_fim + ' 23:59:59');
