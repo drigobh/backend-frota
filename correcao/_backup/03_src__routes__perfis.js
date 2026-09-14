@@ -28,7 +28,7 @@ async function ensurePerfis() {
 async function routes(fastify, options) {
   ensurePerfis().catch(() => {});
 
-  fastify.get('/api/perfis', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get('/api/perfis', async (req, reply) => {
     try {
       await ensurePerfis();
       const res = await db.query('SELECT * FROM perfis ORDER BY id ASC');
@@ -38,7 +38,7 @@ async function routes(fastify, options) {
     }
   });
 
-  fastify.post('/api/perfis', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.post('/api/perfis', async (req, reply) => {
     const { nome, descricao } = req.body || {};
     if (!nome) return reply.code(400).send({ erro: 'Nome do perfil é obrigatório.' });
     try {
@@ -53,7 +53,7 @@ async function routes(fastify, options) {
     }
   });
 
-  fastify.put('/api/perfis/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.put('/api/perfis/:id', async (req, reply) => {
     const { id } = req.params;
     const { nome, descricao, ativo } = req.body || {};
     try {

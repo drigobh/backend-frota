@@ -3,7 +3,7 @@ const db = require('../database');
 async function routes(fastify, options) {
 
   // Listar logs ordenados estritamente por hora/id descrescente
-  fastify.get('/api/auditoria', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get('/api/auditoria', async (req, reply) => {
     try {
       const res = await db.query(`
         SELECT 
@@ -25,7 +25,7 @@ async function routes(fastify, options) {
   });
 
   // Registrar log
-  fastify.post('/api/auditoria', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.post('/api/auditoria', async (req, reply) => {
     const { acao, modulo, entidade, detalhes, descricao, usuario_nome, usuario_email } = req.body || {};
     const mod = String(modulo || entidade || 'SISTEMA').substring(0, 100);
     const det = String(detalhes || descricao || 'Operação realizada');
@@ -47,7 +47,7 @@ async function routes(fastify, options) {
   });
 
   // Limpar logs por critérios (usuário, mês ou período)
-  fastify.post('/api/auditoria/limpar', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.post('/api/auditoria/limpar', async (req, reply) => {
     const { tipo, usuario, mes, data_inicio, data_fim } = req.body || {};
 
     try {

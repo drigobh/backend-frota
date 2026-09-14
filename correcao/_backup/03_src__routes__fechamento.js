@@ -7,7 +7,7 @@ function normalizarMes(m) {
 
 async function routes(fastify, options) {
 
-  fastify.get('/api/meses-fechados', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get('/api/meses-fechados', async (req, reply) => {
     try {
       const res = await db.query('SELECT mes, fechado_por, fechado_em FROM meses_fechados');
       return reply.send(res.rows);
@@ -16,7 +16,7 @@ async function routes(fastify, options) {
     }
   });
 
-  fastify.post('/api/meses-fechados/toggle', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.post('/api/meses-fechados/toggle', async (req, reply) => {
     const { mes, usuario_nome } = req.body || {};
     if (!mes) return reply.code(400).send({ erro: 'Mês não informado.' });
 

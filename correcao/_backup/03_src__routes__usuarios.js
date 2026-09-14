@@ -63,7 +63,7 @@ async function routes(fastify, options) {
   ensureUsuariosETabelas().catch(() => {});
 
   // Listar usuários sem erro de tipo (conversão mútua para ::text)
-  fastify.get('/api/usuarios', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get('/api/usuarios', async (req, reply) => {
     try {
       await ensureUsuariosETabelas();
       const res = await db.query(`
@@ -79,7 +79,7 @@ async function routes(fastify, options) {
     }
   });
 
-  fastify.get('/api/usuarios/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get('/api/usuarios/:id', async (req, reply) => {
     const { id } = req.params;
     try {
       await ensureUsuariosETabelas();
@@ -96,7 +96,7 @@ async function routes(fastify, options) {
     }
   });
 
-  fastify.post('/api/usuarios', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.post('/api/usuarios', async (req, reply) => {
     const { nome, email, senha, perfil_id, ativo = true } = req.body || {};
     if (!nome || !email) return reply.code(400).send({ erro: 'Nome e e-mail são obrigatórios.' });
     
@@ -126,7 +126,7 @@ async function routes(fastify, options) {
     }
   });
 
-  fastify.put('/api/usuarios/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.put('/api/usuarios/:id', async (req, reply) => {
     const { id } = req.params;
     const { nome, email, perfil_id, ativo } = req.body || {};
     try {
@@ -155,7 +155,7 @@ async function routes(fastify, options) {
     }
   });
 
-  fastify.put('/api/usuarios/:id/resetar-senha', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.put('/api/usuarios/:id/resetar-senha', async (req, reply) => {
     const { id } = req.params;
     const { nova_senha } = req.body || {};
     if (!nova_senha || nova_senha.length < 6) {
@@ -171,7 +171,7 @@ async function routes(fastify, options) {
     }
   });
 
-  fastify.delete('/api/usuarios/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.delete('/api/usuarios/:id', async (req, reply) => {
     const { id } = req.params;
     try {
       await ensureUsuariosETabelas();
