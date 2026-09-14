@@ -4307,6 +4307,17 @@
       } catch(e) {}
     }
 
+
+    async function initAppSeguro() {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      try {
+        if (typeof loadFechamentosDaAPI === 'function') await loadFechamentosDaAPI();
+        if (typeof loadAuditoriaDaAPI === 'function') await loadAuditoriaDaAPI();
+      } catch(e) {}
+    }
+    window.addEventListener('DOMContentLoaded', initAppSeguro);
+
 </script>
 
   <!-- Gráficos nativos em SVG -->
