@@ -1287,76 +1287,7 @@
     originalAlert(msg);
   };
 
-    // =========================================================================
-    // MOTOR DE AUDITORIA E FECHAMENTO MENSAL (BLINDADO)
-    // =========================================================================
-    let _logsAuditoriaCache = [];
-
-    async function loadAuditoriaDaAPI() {
-      if (!document.getElementById('table-auditoria')) return;
-      try {
-        const t = state.token || localStorage.getItem('token') || '';
-        const res = await fetch('/api/auditoria', {
-          headers: { ...(t ? { 'Authorization': 'Bearer ' + t } : {}) }
-        });
-        if (!res.ok) return;
-        _logsAuditoriaCache = await res.json();
-        renderAuditoria(_logsAuditoriaCache);
-      } catch (err) {
-        console.warn('Auditoria indisponível');
-      }
-    }
-
-    function renderAuditoria(lista) {
-      const tbody = document.getElementById('tbody-auditoria');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-      if (!lista || !Array.isArray(lista) || lista.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhum registro de auditoria encontrado.</td></tr>';
-        return;
-      }
-      lista.forEach(a => {
-        const dataFormatada = a.created_at ? new Date(a.created_at).toLocaleString('pt-BR') : '-';
-        const acaoStr = String(a.acao || 'AÇÃO').toUpperCase();
-        let badgeCor = 'badge-pos';
-        if (acaoStr.includes('EXCLU') || acaoStr.includes('CONGELAR') || acaoStr.includes('DELETE')) badgeCor = 'badge-neg';
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${dataFormatada}</td>
-          <td><strong>${a.usuario_nome || 'Administrador'}</strong></td>
-          <td><span class="${badgeCor}">${acaoStr}</span></td>
-          <td><span class="vehicle-tag">${a.modulo || a.entidade || 'SISTEMA'}</span></td>
-          <td style="max-width:380px; word-break:break-word;">${a.detalhes || '-'}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function filtrarAuditoriaNaTela() {
-      const input = document.getElementById('filtro-auditoria');
-      if (!input) return;
-      const termo = input.value.toLowerCase().trim();
-      if (!termo) { renderAuditoria(_logsAuditoriaCache); return; }
-      const filtrados = _logsAuditoriaCache.filter(item => {
-        const dataStr = item.created_at ? new Date(item.created_at).toLocaleString('pt-BR').toLowerCase() : '';
-        const user = String(item.usuario_nome || '').toLowerCase();
-        const acao = String(item.acao || '').toLowerCase();
-        const mod = String(item.modulo || '').toLowerCase();
-        const det = String(item.detalhes || '').toLowerCase();
-        return dataStr.includes(termo) || user.includes(termo) || acao.includes(termo) || mod.includes(termo) || det.includes(termo);
-      });
-      renderAuditoria(filtrados);
-    }
-
-    async function testarAuditoriaManual() {
-      try {
-        await registrarLog('TESTE_MANUAL', 'SISTEMA', 'Teste disparado manualmente');
-        await loadAuditoriaDaAPI();
-        alert('✔ Log registrado com sucesso!');
-      } catch (e) {
-        alert('Erro: ' + e.message);
-      }
-    }
+    
 
     async function abrirModalLimparAuditoria() {
       const op = prompt("LIMPAR LOGS:\n1: Por Usuário\n2: Por Mês (AAAA-MM)\n3: Tudo\nDigite 1, 2 ou 3:");
@@ -1451,6 +1382,114 @@
           })
         });
       } catch(e) {}
+    }
+
+
+    // =========================================================================
+    // CONTROLE DE FECHAMENTO MENSAL E AUDITORIA SINCRONIZADA
+    // =========================================================================
+    state.mesesFechados = state.mesesFechados || [];
+
+    function isMesFechado(mes = state?.currentMonth) {
+      if (!mes || !state.mesesFechados || !Array.isArray(state.mesesFechados)) return false;
+      const mStr = String(mes).trim().toLowerCase();
+      const m7 = mStr.substring(0, 7);
+      return state.mesesFechados.some(x => {
+        const xStr = String(x).trim().toLowerCase();
+        return xStr === mStr || xStr === m7 || xStr.substring(0, 7) === m7;
+      });
+    }
+
+    function atualizarInterfaceFechamento() {
+      const badge = document.getElementById('badge-status-mes');
+      const btn = document.getElementById('btn-toggle-fechamento');
+      if (!badge) return;
+
+      const mesAtual = state?.currentMonth || '';
+      const fechado = isMesFechado(mesAtual);
+      const isAdmin = state?.user?.perfil === 'Administrador';
+
+      if (fechado) {
+        badge.className = 'lock-badge locked';
+        badge.style.setProperty('background', '#fee2e2', 'important');
+        badge.style.setProperty('color', '#991b1b', 'important');
+        badge.style.setProperty('border-color', '#f87171', 'important');
+        badge.textContent = '🔒 Mês Congelado (' + mesAtual + ')';
+      } else {
+        badge.className = 'lock-badge unlocked';
+        badge.style.setProperty('background', '#dcfce7', 'important');
+        badge.style.setProperty('color', '#166534', 'important');
+        badge.style.setProperty('border-color', '#86efac', 'important');
+        badge.textContent = '🔓 Mês Aberto (' + mesAtual + ')';
+      }
+
+      if (btn) {
+        btn.style.display = isAdmin ? 'inline-flex' : 'none';
+        btn.innerHTML = fechado ? '<span>🔓</span> Descongelar Mês' : '<span>🔒</span> Congelar Mês';
+        btn.style.backgroundColor = fechado ? '#dc2626' : '#0f2a4a';
+      }
+    }
+
+    async function loadFechamentosDaAPI() {
+      try {
+        const t = state.token || localStorage.getItem('token') || '';
+        const res = await fetch('/api/meses-fechados', {
+          headers: { ...(t ? { 'Authorization': 'Bearer ' + t } : {}) }
+        });
+        if (res.ok) {
+          const dados = await res.json();
+          state.mesesFechados = Array.isArray(dados) ? dados.map(x => String(x.mes).trim()) : [];
+        }
+      } catch (e) {
+        console.warn('Erro ao carregar fechamentos:', e);
+      } finally {
+        atualizarInterfaceFechamento();
+      }
+    }
+
+    async function toggleFechamentoMes() {
+      const mes = state.currentMonth;
+      if (!mes) {
+        alert('Selecione um mês primeiro.');
+        return;
+      }
+      const fechadoAtual = isMesFechado(mes);
+      const acaoDesejada = !fechadoAtual;
+
+      const confirmar = confirm(
+        acaoDesejada
+          ? `Deseja CONGELAR a competência de "${mes}"? Operadores não poderão alterar dados deste período.`
+          : `Deseja DESCONGELAR a competência de "${mes}"? O mês voltará a aceitar edições.`
+      );
+      if (!confirmar) return;
+
+      try {
+        const u = state.user || {};
+        const t = state.token || localStorage.getItem('token') || '';
+        const res = await fetch('/api/meses-fechados/toggle', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(t ? { 'Authorization': 'Bearer ' + t } : {})
+          },
+          body: JSON.stringify({ mes, usuario_nome: u.nome || 'Administrador' })
+        });
+        
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.erro || 'Falha no servidor');
+
+        await loadFechamentosDaAPI();
+
+        await registrarLog(
+          data.fechado ? 'CONGELAR' : 'DESCONGELAR',
+          'COMPETÊNCIA',
+          `Competência de ${mes} foi ${data.fechado ? 'congelada' : 'descongelada'}`
+        );
+
+        alert(`Competência de ${mes} ${data.fechado ? 'CONGELADA' : 'DESCONGELADA'} com sucesso!`);
+      } catch (err) {
+        alert('Erro ao alterar fechamento: ' + err.message);
+      }
     }
 
 </script>
