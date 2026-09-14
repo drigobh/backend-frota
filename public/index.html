@@ -2065,6 +2065,7 @@
           </div>
           <div class="bar-controls-right">
             <button class="btn-action btn-action-secondary" onclick="loadAuditoriaDaAPI()">🔄 Atualizar Logs</button>
+            <button class="btn-action" style="background:#0284c7;color:#fff;" onclick="testarAuditoriaManual()">🧪 Testar Auditoria</button>
             <button class="btn-action btn-action-secondary" onclick="exportTableToCSV('Trilha_Auditoria.csv', 'table-auditoria')">⬇️ Exportar CSV</button>
           </div>
         </div>
@@ -2098,6 +2099,34 @@
   </div>
 
   <script>
+
+    // Interceptador Global para Auditoria Automática
+    const _originalFetch = window.fetch;
+    window.fetch = async function(...args) {
+      const response = await _originalFetch.apply(this, args);
+      try {
+        const inputUrl = typeof args[0] === 'string' ? args[0] : (args[0]?.url || '');
+        const options = args[1] || {};
+        const method = (options.method || 'GET').toUpperCase();
+
+        if (response.ok && ['POST', 'PUT', 'DELETE'].includes(method)) {
+          if (!inputUrl.includes('/auditoria') && !inputUrl.includes('/login')) {
+            const modulo = inputUrl.replace('/api/', '').split('/')[0].toUpperCase() || 'SISTEMA';
+            const mapaAcoes = { 'POST': 'Cadastro/Inclusão', 'PUT': 'Atualização/Edição', 'DELETE': 'Exclusão' };
+            let detalhe = inputUrl;
+            if (options.body) {
+              try {
+                detalhe = typeof options.body === 'string' ? options.body : JSON.stringify(options.body);
+              } catch(e) {}
+            }
+            if (detalhe.length > 200) detalhe = detalhe.substring(0, 200) + '...';
+            registrarLog(mapaAcoes[method] || method, modulo, detalhe);
+          }
+        }
+      } catch(e) {}
+      return response;
+    };
+
     const API_URL = '/api';
 
     function apiFetch(endpoint, options = {}) {
@@ -2120,23 +2149,7 @@
           throw new Error('Sessao expirada. Faca login novamente.');
         }
         
-      // Interceptador de Auditoria Automática
-      if (res && res.ok && options && options.method && ['POST', 'PUT', 'DELETE'].includes(options.method.toUpperCase())) {
-        if (!url.includes('/auditoria') && !url.includes('/login') && !url.includes('/meses-fechados')) {
-          const mapaAcoes = { 'POST': 'Cadastro/Inclusão', 'PUT': 'Edição', 'DELETE': 'Exclusão' };
-          const acao = mapaAcoes[options.method.toUpperCase()] || options.method;
-          const rotaLimpa = url.replace('/api/', '').split('/')[0].toUpperCase();
-          let payloadResumo = url;
-          try {
-            if (options.body) {
-              const b = typeof options.body === 'string' ? JSON.parse(options.body) : options.body;
-              payloadResumo = JSON.stringify(b);
-            }
-          } catch(e) {}
-          if (payloadResumo.length > 200) payloadResumo = payloadResumo.substring(0, 200) + '...';
-          registrarLog(acao, rotaLimpa, payloadResumo);
-        }
-      }
+      
 
       return res;
       });
@@ -4172,6 +4185,85 @@
       const el = e.target.closest('[data-tab="auditoria"], [onclick*="auditoria"]');
       if (el) setTimeout(loadAuditoriaDaAPI, 80);
     });
+
+    
+    // =========================================================================
+    // MOTOR DE AUDITORIA ROBUSTO E SEGURO
+    // =========================================================================
+    async function registrarLog(acao, entidade, detalhes) {
+      try {
+        const u = state.user || {};
+        const t = state.token || localStorage.getItem('token') || '';
+        await fetch('/api/auditoria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(t ? { 'Authorization': 'Bearer ' + t } : {})
+          },
+          body: JSON.stringify({
+            acao: String(acao || 'Ação').substring(0, 100),
+            entidade: String(entidade || 'GERAL').substring(0, 100),
+            detalhes: String(detalhes || ''),
+            usuario_nome: u.nome || 'Administrador',
+            usuario_email: u.email || 'admin@frota.com'
+          })
+        });
+      } catch (e) {
+        console.warn('Falha silenciosa ao registrar auditoria:', e);
+      }
+    }
+
+    async function loadAuditoriaDaAPI() {
+      try {
+        const t = state.token || localStorage.getItem('token') || '';
+        const res = await fetch('/api/auditoria', {
+          headers: { ...(t ? { 'Authorization': 'Bearer ' + t } : {}) }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        renderAuditoria(data);
+      } catch (err) {
+        console.error('Erro ao carregar auditoria:', err);
+      }
+    }
+
+    function renderAuditoria(lista) {
+      const tbody = document.getElementById('tbody-auditoria');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!lista || !Array.isArray(lista) || lista.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhum registro de auditoria no momento. Clique em "🧪 Testar Auditoria" acima.</td></tr>';
+        return;
+      }
+
+      lista.forEach(a => {
+        const dataFormatada = a.created_at ? new Date(a.created_at).toLocaleString('pt-BR') : '-';
+        let badgeCor = 'badge-pos';
+        const acaoStr = String(a.acao || '').toLowerCase();
+        if (acaoStr.includes('exclu') || acaoStr.includes('congelar') || acaoStr.includes('delete')) badgeCor = 'badge-neg';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${dataFormatada}</td>
+          <td><strong>${a.usuario_nome || 'Usuário'}</strong><br><span style="font-size:11px;color:#64748b;">${a.usuario_email || '-'}</span></td>
+          <td><span class="${badgeCor}">${a.acao}</span></td>
+          <td><span class="vehicle-tag">${a.entidade}</span></td>
+          <td style="max-width:350px; word-break:break-word;">${a.detalhes || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function testarAuditoriaManual() {
+      try {
+        await registrarLog('Teste de Auditoria', 'SISTEMA', 'Teste manual disparado pelo painel');
+        await loadAuditoriaDaAPI();
+        alert('✔ Log registrado e carregado com sucesso na Trilha de Auditoria!');
+      } catch (e) {
+        alert('Erro ao testar auditoria: ' + e.message);
+      }
+    }
 
     function renderAll() {
       applyPermissions();
