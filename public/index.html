@@ -2262,25 +2262,25 @@
     // =========================================================================
     async function loadCadastrosDaAPI() {
       try {
-        const resCavalos = await apiFetch(`/veiculos`);
-        const cavalos = await resCavalos.json();
-        
-        const resCarretas = await apiFetch(`/carretas`);
-        const carretas = await resCarretas.json();
-        
-        const resMotoristas = await apiFetch(`/motoristas`);
-        const motoristas = await resMotoristas.json();
-        
-        state.cavalos = cavalos;
-        state.carretas = carretas;
-        state.motoristas = motoristas;
-        
+        const resCavalos = await apiFetch('/veiculos');
+        const cavalos = resCavalos.ok ? await resCavalos.json() : [];
+
+        const resCarretas = await apiFetch('/carretas');
+        const carretas = resCarretas.ok ? await resCarretas.json() : [];
+
+        const resMotoristas = await apiFetch('/motoristas');
+        const motoristas = resMotoristas.ok ? await resMotoristas.json() : [];
+
+        state.cavalos = Array.isArray(cavalos) ? cavalos : [];
+        state.carretas = Array.isArray(carretas) ? carretas : [];
+        state.motoristas = Array.isArray(motoristas) ? motoristas : [];
+
         syncPlatesAcrossSystem();
         renderCadastroCavalos();
         renderCadastroCarretas();
         renderCadastroMotoristas();
       } catch (error) {
-        console.error('Erro ao conectar com a API de Cadastros:', error);
+        console.error('Erro ao carregar Cadastros:', error);
       }
     }
 
