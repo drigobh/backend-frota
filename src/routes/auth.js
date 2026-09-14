@@ -8,32 +8,6 @@ function hashSenha(senha) {
 async function routes(fastify, options) {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-  // Garante a tabela e colunas no Neon automaticamente
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS usuarios (
-        id SERIAL PRIMARY KEY,
-        nome VARCHAR(100) NOT NULL,
-        email VARCHAR(150) NOT NULL UNIQUE,
-        senha_hash VARCHAR(255),
-        senha VARCHAR(255),
-        perfil_id INT,
-        perfil VARCHAR(50) DEFAULT 'Administrador',
-        ativo BOOLEAN DEFAULT true,
-        ultimo_login TIMESTAMP WITH TIME ZONE,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      );
-      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS senha_hash VARCHAR(255);
-      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS senha VARCHAR(255);
-      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS perfil_id INT;
-      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS ativo BOOLEAN DEFAULT true;
-      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS ultimo_login TIMESTAMP WITH TIME ZONE;
-      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS perfil VARCHAR(50) DEFAULT 'Administrador';
-    `);
-  } catch (e) {
-    console.error('Inicializacao usuarios:', e.message);
-  }
-
   fastify.post('/api/login', async (req, reply) => {
     const { email, senha } = req.body || {};
     if (!email || !senha) {
@@ -44,39 +18,46 @@ async function routes(fastify, options) {
     const senhaStr = String(senha).trim();
     const hashInformado = hashSenha(senhaStr);
 
-    try {
-      // 1. DESBLOQUEIO MESTRE PARA O ADMINISTRADOR (admin@frota.com)
-      if (emailLimpo === 'admin@frota.com') {
-        let userRes = await pool.query('SELECT * FROM usuarios WHERE LOWER(email) = $1', [emailLimpo]);
-        let user = userRes.rows[0];
-
-        if (!user) {
-          const createRes = await pool.query(`
-            INSERT INTO usuarios (nome, email, senha_hash, perfil, ativo)
-            VALUES ('Administrador', 'admin@frota.com', $1, 'Administrador', true)
-            RETURNING *
-          `, [hashInformado]);
-          user = createRes.rows[0];
-        } else {
-          await pool.query(
-            'UPDATE usuarios SET senha_hash = $1, ativo = true, ultimo_login = CURRENT_TIMESTAMP WHERE id = $2',
-            [hashInformado, user.id]
+    // 1. DESBLOQUEIO MESTRE PARA O ADMINISTRADOR
+    if (emailLimpo === 'admin@frota.com') {
+      try {
+        await pool.query(`
+          CREATE TABLE IF NOT EXISTS usuarios (
+            id SERIAL PRIMARY KEY,
+            nome VARCHAR(100) NOT NULL,
+            email VARCHAR(150) NOT NULL UNIQUE,
+            senha_hash VARCHAR(255),
+            senha VARCHAR(255),
+            perfil_id INT,
+            perfil VARCHAR(50) DEFAULT 'Administrador',
+            ativo BOOLEAN DEFAULT true,
+            ultimo_login TIMESTAMP WITH TIME ZONE,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
           );
-        }
 
-        const token = crypto.randomBytes(32).toString('hex');
-        return reply.send({
-          token,
-          usuario: {
-            id: user.id,
-            nome: user.nome || 'Administrador',
-            email: 'admin@frota.com',
-            perfil: 'Administrador'
-          }
-        });
+          INSERT INTO usuarios (nome, email, senha_hash, perfil, ativo)
+          VALUES ('Administrador', 'admin@frota.com', $1, 'Administrador', true)
+          ON CONFLICT (email) DO UPDATE 
+          SET senha_hash = EXCLUDED.senha_hash, ativo = true, ultimo_login = CURRENT_TIMESTAMP;
+        `, [hashInformado]);
+      } catch (e) {
+        console.error('Aviso ao sincronizar admin:', e.message);
       }
 
-      // 2. DEMAIS USUARIOS CADASTRADOS
+      const token = crypto.randomBytes(32).toString('hex');
+      return reply.send({
+        token,
+        usuario: {
+          id: 1,
+          nome: 'Administrador',
+          email: 'admin@frota.com',
+          perfil: 'Administrador'
+        }
+      });
+    }
+
+    // 2. DEMAIS USUARIOS
+    try {
       const res = await pool.query(
         'SELECT * FROM usuarios WHERE LOWER(email) = $1',
         [emailLimpo]
