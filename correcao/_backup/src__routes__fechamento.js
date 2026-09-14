@@ -1,4 +1,4 @@
-const db = require('../database');
+const { Pool } = require('pg');
 
 function normalizarMes(m) {
   if (!m) return '';
@@ -6,10 +6,11 @@ function normalizarMes(m) {
 }
 
 async function routes(fastify, options) {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
   fastify.get('/api/meses-fechados', async (req, reply) => {
     try {
-      const res = await db.query('SELECT mes, fechado_por, fechado_em FROM meses_fechados');
+      const res = await pool.query('SELECT mes, fechado_por, fechado_em FROM meses_fechados');
       return reply.send(res.rows);
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
@@ -24,19 +25,19 @@ async function routes(fastify, options) {
     const mesCurto = mesChave.substring(0, 7);
 
     try {
-      const check = await db.query(
+      const check = await pool.query(
         'SELECT mes FROM meses_fechados WHERE LOWER(mes) = $1 OR LOWER(mes) = $2 OR LEFT(LOWER(mes), 7) = $2',
         [mesChave, mesCurto]
       );
 
       if (check.rows.length > 0) {
-        await db.query(
+        await pool.query(
           'DELETE FROM meses_fechados WHERE LOWER(mes) = $1 OR LOWER(mes) = $2 OR LEFT(LOWER(mes), 7) = $2',
           [mesChave, mesCurto]
         );
         return reply.send({ fechado: false, mes });
       } else {
-        await db.query(
+        await pool.query(
           'INSERT INTO meses_fechados (mes, fechado_por) VALUES ($1, $2) ON CONFLICT (mes) DO NOTHING',
           [mes.trim(), usuario_nome || 'Administrador']
         );

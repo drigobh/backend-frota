@@ -1,11 +1,12 @@
-const db = require('../database');
+const { Pool } = require('pg');
 
 async function routes(fastify, options) {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
   // Listar logs ordenados estritamente por hora/id descrescente
   fastify.get('/api/auditoria', async (req, reply) => {
     try {
-      const res = await db.query(`
+      const res = await pool.query(`
         SELECT 
           id,
           COALESCE(usuario_nome, usuario, 'Administrador') AS usuario_nome,
@@ -34,7 +35,7 @@ async function routes(fastify, options) {
     const act = String(acao || 'Ação').substring(0, 100);
 
     try {
-      const res = await db.query(`
+      const res = await pool.query(`
         INSERT INTO auditoria (
           usuario_nome, usuario, usuario_email, acao, entidade, modulo, tabela, detalhes, descricao, created_at
         ) VALUES ($1, $1, $2, $3, $4, $4, $4, $5, $5, CURRENT_TIMESTAMP)
@@ -70,7 +71,7 @@ async function routes(fastify, options) {
         return reply.code(400).send({ erro: 'Critério de exclusão inválido ou parâmetros ausentes.' });
       }
 
-      await db.query(query, params);
+      await pool.query(query, params);
       return reply.send({ mensagem: 'Logs removidos com sucesso!' });
     } catch (err) {
       return reply.code(500).send({ erro: err.message });

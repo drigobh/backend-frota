@@ -1,15 +1,15 @@
-const db = require('../database');
-const bcrypt = require('bcrypt');
+const { Pool } = require('pg');
+const crypto = require('crypto');
 
 function hashSenha(senha) {
   return crypto.createHash('sha256').update(String(senha)).digest('hex');
 }
 
 let usuariosEnsured = false;
-async function ensureUsuariosETabelas() {
+async function ensureUsuariosETabelas(pool) {
   if (usuariosEnsured) return;
   try {
-    await db.query(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS perfis (
         id SERIAL PRIMARY KEY,
         nome VARCHAR(50) NOT NULL UNIQUE,
@@ -60,13 +60,14 @@ async function ensureUsuariosETabelas() {
 }
 
 async function routes(fastify, options) {
-  ensureUsuariosETabelas().catch(() => {});
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  ensureUsuariosETabelas(pool).catch(() => {});
 
   // Listar usuários sem erro de tipo (conversão mútua para ::text)
   fastify.get('/api/usuarios', async (req, reply) => {
     try {
-      await ensureUsuariosETabelas();
-      const res = await db.query(`
+      await ensureUsuariosETabelas(pool);
+      const res = await pool.query(`
         SELECT u.id, u.nome, u.email, u.perfil_id, COALESCE(p.nome, u.perfil, 'Administrador') as perfil, COALESCE(u.ativo, true) as ativo, u.ultimo_login, u.created_at
         FROM usuarios u
         LEFT JOIN perfis p ON u.perfil_id::text = p.id::text
@@ -82,8 +83,8 @@ async function routes(fastify, options) {
   fastify.get('/api/usuarios/:id', async (req, reply) => {
     const { id } = req.params;
     try {
-      await ensureUsuariosETabelas();
-      const res = await db.query(`
+      await ensureUsuariosETabelas(pool);
+      const res = await pool.query(`
         SELECT u.id, u.nome, u.email, u.perfil_id, COALESCE(p.nome, u.perfil, 'Administrador') as perfil, COALESCE(u.ativo, true) as ativo, u.ultimo_login, u.created_at
         FROM usuarios u
         LEFT JOIN perfis p ON u.perfil_id::text = p.id::text
@@ -104,14 +105,14 @@ async function routes(fastify, options) {
     const senhaHash = hashSenha(senhaFinal);
 
     try {
-      await ensureUsuariosETabelas();
+      await ensureUsuariosETabelas(pool);
       let perfilNome = 'Operador';
       if (perfil_id) {
-        const pRes = await db.query('SELECT nome FROM perfis WHERE id::text = $1::text', [String(perfil_id)]);
+        const pRes = await pool.query('SELECT nome FROM perfis WHERE id::text = $1::text', [String(perfil_id)]);
         if (pRes.rows.length > 0) perfilNome = pRes.rows[0].nome;
       }
 
-      const res = await db.query(`
+      const res = await pool.query(`
         INSERT INTO usuarios (nome, email, senha_hash, perfil_id, perfil, ativo)
         VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING id, nome, email, perfil_id, perfil, ativo, ultimo_login, created_at
@@ -130,14 +131,14 @@ async function routes(fastify, options) {
     const { id } = req.params;
     const { nome, email, perfil_id, ativo } = req.body || {};
     try {
-      await ensureUsuariosETabelas();
+      await ensureUsuariosETabelas(pool);
       let perfilNome = null;
       if (perfil_id) {
-        const pRes = await db.query('SELECT nome FROM perfis WHERE id::text = $1::text', [String(perfil_id)]);
+        const pRes = await pool.query('SELECT nome FROM perfis WHERE id::text = $1::text', [String(perfil_id)]);
         if (pRes.rows.length > 0) perfilNome = pRes.rows[0].nome;
       }
 
-      const res = await db.query(`
+      const res = await pool.query(`
         UPDATE usuarios
         SET nome = COALESCE($1, nome),
             email = COALESCE($2, email),
@@ -163,8 +164,8 @@ async function routes(fastify, options) {
     }
     const senhaHash = hashSenha(nova_senha);
     try {
-      await ensureUsuariosETabelas();
-      await db.query('UPDATE usuarios SET senha_hash = $1 WHERE id::text = $2::text', [senhaHash, id]);
+      await ensureUsuariosETabelas(pool);
+      await pool.query('UPDATE usuarios SET senha_hash = $1 WHERE id::text = $2::text', [senhaHash, id]);
       return reply.send({ mensagem: 'Senha resetada com sucesso!' });
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
@@ -174,8 +175,8 @@ async function routes(fastify, options) {
   fastify.delete('/api/usuarios/:id', async (req, reply) => {
     const { id } = req.params;
     try {
-      await ensureUsuariosETabelas();
-      await db.query('UPDATE usuarios SET ativo = false WHERE id::text = $1::text', [id]);
+      await ensureUsuariosETabelas(pool);
+      await pool.query('UPDATE usuarios SET ativo = false WHERE id::text = $1::text', [id]);
       return reply.send({ mensagem: 'Usuário desativado com sucesso!' });
     } catch (err) {
       return reply.code(500).send({ erro: err.message });

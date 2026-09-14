@@ -1,10 +1,10 @@
-const db = require('../database');
+const { Pool } = require('pg');
 
 let perfisEnsured = false;
-async function ensurePerfis() {
+async function ensurePerfis(pool) {
   if (perfisEnsured) return;
   try {
-    await db.query(`
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS perfis (
         id SERIAL PRIMARY KEY,
         nome VARCHAR(50) NOT NULL UNIQUE,
@@ -26,12 +26,13 @@ async function ensurePerfis() {
 }
 
 async function routes(fastify, options) {
-  ensurePerfis().catch(() => {});
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  ensurePerfis(pool).catch(() => {});
 
   fastify.get('/api/perfis', async (req, reply) => {
     try {
-      await ensurePerfis();
-      const res = await db.query('SELECT * FROM perfis ORDER BY id ASC');
+      await ensurePerfis(pool);
+      const res = await pool.query('SELECT * FROM perfis ORDER BY id ASC');
       return reply.send(res.rows);
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
@@ -42,8 +43,8 @@ async function routes(fastify, options) {
     const { nome, descricao } = req.body || {};
     if (!nome) return reply.code(400).send({ erro: 'Nome do perfil é obrigatório.' });
     try {
-      await ensurePerfis();
-      const res = await db.query(
+      await ensurePerfis(pool);
+      const res = await pool.query(
         'INSERT INTO perfis (nome, descricao) VALUES ($1, $2) RETURNING *',
         [nome, descricao || '']
       );
@@ -57,8 +58,8 @@ async function routes(fastify, options) {
     const { id } = req.params;
     const { nome, descricao, ativo } = req.body || {};
     try {
-      await ensurePerfis();
-      const res = await db.query(
+      await ensurePerfis(pool);
+      const res = await pool.query(
         'UPDATE perfis SET nome = COALESCE($1, nome), descricao = COALESCE($2, descricao), ativo = COALESCE($3, ativo) WHERE id = $4 RETURNING *',
         [nome, descricao, ativo, id]
       );
