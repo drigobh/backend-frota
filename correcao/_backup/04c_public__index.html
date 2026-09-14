@@ -1312,6 +1312,83 @@
     }
 
     state.mesesFechados = state.mesesFechados || [];
+    function isMesFechado(mes = state?.currentMonth) {
+      if (!mes || !state.mesesFechados) return false;
+      const mStr = String(mes).trim().substring(0, 7);
+      return state.mesesFechados.some(x => String(x).trim().substring(0, 7) === mStr);
+    }
+
+    function atualizarInterfaceFechamento() {
+      const badge = document.getElementById('badge-status-mes');
+      if (!badge) return;
+      const fechado = isMesFechado();
+      const isAdmin = state?.user?.perfil === 'Administrador';
+      const btn = document.getElementById('btn-toggle-fechamento');
+      
+      badge.className = 'lock-badge ' + (fechado ? 'locked' : 'unlocked');
+      badge.style.background = fechado ? '#fee2e2' : '#dcfce7';
+      badge.style.color = fechado ? '#991b1b' : '#166534';
+      badge.innerHTML = fechado ? '🔒 Mês Congelado' : '🔓 Mês Aberto';
+
+      if (btn) {
+        btn.style.display = isAdmin ? 'inline-flex' : 'none';
+        btn.innerHTML = fechado ? '<span>🔓</span> Descongelar Mês' : '<span>🔒</span> Congelar Mês';
+        btn.style.background = fechado ? '#dc2626' : '#0f2a4a';
+      }
+    }
+
+    async function loadFechamentosDaAPI() {
+      try {
+        const t = state.token || localStorage.getItem('token') || '';
+        const res = await fetch('/api/meses-fechados', {
+          headers: { ...(t ? { 'Authorization': 'Bearer ' + t } : {}) }
+        });
+        if (res.ok) {
+          const dados = await res.json();
+          state.mesesFechados = Array.isArray(dados) ? dados.map(x => String(x.mes).trim()) : [];
+        }
+      } catch (e) {}
+      finally { atualizarInterfaceFechamento(); }
+    }
+
+    async function toggleFechamentoMes() {
+      const mes = state.currentMonth;
+      if (!mes) return;
+      const fechadoAtual = isMesFechado(mes);
+      if (!confirm(fechadoAtual ? `Descongelar "${mes}"?` : `Congelar "${mes}"?`)) return;
+      try {
+        const t = state.token || localStorage.getItem('token') || '';
+        const res = await fetch('/api/meses-fechados/toggle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...(t ? { 'Authorization': 'Bearer ' + t } : {}) },
+          body: JSON.stringify({ mes, usuario_nome: state.user?.nome || 'Administrador' })
+        });
+        const data = await res.json();
+        await loadFechamentosDaAPI();
+        alert(`Competência ${data.fechado ? 'CONGELADA' : 'DESCONGELADA'} com sucesso!`);
+      } catch (e) { alert('Erro: ' + e.message); }
+    }
+
+    async function registrarLog(acao, entidade, detalhes) {
+      try {
+        const t = state.token || localStorage.getItem('token') || '';
+        await fetch('/api/auditoria', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...(t ? { 'Authorization': 'Bearer ' + t } : {}) },
+          body: JSON.stringify({
+            acao, entidade, detalhes: String(detalhes || ''),
+            usuario_nome: state.user?.nome || 'Administrador',
+            usuario_email: state.user?.email || 'admin@frota.com'
+          })
+        });
+      } catch(e) {}
+    }
+
+
+    // =========================================================================
+    // CONTROLE DE FECHAMENTO MENSAL E AUDITORIA SINCRONIZADA
+    // =========================================================================
+    state.mesesFechados = state.mesesFechados || [];
 
     function isMesFechado(mes = state?.currentMonth) {
       if (!mes || !state.mesesFechados || !Array.isArray(state.mesesFechados)) return false;
