@@ -2344,8 +2344,11 @@
     }
     function fazerLogout() {
       localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+      localStorage.setItem('activeTab', 'dashboard');
+      state.token = null;
       state.user = null;
-      document.getElementById('login-screen').style.display = 'flex';
+      location.reload();
     }
 
     // =========================================================================
