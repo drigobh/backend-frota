@@ -3786,7 +3786,7 @@
       document.getElementById('btn-add-manutencao').onclick = addManutencaoRow;
       document.getElementById('btn-add-documento').onclick = addDocumentoRow;
       
-      document.getElementById('btn-print-report').addEventListener('click', () => {
+      document.getElementById('btn-print-report')?.addEventListener('click', () => {
         const resumoBtn = document.querySelector('[data-tab="tab-resumo"]');
         if (resumoBtn) resumoBtn.click();
         window.print();
