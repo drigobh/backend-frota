@@ -4004,7 +4004,12 @@
       container.innerHTML = htmlDocs + htmlManut;
     }
 
+    
     function renderAll() {
+      if (typeof atualizarInterfaceFechamento === 'function') {
+        atualizarInterfaceFechamento();
+      }
+
       applyPermissions();
       renderCadastroCavalos();
       renderCadastroCarretas();
