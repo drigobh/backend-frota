@@ -1,10 +1,38 @@
-const db = require('../database');
+/**
+ * ============================================================================
+ * CORRECAO 06b - Reescrever perfis.js com rotas completas
+ * ============================================================================
+ * ADICIONA:
+ *   GET    /api/permissoes                 - lista todas as permissoes
+ *   GET    /api/perfis/:id                 - detalhes do perfil
+ *   GET    /api/perfis/:id/permissoes      - permissoes de um perfil
+ *   PUT    /api/perfis/:id/permissoes      - salva permissoes de um perfil
+ *   DELETE /api/perfis/:id                 - exclui perfil (bloqueia se for sistema)
+ *
+ * RODAR (dry-run):   node correcao/FASE_1_CRITICA/06b_rotas_permissoes.js
+ * RODAR (aplicar):   node correcao/FASE_1_CRITICA/06b_rotas_permissoes.js --apply
+ * ============================================================================
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = path.resolve(__dirname, '../..');
+const BACKUP_DIR = path.resolve(ROOT, 'correcao/_backup');
+const APLICAR = process.argv.includes('--apply');
+
+const ARQUIVO = 'src/routes/perfis.js';
+
+// ===========================================================================
+// NOVO CONTEUDO DE perfis.js
+// ===========================================================================
+const NOVO_CONTEUDO = `const db = require('../database');
 
 let perfisEnsured = false;
 async function ensurePerfis() {
   if (perfisEnsured) return;
   try {
-    await db.query(`
+    await db.query(\`
       CREATE TABLE IF NOT EXISTS perfis (
         id SERIAL PRIMARY KEY,
         nome VARCHAR(50) NOT NULL UNIQUE,
@@ -19,7 +47,7 @@ async function ensurePerfis() {
       ('Operador', 'Lancamentos de KM, abastecimentos e acoplamentos', false),
       ('Financeiro', 'Gestao de DRE, receitas, despesas e faturamento', false)
       ON CONFLICT (nome) DO NOTHING;
-    `);
+    \`);
     perfisEnsured = true;
   } catch (err) {
     console.error('Auto-migracao perfis:', err.message);
@@ -35,7 +63,7 @@ async function routes(fastify, options) {
   fastify.get('/api/perfis', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     try {
       await ensurePerfis();
-      const res = await db.query(`
+      const res = await db.query(\`
         SELECT 
           p.id, p.nome, p.descricao, p.ativo, p.eh_sistema, p.created_at,
           COALESCE(COUNT(pp.permissao_id), 0)::int AS total_permissoes,
@@ -44,7 +72,7 @@ async function routes(fastify, options) {
         LEFT JOIN perfil_permissoes pp ON pp.perfil_id = p.id
         GROUP BY p.id
         ORDER BY p.id ASC
-      `);
+      \`);
       return reply.send(res.rows);
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
@@ -57,11 +85,11 @@ async function routes(fastify, options) {
   fastify.get('/api/permissoes', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     try {
       await ensurePerfis();
-      const res = await db.query(`
+      const res = await db.query(\`
         SELECT id, chave, descricao, modulo
         FROM permissoes
         ORDER BY modulo ASC, chave ASC
-      `);
+      \`);
       return reply.send(res.rows);
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
@@ -90,13 +118,13 @@ async function routes(fastify, options) {
   fastify.get('/api/perfis/:id/permissoes', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     try {
       await ensurePerfis();
-      const res = await db.query(`
+      const res = await db.query(\`
         SELECT perm.id, perm.chave, perm.descricao, perm.modulo
         FROM perfil_permissoes pp
         JOIN permissoes perm ON perm.id = pp.permissao_id
         WHERE pp.perfil_id = $1
         ORDER BY perm.modulo, perm.chave
-      `, [req.params.id]);
+      \`, [req.params.id]);
       return reply.send(res.rows);
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
@@ -235,3 +263,58 @@ async function routes(fastify, options) {
 }
 
 module.exports = routes;
+`;
+
+function garantirBackup(relPath) {
+  const absPath = path.resolve(ROOT, relPath);
+  const backupPath = path.resolve(BACKUP_DIR, '06b_' + relPath.replace(/[\\/]/g, '__'));
+  if (!fs.existsSync(backupPath)) {
+    fs.mkdirSync(path.dirname(backupPath), { recursive: true });
+    fs.copyFileSync(absPath, backupPath);
+    return backupPath;
+  }
+  return backupPath;
+}
+
+console.log('\n=============================================');
+console.log('  CORRECAO 06b - Reescrever perfis.js');
+console.log('  Modo: ' + (APLICAR ? 'APLICAR (--apply)' : 'DRY-RUN (sem alterar)'));
+console.log('=============================================\n');
+
+const absPath = path.resolve(ROOT, ARQUIVO);
+if (!fs.existsSync(absPath)) {
+  console.log('   [ERRO] Arquivo nao encontrado: ' + ARQUIVO);
+  process.exit(1);
+}
+
+const original = fs.readFileSync(absPath, 'utf8');
+
+console.log('   Arquivo: ' + ARQUIVO);
+console.log('   Tamanho original: ' + original.length + ' chars');
+console.log('   Tamanho novo:     ' + NOVO_CONTEUDO.length + ' chars');
+console.log('');
+console.log('   Rotas que serao adicionadas:');
+console.log('     - GET    /api/permissoes');
+console.log('     - GET    /api/perfis/:id');
+console.log('     - GET    /api/perfis/:id/permissoes');
+console.log('     - POST   /api/perfis (atualizado com permissoes)');
+console.log('     - PUT    /api/perfis/:id');
+console.log('     - PUT    /api/perfis/:id/permissoes');
+console.log('     - DELETE /api/perfis/:id');
+console.log('');
+
+if (!APLICAR) {
+  console.log('   [DRY] O arquivo seria reescrito por completo.');
+  console.log('         Para aplicar: node correcao/FASE_1_CRITICA/06b_rotas_permissoes.js --apply\n');
+  process.exit(0);
+}
+
+const backupPath = garantirBackup(ARQUIVO);
+console.log('   [BACKUP] ' + backupPath);
+
+fs.writeFileSync(absPath, NOVO_CONTEUDO, 'utf8');
+console.log('   [OK] Arquivo reescrito com sucesso!');
+console.log('\n✅ Proximos passos:');
+console.log('   1. Testar sintaxe: node -e "require(\'./src/routes/perfis.js\'); console.log(\'perfis OK\')"');
+console.log('   2. Commit + push');
+console.log('   3. Testar no Render\n');
