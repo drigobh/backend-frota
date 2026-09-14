@@ -1,8 +1,8 @@
 const db = require('../database');
 const bcrypt = require('bcrypt');
 
-async function hashSenha(senha) {
-  return bcrypt.hash(String(senha), 10);
+function hashSenha(senha) {
+  return crypto.createHash('sha256').update(String(senha)).digest('hex');
 }
 
 let usuariosEnsured = false;
@@ -101,7 +101,7 @@ async function routes(fastify, options) {
     if (!nome || !email) return reply.code(400).send({ erro: 'Nome e e-mail são obrigatórios.' });
     
     const senhaFinal = senha || '123456';
-    const senhaHash = await hashSenha(senhaFinal);
+    const senhaHash = hashSenha(senhaFinal);
 
     try {
       await ensureUsuariosETabelas();
@@ -161,7 +161,7 @@ async function routes(fastify, options) {
     if (!nova_senha || nova_senha.length < 6) {
       return reply.code(400).send({ erro: 'A senha deve conter no mínimo 6 caracteres.' });
     }
-    const senhaHash = await hashSenha(nova_senha);
+    const senhaHash = hashSenha(nova_senha);
     try {
       await ensureUsuariosETabelas();
       await db.query('UPDATE usuarios SET senha_hash = $1 WHERE id::text = $2::text', [senhaHash, id]);

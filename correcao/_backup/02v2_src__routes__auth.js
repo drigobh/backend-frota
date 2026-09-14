@@ -1,20 +1,12 @@
-const db = require('../database');
-const bcrypt = require('bcrypt');
+const { Pool } = require('pg');
 const crypto = require('crypto');
 
-async function hashSenha(senha) {
-  return bcrypt.hash(String(senha), 10);
-}
-
-async function verificarSenha(senha, hash) {
-  try {
-    return await bcrypt.compare(String(senha), hash);
-  } catch (e) {
-    return false;
-  }
+function hashSenha(senha) {
+  return crypto.createHash('sha256').update(String(senha)).digest('hex');
 }
 
 async function routes(fastify, options) {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
   fastify.post('/api/login', async (req, reply) => {
     const { email, senha } = req.body || {};
@@ -24,23 +16,23 @@ async function routes(fastify, options) {
 
     const emailLimpo = String(email).trim().toLowerCase();
     const senhaStr = String(senha).trim();
-    const hashInformado = await hashSenha(senhaStr);
+    const hashInformado = hashSenha(senhaStr);
 
     try {
       // 1. DESBLOQUEIO MASTER PARA admin@frota.com
       if (emailLimpo === 'admin@frota.com') {
-        let userRes = await db.query('SELECT * FROM usuarios WHERE LOWER(email) = $1', [emailLimpo]);
+        let userRes = await pool.query('SELECT * FROM usuarios WHERE LOWER(email) = $1', [emailLimpo]);
         let user = userRes.rows[0];
 
         if (!user) {
-          const createRes = await db.query(`
+          const createRes = await pool.query(`
             INSERT INTO usuarios (nome, email, senha_hash, perfil, ativo)
             VALUES ('Administrador', 'admin@frota.com', $1, 'Administrador', true)
             RETURNING *
           `, [hashInformado]);
           user = createRes.rows[0];
         } else {
-          await db.query(
+          await pool.query(
             'UPDATE usuarios SET senha_hash = $1, ativo = true, ultimo_login = CURRENT_TIMESTAMP WHERE id = $2',
             [hashInformado, user.id]
           );
@@ -64,7 +56,7 @@ async function routes(fastify, options) {
       }
 
       // 2. DEMAIS USUÁRIOS
-      const res = await db.query('SELECT * FROM usuarios WHERE LOWER(email) = $1', [emailLimpo]);
+      const res = await pool.query('SELECT * FROM usuarios WHERE LOWER(email) = $1', [emailLimpo]);
       if (res.rows.length === 0) {
         return reply.code(401).send({ erro: 'Usuário não encontrado.' });
       }
@@ -75,25 +67,13 @@ async function routes(fastify, options) {
       }
 
       const senhaDb = user.senha_hash || user.senha;
-      let senhaValida = false;
-
-      if (senhaDb && senhaDb.startsWith('$2')) {
-        senhaValida = await verificarSenha(senhaStr, senhaDb);
-      } else {
-        const hashLegado = crypto.createHash('sha256').update(senhaStr).digest('hex');
-        if (senhaDb === senhaStr || senhaDb === hashLegado) {
-          senhaValida = true;
-          const novoHash = await hashSenha(senhaStr);
-          await db.query('UPDATE usuarios SET senha_hash = $1 WHERE id = $2', [novoHash, user.id]);
-          console.log('[MIGRACAO] Senha de ' + user.email + ' migrada para bcrypt');
-        }
-      }
+      const senhaValida = (senhaDb === senhaStr || senhaDb === hashInformado);
 
       if (!senhaValida) {
         return reply.code(401).send({ erro: 'Senha incorreta.' });
       }
 
-      await db.query('UPDATE usuarios SET ultimo_login = CURRENT_TIMESTAMP WHERE id = $1', [user.id]);
+      await pool.query('UPDATE usuarios SET ultimo_login = CURRENT_TIMESTAMP WHERE id = $1', [user.id]);
 
       const payload = { id: user.id, email: user.email, nome: user.nome, perfil: user.perfil || 'Operador' };
       let token;
