@@ -1325,7 +1325,30 @@
         <button class="nav-tab-btn" data-tab="tab-auditoria" id="nav-tab-auditoria"><span>&#128373;</span><span class="nav-label">Auditoria</span></button>
       </div>
     </nav>
-  </aside>
+  
+          <div class="nav-group" data-group="grupo-admin">
+            <a href="#" class="nav-header" onclick="toggleSubmenu('grupo-admin'); return false;">
+              <span class="nav-header-icon">⚙️</span>
+              <span class="nav-header-text">Administração</span>
+              <span class="nav-arrow">▼</span>
+            </a>
+            <div class="nav-submenu" id="grupo-admin">
+              <a href="#" class="nav-item" id="nav-tab-usuarios" onclick="switchTab('usuarios'); return false;">
+                <span class="nav-item-icon">👥</span>
+                <span class="nav-item-text">Usuários</span>
+              </a>
+              <a href="#" class="nav-item" id="nav-tab-perfis" onclick="switchTab('perfis'); return false;">
+                <span class="nav-item-icon">🛡️</span>
+                <span class="nav-item-text">Perfis</span>
+              </a>
+              <a href="#" class="nav-item" id="nav-tab-auditoria" onclick="switchTab('auditoria'); loadAuditoriaDaAPI(); return false;">
+                <span class="nav-item-icon">🕵️</span>
+                <span class="nav-item-text">Auditoria</span>
+              </a>
+            </div>
+          </div>
+
+    </aside>
 
   <div class="app-wrapper">
     <!-- Top Fixed Application Header -->
@@ -1971,6 +1994,8 @@
       </section>
     
       <!-- TAB: AUDITORIA -->
+      
+      <!-- TAB: AUDITORIA -->
       <section id="tab-auditoria" class="tab-content" style="display:none;">
         <div class="bar-controls" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:1rem;">
           <div style="display:flex; align-items:center; gap:0.75rem;">
@@ -2004,6 +2029,7 @@
           </table>
         </div>
       </section>
+
   
     </main>
 
