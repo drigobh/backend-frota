@@ -1944,6 +1944,17 @@
   </div>
 
   <script>
+
+    // Função auxiliar para evitar crash quando o elemento não existe na tela
+    function safeSetText(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+    function safeSetHtml(id, inner) {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = inner;
+    }
+
     const API_URL = '/api';
 
     function apiFetch(endpoint, options = {}) {
