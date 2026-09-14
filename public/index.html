@@ -1319,20 +1319,15 @@
         <button class="nav-tab-btn" data-tab="tab-graficos" id="nav-tab-graficos"><span>&#128201;</span><span class="nav-label">Graficos</span></button>
       </div>
       <button class="nav-tab-btn nav-group-toggle" data-group="grupo-admin"><span>&#128274;</span><span class="nav-label">Administracao</span><span class="nav-arrow">&#9654;</span></button>
-      <div class="nav-submenu" id="grupo-admin">
-        <button class="nav-tab-btn" data-tab="tab-usuarios" id="nav-tab-usuarios" onclick="setTimeout(loadUsuariosDaAPI, 100)"><span>&#128101;</span><span class="nav-label">Usuarios</span></button>
-        <button class="nav-tab-btn" data-tab="tab-perfis" id="nav-tab-perfis"><span>&#128737;</span><span class="nav-label">Perfis</span></button>
-        <button class="nav-tab-btn" data-tab="tab-auditoria" id="nav-tab-auditoria"><span>&#128373;</span><span class="nav-label">Auditoria</span></button>
-      </div>
-    </nav>
-  
+      
+    
           <div class="nav-group" data-group="grupo-admin">
             <a href="#" class="nav-header" onclick="toggleSubmenu('grupo-admin'); return false;">
               <span class="nav-header-icon">⚙️</span>
               <span class="nav-header-text">Administração</span>
               <span class="nav-arrow">▼</span>
             </a>
-            <div class="nav-submenu" id="grupo-admin">
+            <div class="nav-submenu" id="grupo-admin" style="display:none;">
               <a href="#" class="nav-item" id="nav-tab-usuarios" onclick="switchTab('usuarios'); return false;">
                 <span class="nav-item-icon">👥</span>
                 <span class="nav-item-text">Usuários</span>
@@ -1348,85 +1343,9 @@
             </div>
           </div>
 
-    </aside>
-
-  <div class="app-wrapper">
-    <!-- Top Fixed Application Header -->
-    <header class="app-header no-print">
-      <div style="font-size: 0.95rem; font-weight: 700; color: #0f2a4a;">
-        Sistema Integrado de Frotas & Operações
-      </div>
-      <div class="header-actions">
-        <div class="user-badge" id="current-user-badge">👤 Conectado</div>
-        <button class="header-btn" onclick="fazerLogout()" title="Sair do sistema">
-          Sair
-        </button>
-        <button class="header-btn" id="btn-print-report" title="Imprimir resumo executivo do mês">
-          <span>🖨️</span> Exportar Relatório
-        </button>
-      </div>
-    </header>
-
-    <!-- Main Work Area -->
-    <main class="app-main">
-      
-      <div class="print-header">
-        <h2 style="margin:0 0 0.25rem 0; font-size: 1.5rem;">Caderninho de Motorista — Relatório Operacional de Frota</h2>
-        <p style="margin:0; font-size: 0.9rem; color: #475569;" id="print-header-meta">Mês de Referência: -</p>
-      </div>
-
-      <!-- TAB 0: DASHBOARD -->
-      <section id="tab-dashboard" class="tab-content active">
-
-        <!-- BARRA DE CONTROLE DE COMPETÊNCIA -->
-        <div id="box-fechamento-dashboard" style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:0.75rem 1.25rem; margin-top:1rem; margin-bottom:1.25rem; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-          <div style="display:flex; align-items:center; gap:0.75rem;">
-            <span style="font-weight:700; color:#0f2a4a; font-size:0.95rem;">Competência Mensal:</span>
-            <span id="badge-status-mes" class="lock-badge unlocked" style="padding:4px 10px; border-radius:6px; font-weight:700; font-size:0.85rem; background:#dcfce7; color:#166534; border:1px solid #86efac;">🔓 Mês Aberto</span>
-          </div>
-          <div>
-            <button id="btn-toggle-fechamento" onclick="toggleFechamentoMes()" class="btn-action" style="background:#0f2a4a; color:#ffffff; font-weight:600; padding:0.45rem 1.1rem; border-radius:6px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
-              <span>🔒</span> Congelar Mês
-            </button>
-          </div>
-        </div>
+    </nav>
   
-        <div class="bar-controls">
-          <div class="bar-controls-left">
-            <span class="label-month-select">Mês de Referência:</span>
-            <select class="select-month select-mes-global" id="select-mes-dashboard"></select>
-          </div>
-          <div class="bar-controls-right">
-            <span style="font-size:0.85rem; color: var(--text-muted);">Painel consolidado em tempo real da nuvem</span>
-          </div>
-        </div>
-
-        <div class="section-title-wrap">
-          <h2 class="section-title"><span>📊</span> Visão Geral da Frota & Operação</h2>
-        </div>
-
-        <div class="kpi-row">
-          <div class="kpi-card kpi-accent">
-            <div class="kpi-card-title">Veículos Ativos</div>
-            <div class="kpi-card-val" id="dash-veiculos">0</div>
-            <div class="kpi-card-sub">Frota tratora cadastrada</div>
-          </div>
-          <div class="kpi-card kpi-accent">
-            <div class="kpi-card-title">Motoristas Ativos</div>
-            <div class="kpi-card-val" id="dash-motoristas">0</div>
-            <div class="kpi-card-sub">Quadro efetivo</div>
-          </div>
-          <div class="kpi-card kpi-warning">
-            <div class="kpi-card-title">Em Operação (Acoplados)</div>
-            <div class="kpi-card-val" id="dash-acoplados">0</div>
-            <div class="kpi-card-sub">Conjuntos rodando no mês</div>
-          </div>
-          <div class="kpi-card kpi-accent">
-            <div class="kpi-card-title">Quilometragem Total</div>
-            <div class="kpi-card-val" id="dash-km">0 km</div>
-            <div class="kpi-card-sub">Distância percorrida</div>
-          </div>
-        </div>
+          
 
         
         <!-- CENTRAL DE ALERTAS INTELIGENTES -->
@@ -1996,6 +1915,8 @@
       <!-- TAB: AUDITORIA -->
       
       <!-- TAB: AUDITORIA -->
+      
+      <!-- TAB: AUDITORIA -->
       <section id="tab-auditoria" class="tab-content" style="display:none;">
         <div class="bar-controls" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:1rem;">
           <div style="display:flex; align-items:center; gap:0.75rem;">
@@ -2030,7 +1951,44 @@
         </div>
       </section>
 
+
   
+    
+      <!-- TAB: PERFIS -->
+      <section id="tab-perfis" class="tab-content" style="display:none;">
+        <div class="section-title-wrap">
+          <h2 class="section-title"><span>🛡️</span> Perfis de Acesso e Permissões</h2>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Perfil</th>
+                <th>Descrição do Acesso</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Administrador</strong></td>
+                <td>Acesso total ao sistema, cadastros, DRE, usuários e auditoria.</td>
+                <td><span class="badge-pos">Ativo</span></td>
+              </tr>
+              <tr>
+                <td><strong>Financeiro</strong></td>
+                <td>Gestão financeira, DRE e relatórios executivos.</td>
+                <td><span class="badge-pos">Ativo</span></td>
+              </tr>
+              <tr>
+                <td><strong>Operador</strong></td>
+                <td>Lançamentos operacionais de KM, abastecimentos e acoplamentos.</td>
+                <td><span class="badge-pos">Ativo</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
     </main>
 
     <footer class="app-footer no-print">
