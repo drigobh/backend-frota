@@ -79,6 +79,7 @@ fastify.register(require('./routes/frota_avancada'));
 fastify.register(require('./routes/usuarios'));
 fastify.register(require('./routes/perfis'));
 fastify.register(require('./routes/auditoria'));
+fastify.register(require('./routes/fechamento'));
 fastify.register(require('./routes/alertas'));
 
 // =========================================================================

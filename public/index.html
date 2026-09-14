@@ -310,6 +310,89 @@
       background: #dcfce7;
       color: #166534;
     }
+  
+    /* ESTILIZAÇÃO RELATÓRIO EXECUTIVO A4 */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 12mm 10mm 15mm 10mm;
+      }
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 10pt !important;
+      }
+      .no-print, .app-sidebar, .app-header, .bar-controls, .btn-action, .plate-tabs {
+        display: none !important;
+      }
+      .app-wrapper {
+        margin: 0 !important;
+        width: 100% !important;
+      }
+      .app-main {
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .print-header {
+        display: block !important;
+        border-bottom: 2px solid #0f2a4a;
+        padding-bottom: 8px;
+        margin-bottom: 16px;
+      }
+      .table-container {
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+        margin-bottom: 12px !important;
+      }
+      table.data-table th {
+        background-color: #0f2a4a !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        font-size: 8pt !important;
+        padding: 4px 6px !important;
+      }
+      table.data-table td {
+        font-size: 8.5pt !important;
+        padding: 4px 6px !important;
+      }
+      .kpi-row {
+        gap: 8px !important;
+        margin-bottom: 12px !important;
+        page-break-inside: avoid;
+      }
+      .kpi-card {
+        padding: 8px !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+      }
+      .kpi-card-val {
+        font-size: 1.1rem !important;
+      }
+    }
+
+    /* BADGE DE COMPETÊNCIA FECHADA */
+    .lock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .lock-badge.locked {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #f87171;
+    }
+    .lock-badge.unlocked {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #86efac;
+    }
   </style>
   
   <style>
@@ -1359,8 +1442,11 @@
             <span class="label-month-select">Mês de Referência:</span>
             <select class="select-month select-mes-global" id="select-mes-dashboard"></select>
           </div>
+          
           <div class="bar-controls-right">
-            <span style="font-size:0.85rem; color: var(--text-muted);">Painel consolidado em tempo real da nuvem</span>
+            <span id="badge-status-mes" class="lock-badge unlocked">🔓 Competência Aberta</span>
+            <button class="btn-action btn-action-secondary" id="btn-toggle-fechamento" onclick="toggleFechamentoMes()" style="display:none;">🔒 Congelar Mês</button>
+            <span style="font-size:0.85rem; color: var(--text-muted); margin-left: 8px;">Painel em tempo real</span>
           </div>
         </div>
 
@@ -2507,7 +2593,7 @@
     async function deleteItem(tipo, id) {
       if (!confirm('Deseja excluir este registro?')) return;
       try {
-        await apiFetch(`/${tipo}/${id}`, { method: 'DELETE' });
+        await apiFetch(`/${tipo}/${id}`, { method: 'DELETE' }); registrarLog('Excluir', tipo, 'ID: ' + id);
         loadCadastrosDaAPI();
         loadDashboardData();
       } catch (error) {
@@ -2939,7 +3025,7 @@
     async function deleteAbastecimento(id) {
       if (!confirm('Deseja excluir este registro de abastecimento?')) return;
       try {
-        await apiFetch(`/abastecimentos/${id}`, { method: 'DELETE' });
+        await apiFetch(`/abastecimentos/${id}`, { method: 'DELETE' }); registrarLog('Excluir Abastecimento', 'Abastecimento', 'ID: ' + id);
         loadAbastecimentosDaAPI();
       } catch (err) {
         console.error(err);
@@ -3132,7 +3218,7 @@
       if (!confirm('Deseja excluir este lançamento financeiro?')) return;
       
       try {
-        await apiFetch(`/financeiro/${id}`, { method: 'DELETE' });
+        await apiFetch(`/financeiro/${id}`, { method: 'DELETE' }); registrarLog('Excluir Lançamento DRE', 'Financeiro', 'ID: ' + id);
         loadLancamentosDaAPI();
         loadDashboardData();
       } catch (error) {
@@ -3310,7 +3396,7 @@
     async function deleteManutencao(id) {
       if (!confirm('Deseja excluir este registro de manutenção?')) return;
       try {
-        await apiFetch(`/manutencoes/${id}`, { method: 'DELETE' });
+        await apiFetch(`/manutencoes/${id}`, { method: 'DELETE' }); registrarLog('Excluir Manutenção', 'Manutenção', 'ID: ' + id);
         loadManutencoesDaAPI();
       } catch (err) {
         console.error(err);
@@ -3386,7 +3472,7 @@
     async function deleteDocumento(id) {
       if (!confirm('Deseja excluir este documento?')) return;
       try {
-        await apiFetch(`/documentos/${id}`, { method: 'DELETE' });
+        await apiFetch(`/documentos/${id}`, { method: 'DELETE' }); registrarLog('Excluir Documento', 'Documentos', 'ID: ' + id);
         loadDocumentosDaAPI();
       } catch (err) {
         console.error(err);
@@ -3823,6 +3909,79 @@
           })
         });
       } catch (e) {}
+    }
+
+    
+    // =========================================================================
+    // CONTROLE DE COMPETÊNCIA CONTÁBIL (FECHAMENTO MENSAL)
+    // =========================================================================
+    state.mesesFechados = [];
+
+    async function loadFechamentosDaAPI() {
+      try {
+        const res = await apiFetch('/meses-fechados');
+        if (res.ok) {
+          state.mesesFechados = (await res.json()).map(x => x.mes);
+          atualizarInterfaceFechamento();
+        }
+      } catch (e) {}
+    }
+
+    function isMesFechado(mes = state.currentMonth) {
+      return state.mesesFechados.includes(mes);
+    }
+
+    function atualizarInterfaceFechamento() {
+      const fechado = isMesFechado();
+      const isAdmin = state.user?.perfil === 'Administrador';
+      
+      const badge = document.getElementById('badge-status-mes');
+      const btnToggle = document.getElementById('btn-toggle-fechamento');
+
+      if (badge) {
+        badge.className = 'lock-badge ' + (fechado ? 'locked' : 'unlocked');
+        badge.innerHTML = fechado ? '🔒 Mês Congelado' : '🔓 Competência Aberta';
+      }
+
+      if (btnToggle) {
+        btnToggle.style.display = isAdmin ? 'inline-flex' : 'none';
+        btnToggle.textContent = fechado ? '🔓 Descongelar Mês' : '🔒 Congelar Mês';
+      }
+
+      // Bloqueia campos de edição se não for admin e o mês estiver fechado
+      const bloquear = fechado && !isAdmin;
+      document.querySelectorAll('#tab-km input, #tab-abastecimentos button, #tab-dre button').forEach(el => {
+        if (!el.classList.contains('select-mes-global') && el.id !== 'btn-toggle-fechamento') {
+          el.disabled = bloquear;
+        }
+      });
+    }
+
+    async function toggleFechamentoMes() {
+      const mes = state.currentMonth;
+      const fechadoAtual = isMesFechado(mes);
+      const msg = fechadoAtual 
+        ? `Deseja DESCONGELAR a competência de "${mes}" para permitir novas alterações?`
+        : `Deseja CONGELAR a competência de "${mes}"? Lançamentos e edições de operadores serão bloqueados.`;
+
+      if (!confirm(msg)) return;
+
+      try {
+        const res = await apiFetch('/meses-fechados/toggle', {
+          method: 'POST',
+          body: JSON.stringify({ mes, usuario_nome: state.user?.nome || 'Administrador' })
+        });
+        if (res.ok) {
+          await loadFechamentosDaAPI();
+          registrarLog(
+            fechadoAtual ? 'Descongelar Mês' : 'Congelar Mês',
+            'Competência',
+            `Competência de ${mes} ${fechadoAtual ? 'descongelada' : 'congelada'}`
+          );
+        }
+      } catch (err) {
+        alert('Erro ao alterar fechamento da competência.');
+      }
     }
 
     function renderAll() {
