@@ -1,6 +1,3 @@
-const { autoMigrate } = require('./auto_migrate');
-const { Pool: PoolMigrate } = require('pg');
-new PoolMigrate({ connectionString: process.env.DATABASE_URL }).connect().then(c => { autoMigrate(c); c.release(); }).catch(()=>{});
 // =========================================================================
 // CADERNINHO DE MOTORISTA - SERVIDOR PRINCIPAL
 // Stack: Fastify + PostgreSQL (Neon) + Render
@@ -77,7 +74,6 @@ fastify.register(require('./routes/km'));
 fastify.register(require('./routes/financeiro'));
 fastify.register(require('./routes/dashboard'));
 fastify.register(require('./routes/auth'));
-fastify.register(require('./routes/cadastros'));
 fastify.register(require('./routes/abastecimentos'));
 fastify.register(require('./routes/frota_avancada'));
 fastify.register(require('./routes/usuarios'));

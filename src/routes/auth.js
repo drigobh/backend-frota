@@ -18,57 +18,50 @@ async function routes(fastify, options) {
     const senhaStr = String(senha).trim();
     const hashInformado = hashSenha(senhaStr);
 
-    // 1. DESBLOQUEIO MESTRE PARA O ADMINISTRADOR
-    if (emailLimpo === 'admin@frota.com') {
-      try {
-        await pool.query(`
-          CREATE TABLE IF NOT EXISTS usuarios (
-            id SERIAL PRIMARY KEY,
-            nome VARCHAR(100) NOT NULL,
-            email VARCHAR(150) NOT NULL UNIQUE,
-            senha_hash VARCHAR(255),
-            senha VARCHAR(255),
-            perfil_id INT,
-            perfil VARCHAR(50) DEFAULT 'Administrador',
-            ativo BOOLEAN DEFAULT true,
-            ultimo_login TIMESTAMP WITH TIME ZONE,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-          );
+    try {
+      // 1. DESBLOQUEIO MASTER PARA admin@frota.com
+      if (emailLimpo === 'admin@frota.com') {
+        let userRes = await pool.query('SELECT * FROM usuarios WHERE LOWER(email) = $1', [emailLimpo]);
+        let user = userRes.rows[0];
 
-          INSERT INTO usuarios (nome, email, senha_hash, perfil, ativo)
-          VALUES ('Administrador', 'admin@frota.com', $1, 'Administrador', true)
-          ON CONFLICT (email) DO UPDATE 
-          SET senha_hash = EXCLUDED.senha_hash, ativo = true, ultimo_login = CURRENT_TIMESTAMP;
-        `, [hashInformado]);
-      } catch (e) {
-        console.error('Aviso ao sincronizar admin:', e.message);
+        if (!user) {
+          const createRes = await pool.query(`
+            INSERT INTO usuarios (nome, email, senha_hash, perfil, ativo)
+            VALUES ('Administrador', 'admin@frota.com', $1, 'Administrador', true)
+            RETURNING *
+          `, [hashInformado]);
+          user = createRes.rows[0];
+        } else {
+          await pool.query(
+            'UPDATE usuarios SET senha_hash = $1, ativo = true, ultimo_login = CURRENT_TIMESTAMP WHERE id = $2',
+            [hashInformado, user.id]
+          );
+        }
+
+        // Gera token JWT assinado se fastify.jwt existir, ou assina via jsonwebtoken
+        const payload = { id: user.id, email: user.email, nome: user.nome || 'Administrador', perfil: 'Administrador' };
+        let token;
+        if (fastify.jwt && typeof fastify.jwt.sign === 'function') {
+          token = fastify.jwt.sign(payload);
+        } else {
+          try {
+            const jwt = require('jsonwebtoken');
+            token = jwt.sign(payload, process.env.JWT_SECRET || 'secret');
+          } catch (e) {
+            token = crypto.randomBytes(32).toString('hex');
+          }
+        }
+
+        return reply.send({ token, usuario: payload });
       }
 
-      const token = crypto.randomBytes(32).toString('hex');
-      return reply.send({
-        token,
-        usuario: {
-          id: 1,
-          nome: 'Administrador',
-          email: 'admin@frota.com',
-          perfil: 'Administrador'
-        }
-      });
-    }
-
-    // 2. DEMAIS USUARIOS
-    try {
-      const res = await pool.query(
-        'SELECT * FROM usuarios WHERE LOWER(email) = $1',
-        [emailLimpo]
-      );
-
+      // 2. DEMAIS USUÁRIOS
+      const res = await pool.query('SELECT * FROM usuarios WHERE LOWER(email) = $1', [emailLimpo]);
       if (res.rows.length === 0) {
         return reply.code(401).send({ erro: 'Usuário não encontrado.' });
       }
 
       const user = res.rows[0];
-
       if (user.ativo === false) {
         return reply.code(401).send({ erro: 'Usuário inativo no sistema.' });
       }
@@ -81,17 +74,21 @@ async function routes(fastify, options) {
       }
 
       await pool.query('UPDATE usuarios SET ultimo_login = CURRENT_TIMESTAMP WHERE id = $1', [user.id]);
-      const token = crypto.randomBytes(32).toString('hex');
 
-      return reply.send({
-        token,
-        usuario: {
-          id: user.id,
-          nome: user.nome,
-          email: user.email,
-          perfil: user.perfil || 'Operador'
+      const payload = { id: user.id, email: user.email, nome: user.nome, perfil: user.perfil || 'Operador' };
+      let token;
+      if (fastify.jwt && typeof fastify.jwt.sign === 'function') {
+        token = fastify.jwt.sign(payload);
+      } else {
+        try {
+          const jwt = require('jsonwebtoken');
+          token = jwt.sign(payload, process.env.JWT_SECRET || 'secret');
+        } catch (e) {
+          token = crypto.randomBytes(32).toString('hex');
         }
-      });
+      }
+
+      return reply.send({ token, usuario: payload });
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
     }
