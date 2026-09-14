@@ -1955,6 +1955,40 @@
           </div>
         </div>
       </section>
+    
+      <!-- TAB: AUDITORIA -->
+      <section id="tab-auditoria" class="tab-content">
+        <div class="bar-controls">
+          <div class="bar-controls-left">
+            <span class="label-month-select">Trilha de Auditoria:</span>
+            <span style="font-size:0.85rem; color:var(--text-muted);">Registro de alterações e segurança do sistema</span>
+          </div>
+          <div class="bar-controls-right">
+            <button class="btn-action btn-action-secondary" onclick="loadAuditoriaDaAPI()">🔄 Atualizar Logs</button>
+            <button class="btn-action btn-action-secondary" onclick="exportTableToCSV('Trilha_Auditoria.csv', 'table-auditoria')">⬇️ Exportar CSV</button>
+          </div>
+        </div>
+
+        <div class="section-title-wrap">
+          <h2 class="section-title"><span>🕵️</span> Histórico de Ações da Frota</h2>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="table-auditoria">
+            <thead>
+              <tr>
+                <th style="width: 150px;">Data / Hora</th>
+                <th style="width: 180px;">Usuário</th>
+                <th style="width: 120px;">Ação</th>
+                <th style="width: 140px;">Módulo</th>
+                <th>Detalhes do Registro</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-auditoria"></tbody>
+          </table>
+        </div>
+      </section>
+
     </main>
 
     <footer class="app-footer no-print">
@@ -2105,35 +2139,45 @@
     // CONTROLE DE PERMISSÕES NA INTERFACE
     // =========================================================================
     function applyPermissions() {
-      const isAdmin = state.user && state.user.perfil === 'Administrador';
-      
+      const perfil = state.user?.perfil || 'Operador';
+      const isAdmin = perfil === 'Administrador';
+      const isFinanceiro = perfil === 'Financeiro';
+
+      // Grupos do Menu
+      const grupoAdmin = document.querySelector('[data-group="grupo-admin"]');
+      const grupoFinanceiro = document.querySelector('[data-group="grupo-financeiro"]');
+      const submenuAdmin = document.getElementById('grupo-admin');
+      const submenuFinanceiro = document.getElementById('grupo-financeiro');
+
+      // Abas Financeiras
       const dreTab = document.getElementById('nav-tab-dre');
       const resumoTab = document.getElementById('nav-tab-resumo');
       const graficosTab = document.getElementById('nav-tab-graficos');
-      
       const dashFinTitle = document.getElementById('dash-finance-title');
       const dashFinCards = document.getElementById('dash-finance-cards');
-      const printBtn = document.getElementById('btn-print-report');
 
       if (!isAdmin) {
+        if (grupoAdmin) grupoAdmin.style.display = 'none';
+        if (submenuAdmin) submenuAdmin.style.display = 'none';
+      } else {
+        if (grupoAdmin) grupoAdmin.style.display = 'flex';
+      }
+
+      if (!isAdmin && !isFinanceiro) {
+        if (grupoFinanceiro) grupoFinanceiro.style.display = 'none';
+        if (submenuFinanceiro) submenuFinanceiro.style.display = 'none';
         if (dreTab) dreTab.style.display = 'none';
         if (resumoTab) resumoTab.style.display = 'none';
         if (graficosTab) graficosTab.style.display = 'none';
         if (dashFinTitle) dashFinTitle.style.display = 'none';
         if (dashFinCards) dashFinCards.style.display = 'none';
-        if (printBtn) printBtn.style.display = 'none';
-        
-        const activeTab = document.querySelector('.nav-tab-btn.active')?.getAttribute('data-tab');
-        if (['tab-dre', 'tab-resumo', 'tab-graficos'].includes(activeTab)) {
-          document.querySelector('[data-tab="tab-dashboard"]').click();
-        }
       } else {
+        if (grupoFinanceiro) grupoFinanceiro.style.display = 'flex';
         if (dreTab) dreTab.style.display = 'flex';
         if (resumoTab) resumoTab.style.display = 'flex';
         if (graficosTab) graficosTab.style.display = 'flex';
         if (dashFinTitle) dashFinTitle.style.display = 'flex';
         if (dashFinCards) dashFinCards.style.display = 'grid';
-        if (printBtn) printBtn.style.display = 'inline-flex';
       }
     }
 
@@ -3725,6 +3769,60 @@
       }
 
       container.innerHTML = htmlDocs + htmlManut;
+    }
+
+    
+    async function loadAuditoriaDaAPI() {
+      try {
+        const res = await apiFetch('/auditoria');
+        if (!res.ok) return;
+        const data = await res.json();
+        renderAuditoria(data);
+      } catch (err) {
+        console.error('Erro ao carregar auditoria:', err);
+      }
+    }
+
+    function renderAuditoria(lista) {
+      const tbody = document.getElementById('tbody-auditoria');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!lista || lista.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhum registro de auditoria no momento.</td></tr>';
+        return;
+      }
+
+      lista.forEach(a => {
+        const dataFormatada = a.created_at ? new Date(a.created_at).toLocaleString('pt-BR') : '-';
+        let badgeCor = 'badge-pos';
+        if (a.acao.includes('Excluir') || a.acao.includes('Desativar')) badgeCor = 'badge-neg';
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${dataFormatada}</td>
+          <td><strong>${a.usuario_nome}</strong><br><span style="font-size:11px;color:#64748b;">${a.usuario_email}</span></td>
+          <td><span class="${badgeCor}">${a.acao}</span></td>
+          <td><span class="vehicle-tag">${a.entidade}</span></td>
+          <td>${a.detalhes || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function registrarLog(acao, entidade, detalhes) {
+      try {
+        await apiFetch('/auditoria', {
+          method: 'POST',
+          body: JSON.stringify({
+            acao,
+            entidade,
+            detalhes,
+            usuario_nome: state.user?.nome || 'Administrador',
+            usuario_email: state.user?.email || 'admin@frota.com'
+          })
+        });
+      } catch (e) {}
     }
 
     function renderAll() {

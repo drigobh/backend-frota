@@ -1,76 +1,62 @@
-const db = require('../database');
+const { Pool } = require('pg');
 
-module.exports = async function (fastify, options) {
+let auditoriaEnsured = false;
+async function ensureAuditoria(pool) {
+  if (auditoriaEnsured) return;
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS auditoria (
+        id SERIAL PRIMARY KEY,
+        usuario_email VARCHAR(150),
+        usuario_nome VARCHAR(100),
+        acao VARCHAR(50) NOT NULL,
+        entidade VARCHAR(50) NOT NULL,
+        detalhes TEXT,
+        ip VARCHAR(50),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    auditoriaEnsured = true;
+  } catch (err) {
+    console.error('Erro na criacao da tabela de auditoria:', err.message);
+  }
+}
 
-  // =========================================================================
-  // LISTAR AUDITORIA (paginada, filtrável)
-  // =========================================================================
-  fastify.get('/api/auditoria', {
-    preHandler: [fastify.autenticar],
-  }, async (request, reply) => {
-    const limit = Math.min(parseInt(request.query.limit) || 100, 500);
-    const offset = parseInt(request.query.offset) || 0;
-    const modulo = request.query.modulo || null;
-    const usuario = request.query.usuario || null;
+async function routes(fastify, options) {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  ensureAuditoria(pool).catch(() => {});
 
+  // Listar últimos 100 registros de auditoria
+  fastify.get('/api/auditoria', async (req, reply) => {
     try {
-      let query = `
-        SELECT id, usuario_id, usuario_nome, acao, modulo, registro_id,
-               valor_anterior, valor_novo, ip, created_at
+      await ensureAuditoria(pool);
+      const res = await pool.query(`
+        SELECT id, usuario_nome, usuario_email, acao, entidade, detalhes, created_at
         FROM auditoria
-        WHERE 1=1
-      `;
-      const params = [];
-
-      if (modulo) {
-        params.push(modulo);
-        query += ` AND modulo = $${params.length}`;
-      }
-      if (usuario) {
-        params.push('%' + usuario + '%');
-        query += ` AND usuario_nome ILIKE $${params.length}`;
-      }
-
-      params.push(limit, offset);
-      query += ` ORDER BY created_at DESC LIMIT $${params.length - 1} OFFSET $${params.length}`;
-
-      const { rows } = await db.query(query, params);
-
-      const total = await db.query(`SELECT COUNT(*) FROM auditoria`);
-
-      return {
-        registros: rows,
-        total: parseInt(total.rows[0].count),
-        limit,
-        offset,
-      };
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.status(500).send({ erro: 'Erro ao listar auditoria.' });
-    }
-  });
-
-  // =========================================================================
-  // RESUMO DE AUDITORIA (últimas ações agrupadas)
-  // =========================================================================
-  fastify.get('/api/auditoria/resumo', {
-    preHandler: [fastify.autenticar],
-  }, async (request, reply) => {
-    try {
-      const { rows } = await db.query(`
-        SELECT 
-          DATE_TRUNC('day', created_at) AS dia,
-          COUNT(*) AS total
-        FROM auditoria
-        WHERE created_at >= NOW() - INTERVAL '30 days'
-        GROUP BY dia
-        ORDER BY dia DESC
+        ORDER BY id DESC
+        LIMIT 100
       `);
-      return rows;
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.status(500).send({ erro: 'Erro ao gerar resumo.' });
+      return reply.send(res.rows);
+    } catch (err) {
+      return reply.code(500).send({ erro: err.message });
     }
   });
 
-};
+  // Registrar evento de auditoria
+  fastify.post('/api/auditoria', async (req, reply) => {
+    const { acao, entidade, detalhes, usuario_nome, usuario_email } = req.body || {};
+    try {
+      await ensureAuditoria(pool);
+      const res = await pool.query(`
+        INSERT INTO auditoria (usuario_nome, usuario_email, acao, entidade, detalhes)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING *
+      `, [usuario_nome || 'Sistema', usuario_email || 'admin@frota.com', acao, entidade, detalhes || '']);
+      return reply.code(201).send(res.rows[0]);
+    } catch (err) {
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+}
+
+module.exports = routes;
