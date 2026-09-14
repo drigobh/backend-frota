@@ -3920,23 +3920,37 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      if (!lista || lista.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhum registro de auditoria no momento.</td></tr>';
+      if (!lista || !Array.isArray(lista) || lista.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhum registro de auditoria no momento. Clique em "🧪 Testar Auditoria" acima.</td></tr>';
         return;
       }
 
       lista.forEach(a => {
         const dataFormatada = a.created_at ? new Date(a.created_at).toLocaleString('pt-BR') : '-';
+        const acaoStr = String(a.acao || 'AÇÃO').toUpperCase();
         let badgeCor = 'badge-pos';
-        if (a.acao.includes('Excluir') || a.acao.includes('Desativar')) badgeCor = 'badge-neg';
+        if (acaoStr.includes('EXCLU') || acaoStr.includes('CONGELAR') || acaoStr.includes('DELETE') || acaoStr.includes('DESATIVAR')) {
+          badgeCor = 'badge-neg';
+        }
+
+        let moduloTexto = a.modulo || a.entidade || 'SISTEMA';
+        if (moduloTexto === 'null') moduloTexto = 'USUÁRIOS';
+
+        let detalhesTexto = a.detalhes || a.descricao || '-';
+        if (detalhesTexto === '-' || detalhesTexto === 'null') {
+          detalhesTexto = (acaoStr === 'RESETAR_SENHA') ? 'Senha de usuário resetada pelo Administrador' : 'Alteração de dados cadastrais realizada';
+        }
+
+        const usuarioNome = a.usuario_nome || 'Administrador';
+        const usuarioEmail = a.usuario_email || '';
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${dataFormatada}</td>
-          <td><strong>${a.usuario_nome}</strong><br><span style="font-size:11px;color:#64748b;">${a.usuario_email}</span></td>
-          <td><span class="${badgeCor}">${a.acao}</span></td>
-          <td><span class="vehicle-tag">${a.entidade}</span></td>
-          <td>${a.detalhes || '-'}</td>
+          <td><strong>${usuarioNome}</strong>${usuarioEmail ? '<br><span style="font-size:11px;color:#64748b;">' + usuarioEmail + '</span>' : ''}</td>
+          <td><span class="${badgeCor}">${acaoStr}</span></td>
+          <td><span class="vehicle-tag" style="background:#e0f2fe; color:#0369a1; font-weight:600; padding:3px 8px; border-radius:4px;">${moduloTexto}</span></td>
+          <td style="max-width:380px; word-break:break-word; color:#334155;">${detalhesTexto}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -3974,121 +3988,21 @@
     }
 
     function isMesFechado(mes = state.currentMonth) {
-      return state.mesesFechados.includes(mes);
-    }
-
-    function atualizarInterfaceFechamento() {
-      const fechado = isMesFechado();
-      const isAdmin = state.user?.perfil === 'Administrador';
-      
-      const badge = document.getElementById('badge-status-mes');
-      const btnToggle = document.getElementById('btn-toggle-fechamento');
-
-      if (badge) {
-        badge.className = 'lock-badge ' + (fechado ? 'locked' : 'unlocked');
-        badge.innerHTML = fechado ? '🔒 Mês Congelado' : '🔓 Competência Aberta';
-      }
-
-      if (btnToggle) {
-        btnToggle.style.display = isAdmin ? 'inline-flex' : 'none';
-        btnToggle.textContent = fechado ? '🔓 Descongelar Mês' : '🔒 Congelar Mês';
-      }
-
-      // Bloqueia campos de edição se não for admin e o mês estiver fechado
-      const bloquear = fechado && !isAdmin;
-      document.querySelectorAll('#tab-km input, #tab-abastecimentos button, #tab-dre button').forEach(el => {
-        if (!el.classList.contains('select-mes-global') && el.id !== 'btn-toggle-fechamento') {
-          el.disabled = bloquear;
-        }
+      if (!mes || !state.mesesFechados || !Array.isArray(state.mesesFechados)) return false;
+      const mStr = String(mes).trim();
+      const m7 = mStr.substring(0, 7);
+      return state.mesesFechados.some(x => {
+        const xStr = String(x).trim();
+        return xStr === mStr || (m7.length === 7 && xStr.substring(0, 7) === m7);
       });
     }
 
     async function toggleFechamentoMes() {
       const mes = state.currentMonth;
-      const fechadoAtual = isMesFechado(mes);
-      const msg = fechadoAtual 
-        ? `Deseja DESCONGELAR a competência de "${mes}" para permitir novas alterações?`
-        : `Deseja CONGELAR a competência de "${mes}"? Lançamentos e edições de operadores serão bloqueados.`;
-
-      if (!confirm(msg)) return;
-
-      try {
-        const res = await apiFetch('/meses-fechados/toggle', {
-          method: 'POST',
-          body: JSON.stringify({ mes, usuario_nome: state.user?.nome || 'Administrador' })
-        });
-        if (res.ok) {
-          await loadFechamentosDaAPI();
-          registrarLog(
-            fechadoAtual ? 'Descongelar Mês' : 'Congelar Mês',
-            'Competência',
-            `Competência de ${mes} ${fechadoAtual ? 'descongelada' : 'congelada'}`
-          );
-        }
-      } catch (err) {
-        alert('Erro ao alterar fechamento da competência.');
+      if (!mes) {
+        alert('Selecione um mês primeiro.');
+        return;
       }
-    }
-
-    
-    // =========================================================================
-    // MOTOR DE FECHAMENTO MENSAL E AUDITORIA ATIVA
-    // =========================================================================
-    state.mesesFechados = [];
-
-    async function loadFechamentosDaAPI() {
-      try {
-        const res = await fetch('/api/meses-fechados', {
-          headers: { 'Authorization': 'Bearer ' + (state.token || localStorage.getItem('token') || '') }
-        });
-        if (res.ok) {
-          state.mesesFechados = (await res.json()).map(x => x.mes);
-          atualizarInterfaceFechamento();
-        }
-      } catch (e) {}
-    }
-
-    function isMesFechado(mes = state.currentMonth) {
-      return state.mesesFechados.includes(mes);
-    }
-
-    function atualizarInterfaceFechamento() {
-      const mes = state.currentMonth;
-      const fechado = isMesFechado(mes);
-      const badge = document.getElementById('badge-status-mes');
-      const btn = document.getElementById('btn-toggle-fechamento');
-
-      if (badge) {
-        if (fechado) {
-          badge.className = 'lock-badge locked';
-          badge.style.background = '#fee2e2';
-          badge.style.color = '#991b1b';
-          badge.style.borderColor = '#f87171';
-          badge.innerHTML = '🔒 Mês Congelado';
-        } else {
-          badge.className = 'lock-badge unlocked';
-          badge.style.background = '#dcfce7';
-          badge.style.color = '#166534';
-          badge.style.borderColor = '#86efac';
-          badge.innerHTML = '🔓 Mês Aberto';
-        }
-      }
-
-      if (btn) {
-        btn.innerHTML = fechado ? '<span>🔓</span> Descongelar Mês' : '<span>🔒</span> Congelar Mês';
-        btn.style.background = fechado ? '#dc2626' : '#0f2a4a';
-      }
-
-      // Se o mês estiver fechado e não for admin, desabilita inputs de digitação
-      const isAdmin = state.user?.perfil === 'Administrador';
-      const bloquear = fechado && !isAdmin;
-      document.querySelectorAll('#tab-km input, #tab-abastecimentos button:not(.btn-filtro)').forEach(el => {
-        if (el.id !== 'btn-toggle-fechamento') el.disabled = bloquear;
-      });
-    }
-
-    async function toggleFechamentoMes() {
-      const mes = state.currentMonth;
       const fechadoAtual = isMesFechado(mes);
       const confirmar = confirm(
         fechadoAtual
@@ -4099,24 +4013,39 @@
 
       try {
         const u = state.user || {};
+        const t = state.token || localStorage.getItem('token') || '';
         const res = await fetch('/api/meses-fechados/toggle', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + (state.token || localStorage.getItem('token') || '')
+            ...(t ? { 'Authorization': 'Bearer ' + t } : {})
           },
           body: JSON.stringify({ mes, usuario_nome: u.nome || 'Administrador' })
         });
-        if (res.ok) {
-          await loadFechamentosDaAPI();
-          registrarLog(
-            fechadoAtual ? 'Descongelar Mês' : 'Congelar Mês',
-            'COMPETÊNCIA',
-            `Competência de ${mes} ${fechadoAtual ? 'descongelada' : 'congelada'}`
-          );
+        
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.erro || 'Falha no servidor');
+
+        // Atualiza imediatamente na memória local
+        if (data.fechado) {
+          if (!state.mesesFechados.includes(mes)) state.mesesFechados.push(mes);
+        } else {
+          const m7 = String(mes).substring(0, 7);
+          state.mesesFechados = state.mesesFechados.filter(x => String(x).substring(0, 7) !== m7 && x !== mes);
         }
+
+        atualizarInterfaceFechamento();
+
+        // Registra na Auditoria
+        await registrarLog(
+          data.fechado ? 'CONGELAR' : 'DESCONGELAR',
+          'COMPETÊNCIA',
+          `Competência de ${mes} foi ${data.fechado ? 'congelada' : 'descongelada'}`
+        );
+
+        alert(`Competência de ${mes} ${data.fechado ? 'CONGELADA' : 'DESCONGELADA'} com sucesso!`);
       } catch (err) {
-        alert('Erro ao processar fechamento: ' + err.message);
+        alert('Erro ao alterar fechamento: ' + err.message);
       }
     }
 
@@ -4266,6 +4195,7 @@
     }
 
     function renderAll() {
+      atualizarInterfaceFechamento();
       applyPermissions();
       renderCadastroCavalos();
       renderCadastroCarretas();

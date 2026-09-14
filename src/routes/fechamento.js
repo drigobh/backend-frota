@@ -1,30 +1,11 @@
 const { Pool } = require('pg');
 
-let fechamentoEnsured = false;
-async function ensureFechamento(pool) {
-  if (fechamentoEnsured) return;
-  try {
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS meses_fechados (
-        mes VARCHAR(30) PRIMARY KEY,
-        fechado_por VARCHAR(150),
-        fechado_em TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-    fechamentoEnsured = true;
-  } catch (err) {
-    console.error('Erro na tabela meses_fechados:', err.message);
-  }
-}
-
 async function routes(fastify, options) {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-  ensureFechamento(pool).catch(() => {});
 
   fastify.get('/api/meses-fechados', async (req, reply) => {
     try {
-      await ensureFechamento(pool);
-      const res = await pool.query('SELECT mes, fechado_por, fechado_em FROM meses_fechados');
+      const res = await pool.query('SELECT mes, fechado_por, fechado_em FROM meses_fechados ORDER BY fechado_em DESC');
       return reply.send(res.rows);
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
@@ -32,19 +13,26 @@ async function routes(fastify, options) {
   });
 
   fastify.post('/api/meses-fechados/toggle', async (req, reply) => {
-    const { mes, usuario_nome } = req.body || {};
+    let { mes, usuario_nome } = req.body || {};
     if (!mes) return reply.code(400).send({ erro: 'Mês não informado.' });
+    mes = String(mes).trim();
+    const mes7 = mes.substring(0, 7);
 
     try {
-      await ensureFechamento(pool);
-      const check = await pool.query('SELECT mes FROM meses_fechados WHERE mes = $1', [mes]);
-      
+      const check = await pool.query(
+        'SELECT mes FROM meses_fechados WHERE mes = $1 OR mes = $2 OR LEFT(mes, 7) = $2',
+        [mes, mes7]
+      );
+
       if (check.rows.length > 0) {
-        await pool.query('DELETE FROM meses_fechados WHERE mes = $1', [mes]);
+        await pool.query(
+          'DELETE FROM meses_fechados WHERE mes = $1 OR mes = $2 OR LEFT(mes, 7) = $2',
+          [mes, mes7]
+        );
         return reply.send({ fechado: false, mes });
       } else {
         await pool.query(
-          'INSERT INTO meses_fechados (mes, fechado_por) VALUES ($1, $2)',
+          'INSERT INTO meses_fechados (mes, fechado_por) VALUES ($1, $2) ON CONFLICT (mes) DO UPDATE SET fechado_por = EXCLUDED.fechado_por',
           [mes, usuario_nome || 'Administrador']
         );
         return reply.send({ fechado: true, mes });
