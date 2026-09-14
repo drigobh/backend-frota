@@ -81,8 +81,7 @@ fastify.register(require('./routes/perfis'));
 fastify.register(require('./routes/auditoria'));
 fastify.register(require('./routes/fechamento'));
 fastify.register(require('./routes/alertas'));
-fastify.register(require('./routes/alertas'));
-fastify.register(require('./routes/historico'));   // ← ADICIONAR ESTA LINHA
+fastify.register(require('./routes/historico'));
 
 // =========================================================================
 // ROTA PRINCIPAL — Serve o index.html
