@@ -1366,8 +1366,8 @@
       <button class="nav-tab-btn nav-group-toggle" data-group="grupo-admin"><span>&#128274;</span><span class="nav-label">Administracao</span><span class="nav-arrow">&#9654;</span></button>
       <div class="nav-submenu" id="grupo-admin">
         <button class="nav-tab-btn" data-tab="tab-usuarios" id="nav-tab-usuarios" onclick="setTimeout(loadUsuariosDaAPI, 100)"><span>&#128101;</span><span class="nav-label">Usuarios</span></button>
-        <button class="nav-tab-btn" data-tab="tab-perfis" id="nav-tab-perfis" onclick="setTimeout(loadPerfisDaAPI, 100)"><span>&#128737;</span><span class="nav-label">Perfis</span></button>
-        <button class="nav-tab-btn" data-tab="tab-auditoria" id="nav-tab-auditoria" onclick="setTimeout(loadAuditoriaDaAPI, 100)"><span>&#128373;</span><span class="nav-label">Auditoria</span></button>
+        <button class="nav-tab-btn" data-tab="tab-perfis" id="nav-tab-perfis"><span>&#128737;</span><span class="nav-label">Perfis</span></button>
+        <button class="nav-tab-btn" data-tab="tab-auditoria" id="nav-tab-auditoria"><span>&#128373;</span><span class="nav-label">Auditoria</span></button>
       </div>
     </nav>
   </aside>
@@ -2020,35 +2020,7 @@
 
     
       <!-- TAB: AUDITORIA -->
-      <!-- TAB: PERFIS DE ACESSO -->
-      <section id="tab-perfis" class="tab-content">
-        <div class="bar-controls">
-          <div class="bar-controls-left">
-            <span class="label-month-select">Gestao de Perfis de Acesso:</span>
-          </div>
-          <div class="bar-controls-right">
-            <button class="btn-action btn-action-primary" id="btn-add-perfil">+ Novo Perfil</button>
-          </div>
-        </div>
-        <div class="section-title-wrap">
-          <h2 class="section-title"><span>&#128737;</span> Perfis de Acesso do Sistema</h2>
-        </div>
-        <div class="table-container">
-          <table class="data-table" id="table-perfis">
-            <thead>
-              <tr>
-                <th style="width: 50px;">#</th>
-                <th style="width: 250px;">Nome do Perfil</th>
-                <th>Descricao</th>
-                <th style="width: 120px;" class="col-center">Status</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-perfis"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section id="tab-auditoria" class="tab-content">
+      <section id="tab-auditoria" class="tab-content" style="display:none;">
         <div class="bar-controls" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:1rem;">
           <div style="display:flex; align-items:center; gap:0.75rem;">
             <input type="text" id="filtro-auditoria" placeholder="🔍 Pesquisar em qualquer coluna..." oninput="filtrarAuditoriaNaTela()" style="padding:0.45rem 0.85rem; border:1px solid #cbd5e1; border-radius:6px; width:280px; font-size:0.85rem;">
