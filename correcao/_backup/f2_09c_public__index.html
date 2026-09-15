@@ -4628,18 +4628,13 @@
       document.getElementById('btn-novo-mes-acoplamento')?.addEventListener('click', promptNewMonth);
       
       document.getElementById('btn-add-cavalo').onclick = addCavalo;
-      // ==== BINDS PROTEGIDOS (elementos podem nao existir em todas as telas) ====
-      function bindClick(id, fn) {
-        var el = document.getElementById(id);
-        if (el && typeof fn === 'function') el.onclick = fn;
-      }
-      bindClick('btn-add-carreta', addCarreta);
-      bindClick('btn-add-motorista', addMotorista);
-      bindClick('btn-add-acoplamento', addAcoplamentoRow);
-      bindClick('btn-add-abastecimento', addAbastecimentoRow);
-      bindClick('btn-add-lancamento', addLancamentoRow);
-      bindClick('btn-add-manutencao', addManutencaoRow);
-      bindClick('btn-add-documento', addDocumentoRow);
+      document.getElementById('btn-add-carreta').onclick = addCarreta;
+      document.getElementById('btn-add-motorista').onclick = addMotorista;
+      document.getElementById('btn-add-acoplamento').onclick = addAcoplamentoRow;
+      document.getElementById('btn-add-abastecimento').onclick = addAbastecimentoRow;
+      document.getElementById('btn-add-lancamento').onclick = addLancamentoRow;
+      document.getElementById('btn-add-manutencao').onclick = addManutencaoRow;
+      document.getElementById('btn-add-documento').onclick = addDocumentoRow;
       
       document.getElementById('btn-print-report').addEventListener('click', () => {
         const resumoBtn = document.querySelector('[data-tab="tab-resumo"]');
