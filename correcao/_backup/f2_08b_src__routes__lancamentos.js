@@ -20,15 +20,11 @@ module.exports = async function (fastify, options) {
           c.nome AS categoria,
           l.categoria_id,
           l.veiculo_id,
-          l.centro_custo_id,
-          cc.nome AS centro_custo_nome,
-          cc.codigo AS centro_custo_codigo,
           l.created_at,
           l.updated_at
         FROM lancamentos_financeiros l
         LEFT JOIN veiculos v ON v.id = l.veiculo_id
         LEFT JOIN categorias_financeiras c ON c.id = l.categoria_id
-        LEFT JOIN centros_custo cc ON cc.id = l.centro_custo_id
         WHERE l.deleted_at IS NULL
       `;
 
@@ -137,7 +133,7 @@ module.exports = async function (fastify, options) {
   // CRIAR LANCAMENTO
   // ==========================================================================
   fastify.post('/api/lancamentos', { preHandler: [fastify.autenticar] }, async (req, reply) => {
-    const { placa, data, tipo, categoria, descricao, valor, centro_custo_id } = req.body || {};
+    const { placa, data, tipo, categoria, descricao, valor } = req.body || {};
 
     if (!data || !tipo || !categoria || !descricao || !valor) {
       return reply.code(400).send({ erro: 'Campos obrigatorios: data, tipo, categoria, descricao, valor.' });
@@ -174,10 +170,10 @@ module.exports = async function (fastify, options) {
 
       const result = await db.query(`
         INSERT INTO lancamentos_financeiros
-          (veiculo_id, categoria_id, data_lancamento, tipo, descricao, valor, centro_custo_id, created_by)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          (veiculo_id, categoria_id, data_lancamento, tipo, descricao, valor, created_by)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING id
-      `, [veiculo_id, categoria_id, data, tipo, descricao, parseFloat(valor), centro_custo_id || null, req.user.id]);
+      `, [veiculo_id, categoria_id, data, tipo, descricao, parseFloat(valor), req.user.id]);
 
       return reply.code(201).send({ sucesso: true, id: result.rows[0].id });
     } catch (err) {
@@ -191,7 +187,7 @@ module.exports = async function (fastify, options) {
   // ==========================================================================
   fastify.put('/api/lancamentos/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { id } = req.params;
-    const { data, tipo, categoria, descricao, valor, centro_custo_id } = req.body || {};
+    const { data, tipo, categoria, descricao, valor } = req.body || {};
 
     if (!data || !tipo || !categoria || !descricao || !valor) {
       return reply.code(400).send({ erro: 'Campos obrigatorios faltando.' });
@@ -222,12 +218,11 @@ module.exports = async function (fastify, options) {
             categoria_id = $3,
             descricao = $4,
             valor = $5,
-            centro_custo_id = $6,
             updated_at = CURRENT_TIMESTAMP,
-            updated_by = $7
-        WHERE id = $8 AND deleted_at IS NULL
+            updated_by = $6
+        WHERE id = $7 AND deleted_at IS NULL
         RETURNING id
-      `, [data, tipo, categoria_id, descricao, parseFloat(valor), centro_custo_id || null, req.user.id, id]);
+      `, [data, tipo, categoria_id, descricao, parseFloat(valor), req.user.id, id]);
 
       if (result.rows.length === 0) {
         return reply.code(404).send({ erro: 'Lancamento nao encontrado.' });
