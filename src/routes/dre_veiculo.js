@@ -15,7 +15,7 @@ module.exports = async function (fastify, options) {
 
     try {
       const vRes = await db.query(
-        "SELECT id, placa, modelo, marca FROM veiculos WHERE placa = $1 AND status = 'ATIVO'",
+        "SELECT id, placa, modelo FROM veiculos WHERE placa = $1 AND status = 'ATIVO'",
         [placa.toUpperCase()]
       );
       if (vRes.rows.length === 0) {
