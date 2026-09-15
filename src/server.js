@@ -73,6 +73,7 @@ fastify.register(require('./routes/acoplamentos'));
 fastify.register(require('./routes/km'));
 fastify.register(require('./routes/financeiro'));
 fastify.register(require('./routes/lancamentos'));
+fastify.register(require('./routes/dre_veiculo'));
 fastify.register(require('./routes/categorias'));
 fastify.register(require('./routes/centros_custo'));
 fastify.register(require('./routes/dre_consolidada'));
