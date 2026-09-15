@@ -4863,6 +4863,7 @@
 
     // ==== MODULO DE HISTORICO ====
     var __historicoCache = [];
+
     async function loadHistoricoDaAPI() {
       var timeline = document.getElementById("historico-timeline");
       if (timeline) {
@@ -4873,6 +4874,7 @@
       carregarFiltrosHistorico().catch(function(e) { console.warn("Filtros:", e); });
 
       try {
+        // Monta a query string com os filtros ativos
         var params = new URLSearchParams();
         var di = document.getElementById("hist-filtro-data-ini");
         var df = document.getElementById("hist-filtro-data-fim");
@@ -4889,7 +4891,7 @@
 
         var url = "/historico" + (params.toString() ? "?" + params.toString() : "");
 
-        // Timeout de 90 segundos (Render demora a acordar)
+        // Timeout de 90 segundos (Render pode demorar a acordar)
         var controller = new AbortController();
         var timeoutId = setTimeout(function() { controller.abort(); }, 90000);
 
@@ -4904,7 +4906,7 @@
           var msg = res.status === 401 ? "Sessao expirada. Faca login novamente."
                   : res.status === 500 ? "Erro interno do servidor."
                   : "Erro " + res.status;
-          if (timeline) timeline.innerHTML = '<div class="timeline-empty">' + msg + "</div>";
+          if (timeline) timeline.innerHTML = '<div class="timeline-empty">' + msg + '</div>';
           return;
         }
         var data = await res.json();
@@ -4913,7 +4915,7 @@
       } catch (err) {
         console.error("Erro ao carregar historico:", err);
         var mensagem = err.name === "AbortError"
-          ? "Tempo esgotado (servidor pode estar hibernando). Tente novamente."
+          ? "Tempo esgotado (servidor pode estar hibernando). Clique em Atualizar novamente em alguns segundos."
           : "Erro: " + err.message;
         if (timeline) {
           timeline.innerHTML = '<div class="timeline-empty">' + mensagem +
@@ -4921,8 +4923,6 @@
         }
       }
     }
-
-
 
     async function carregarFiltrosHistorico() {
       // Usuarios
