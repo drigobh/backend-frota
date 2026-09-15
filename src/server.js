@@ -72,6 +72,7 @@ fastify.register(require('./routes/cadastro'));
 fastify.register(require('./routes/acoplamentos'));
 fastify.register(require('./routes/km'));
 fastify.register(require('./routes/financeiro'));
+fastify.register(require('./routes/lancamentos'));
 fastify.register(require('./routes/dashboard'));
 fastify.register(require('./routes/auth'));
 fastify.register(require('./routes/abastecimentos'));
