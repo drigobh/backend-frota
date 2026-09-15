@@ -1413,7 +1413,7 @@
         <button class="nav-tab-btn" data-tab="tab-abastecimentos"><span>&#9981;</span><span class="nav-label">Abastecimentos</span></button>
         <button class="nav-tab-btn" data-tab="tab-manutencoes"><span>&#128295;</span><span class="nav-label">Manutencao</span></button>
         <button class="nav-tab-btn" data-tab="tab-documentos"><span>&#128196;</span><span class="nav-label">Documentos</span></button>
-        <button class="nav-tab-btn" data-tab="tab-historico" onclick="setTimeout(loadHistoricoDaAPI, 150)"><span>&#128220;</span><span class="nav-label">Historico</span></button>
+        <button class="nav-tab-btn" data-tab="tab-historico"><span>&#128220;</span><span class="nav-label">Historico</span></button>
       </div>
       <button class="nav-tab-btn nav-group-toggle" data-group="grupo-financeiro"><span>&#128176;</span><span class="nav-label">Financeiro</span><span class="nav-arrow">&#9654;</span></button>
       <div class="nav-submenu" id="grupo-financeiro">
@@ -1888,7 +1888,7 @@
           </div>
           <div class="bar-controls-right">
             <button class="btn-action btn-action-secondary" onclick="exportarHistoricoCSV()">&#11015;&#65039; Exportar CSV</button>
-            <button class="btn-action btn-action-primary" onclick="loadHistoricoDaAPI(true)">&#128260; Atualizar</button>
+            <button class="btn-action btn-action-primary" onclick="loadHistoricoDaAPI()">&#128260; Atualizar</button>
           </div>
         </div>
 
@@ -4863,19 +4863,10 @@
 
     // ==== MODULO DE HISTORICO ====
     var __historicoCache = [];
-    async function loadHistoricoDaAPI(forceRefresh) {
+    async function loadHistoricoDaAPI() {
       var timeline = document.getElementById("historico-timeline");
-
-      // Cache em memoria: se ja temos dados e nao forcou refresh, renderiza direto
-      if (!forceRefresh && __historicoCache && __historicoCache.length > 0) {
-        renderHistorico({ total: __historicoCache.length, porTipo: __historicoUltimoPorTipo || {}, eventos: __historicoCache });
-        // Atualiza em background sem travar a UI
-        setTimeout(function() { loadHistoricoDaAPI(true); }, 500);
-        return;
-      }
-
-      if (timeline && !forceRefresh) {
-        timeline.innerHTML = '<div class="timeline-empty"><div style="margin-bottom:8px;">Carregando historico...</div><div style="font-size:0.75rem; color:#94a3b8;">Consultando servidor...</div></div>';
+      if (timeline) {
+        timeline.innerHTML = '<div class="timeline-empty"><div style="margin-bottom:8px;">Carregando historico...</div><div style="font-size:0.75rem; color:#94a3b8;">Se o servidor estiver hibernando, pode levar ate 60s.</div></div>';
       }
 
       // Filtros em paralelo (nao bloqueia)
@@ -4898,9 +4889,9 @@
 
         var url = "/historico" + (params.toString() ? "?" + params.toString() : "");
 
-        // Timeout curto de 30s (se nao respondeu, provavelmente travou)
+        // Timeout de 90 segundos (Render demora a acordar)
         var controller = new AbortController();
-        var timeoutId = setTimeout(function() { controller.abort(); }, 30000);
+        var timeoutId = setTimeout(function() { controller.abort(); }, 90000);
 
         var res;
         try {
@@ -4913,26 +4904,23 @@
           var msg = res.status === 401 ? "Sessao expirada. Faca login novamente."
                   : res.status === 500 ? "Erro interno do servidor."
                   : "Erro " + res.status;
-          if (timeline) timeline.innerHTML = '<div class="timeline-empty">' + msg + '<div style="margin-top:12px;"><button class="btn-action btn-action-primary" onclick="loadHistoricoDaAPI(true)">&#128260; Tentar novamente</button></div></div>';
+          if (timeline) timeline.innerHTML = '<div class="timeline-empty">' + msg + "</div>";
           return;
         }
         var data = await res.json();
         __historicoCache = (data.eventos || []);
-        __historicoUltimoPorTipo = data.porTipo || {};
         renderHistorico(data);
       } catch (err) {
         console.error("Erro ao carregar historico:", err);
         var mensagem = err.name === "AbortError"
-          ? "Tempo esgotado. O servidor pode estar ocupado. Tente novamente."
+          ? "Tempo esgotado (servidor pode estar hibernando). Tente novamente."
           : "Erro: " + err.message;
         if (timeline) {
           timeline.innerHTML = '<div class="timeline-empty">' + mensagem +
-            '<div style="margin-top:12px;"><button class="btn-action btn-action-primary" onclick="loadHistoricoDaAPI(true)">&#128260; Tentar novamente</button></div></div>';
+            '<div style="margin-top:12px;"><button class="btn-action btn-action-primary" onclick="loadHistoricoDaAPI()">&#128260; Tentar novamente</button></div></div>';
         }
       }
     }
-
-
 
 
 
