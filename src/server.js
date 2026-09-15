@@ -75,6 +75,7 @@ fastify.register(require('./routes/financeiro'));
 fastify.register(require('./routes/lancamentos'));
 fastify.register(require('./routes/categorias'));
 fastify.register(require('./routes/centros_custo'));
+fastify.register(require('./routes/dre_consolidada'));
 fastify.register(require('./routes/dashboard'));
 fastify.register(require('./routes/auth'));
 fastify.register(require('./routes/abastecimentos'));
