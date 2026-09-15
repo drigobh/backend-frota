@@ -2125,12 +2125,6 @@
               </select>
             </div>
             <div class="modal-field">
-              <label for="modal-lanc-centro-custo">Centro de Custo (opcional)</label>
-              <select id="modal-lanc-centro-custo">
-                <option value="">-- Sem centro de custo --</option>
-              </select>
-            </div>
-            <div class="modal-field">
               <label for="modal-lanc-descricao">Descrição *</label>
               <input type="text" id="modal-lanc-descricao" maxlength="255" required>
             </div>
@@ -5448,89 +5442,53 @@
     // ---------------------------------------------------------------------
     async function abrirModalLancamento(id) {
       __lancEditandoId = id || null;
-
-      try {
-        if (!__categoriasCache || __categoriasCache.length === 0) {
-          var rCat = await apiFetch('/lancamentos/categorias');
-          if (rCat.ok) __categoriasCache = await rCat.json();
-        }
-        if (!__veiculosCache || __veiculosCache.length === 0) {
-          var rVeic = await apiFetch('/veiculos');
-          if (rVeic.ok) __veiculosCache = await rVeic.json();
-        }
-        if (!window.__centrosCustoCache || window.__centrosCustoCache.length === 0) {
-          var rCC = await apiFetch('/centros-custo?ativo=true');
-          if (rCC.ok) window.__centrosCustoCache = await rCC.json();
-        }
-      } catch (e) { console.error('Erro ao carregar caches:', e); }
+      await carregarFiltrosLancamentos();
 
       var selCat = document.getElementById('modal-lanc-categoria');
-      if (selCat) {
-        selCat.innerHTML = '<option value="">-- Selecione a categoria --</option>';
-        if (__categoriasCache) {
-          __categoriasCache.forEach(function(c) {
-            var o = document.createElement('option');
-            o.value = c.nome;
-            o.textContent = c.nome + ' (' + c.tipo + ')';
-            selCat.appendChild(o);
-          });
-        }
-      }
-
       var selVeic = document.getElementById('modal-lanc-veiculo');
-      if (selVeic) {
-        selVeic.innerHTML = '<option value="">-- Sem vinculo com veiculo --</option>';
-        if (__veiculosCache) {
-          __veiculosCache.forEach(function(v) {
-            var o = document.createElement('option');
-            o.value = v.placa;
-            o.textContent = v.placa + (v.modelo ? ' - ' + v.modelo : '');
-            selVeic.appendChild(o);
-          });
-        }
-      }
+      selCat.innerHTML = '<option value="">-- Selecione --</option>';
+      selVeic.innerHTML = '<option value="">— Sem vínculo —</option>';
 
-      var selCC = document.getElementById('modal-lanc-centro-custo');
-      if (selCC) {
-        selCC.innerHTML = '<option value="">-- Sem centro de custo --</option>';
-        if (window.__centrosCustoCache) {
-          window.__centrosCustoCache.forEach(function(cc) {
-            var o = document.createElement('option');
-            o.value = cc.id;
-            o.textContent = (cc.codigo ? cc.codigo + ' - ' : '') + cc.nome;
-            selCC.appendChild(o);
-          });
-        }
+      if (__categoriasCache) {
+        __categoriasCache.forEach(function(c) {
+          var o = document.createElement('option');
+          o.value = c.nome; o.textContent = c.nome + ' (' + c.tipo + ')';
+          selCat.appendChild(o);
+        });
+      }
+      if (__veiculosCache) {
+        __veiculosCache.forEach(function(v) {
+          var o = document.createElement('option');
+          o.value = v.placa; o.textContent = v.placa;
+          selVeic.appendChild(o);
+        });
       }
 
       if (id) {
-        document.getElementById('modal-lanc-titulo').innerHTML = '&#9999;&#65039; Editar Lancamento';
-        var item = (__lancamentosCache || []).find(function(x) { return x.id === id; });
+        document.getElementById('modal-lanc-titulo').innerHTML = '&#9999;&#65039; Editar Lançamento';
+        var item = __lancamentosCache.find(function(x) { return x.id === id; });
         if (item) {
           document.getElementById('modal-lanc-data').value = item.data || '';
           document.getElementById('modal-lanc-tipo').value = item.tipo || 'Receita';
-          if (selCat) selCat.value = item.categoria || '';
-          if (selVeic) selVeic.value = item.placa || '';
-          if (selCC) selCC.value = item.centro_custo_id || '';
+          document.getElementById('modal-lanc-categoria').value = item.categoria || '';
+          document.getElementById('modal-lanc-veiculo').value = item.placa || '';
           document.getElementById('modal-lanc-descricao').value = item.descricao || '';
           document.getElementById('modal-lanc-valor').value = (parseFloat(item.valor) || 0).toFixed(2).replace('.', ',');
         }
       } else {
-        document.getElementById('modal-lanc-titulo').innerHTML = '&#128176; Novo Lancamento';
+        document.getElementById('modal-lanc-titulo').innerHTML = '&#128176; Novo Lançamento';
         var hoje = new Date();
         var dataStr = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0') + '-' + String(hoje.getDate()).padStart(2, '0');
         document.getElementById('modal-lanc-data').value = dataStr;
         document.getElementById('modal-lanc-tipo').value = 'Receita';
-        if (selCat) selCat.value = '';
-        if (selVeic) selVeic.value = '';
-        if (selCC) selCC.value = '';
+        document.getElementById('modal-lanc-categoria').value = '';
+        document.getElementById('modal-lanc-veiculo').value = '';
         document.getElementById('modal-lanc-descricao').value = '';
         document.getElementById('modal-lanc-valor').value = '';
       }
 
       document.getElementById('modal-lancamento').classList.add('open');
     }
-
 
     function fecharModalLancamento() {
       document.getElementById('modal-lancamento').classList.remove('open');
@@ -5556,9 +5514,7 @@
         return;
       }
 
-      var selCC = document.getElementById('modal-lanc-centro-custo');
-      var centro_custo_id = selCC ? selCC.value : '';
-      var payload = { placa: placa, data: data, tipo: tipo, categoria: categoria, descricao: descricao, valor: valor, centro_custo_id: centro_custo_id || null };
+      var payload = { placa: placa, data: data, tipo: tipo, categoria: categoria, descricao: descricao, valor: valor };
 
       try {
         var res;
