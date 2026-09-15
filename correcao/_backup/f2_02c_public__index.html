@@ -4866,14 +4866,11 @@
 
     async function loadHistoricoDaAPI() {
       var timeline = document.getElementById("historico-timeline");
-      if (timeline) {
-        timeline.innerHTML = '<div class="timeline-empty"><div style="margin-bottom:8px;">Carregando historico...</div><div style="font-size:0.75rem; color:#94a3b8;">Se o servidor estiver hibernando, pode levar ate 60s.</div></div>';
-      }
-
-      // Filtros em paralelo (nao bloqueia)
-      carregarFiltrosHistorico().catch(function(e) { console.warn("Filtros:", e); });
-
+      if (timeline) timeline.innerHTML = '<div class="timeline-empty">Carregando historico...</div>';
       try {
+        // Preenche os selects de filtro
+        await carregarFiltrosHistorico();
+
         // Monta a query string com os filtros ativos
         var params = new URLSearchParams();
         var di = document.getElementById("hist-filtro-data-ini");
@@ -4890,23 +4887,9 @@
         if (vc && vc.value) params.append("veiculo", vc.value);
 
         var url = "/historico" + (params.toString() ? "?" + params.toString() : "");
-
-        // Timeout de 90 segundos (Render pode demorar a acordar)
-        var controller = new AbortController();
-        var timeoutId = setTimeout(function() { controller.abort(); }, 90000);
-
-        var res;
-        try {
-          res = await apiFetch(url, { signal: controller.signal });
-        } finally {
-          clearTimeout(timeoutId);
-        }
-
+        var res = await apiFetch(url);
         if (!res.ok) {
-          var msg = res.status === 401 ? "Sessao expirada. Faca login novamente."
-                  : res.status === 500 ? "Erro interno do servidor."
-                  : "Erro " + res.status;
-          if (timeline) timeline.innerHTML = '<div class="timeline-empty">' + msg + '</div>';
+          if (timeline) timeline.innerHTML = '<div class="timeline-empty">Erro ao carregar: ' + res.status + "</div>";
           return;
         }
         var data = await res.json();
@@ -4914,13 +4897,7 @@
         renderHistorico(data);
       } catch (err) {
         console.error("Erro ao carregar historico:", err);
-        var mensagem = err.name === "AbortError"
-          ? "Tempo esgotado (servidor pode estar hibernando). Clique em Atualizar novamente em alguns segundos."
-          : "Erro: " + err.message;
-        if (timeline) {
-          timeline.innerHTML = '<div class="timeline-empty">' + mensagem +
-            '<div style="margin-top:12px;"><button class="btn-action btn-action-primary" onclick="loadHistoricoDaAPI()">&#128260; Tentar novamente</button></div></div>';
-        }
+        if (timeline) timeline.innerHTML = '<div class="timeline-empty">Erro: ' + err.message + "</div>";
       }
     }
 
