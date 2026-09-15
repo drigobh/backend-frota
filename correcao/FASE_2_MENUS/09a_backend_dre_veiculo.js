@@ -1,0 +1,189 @@
+/**
+ * ============================================================================
+ * CORRECAO FASE 2 - 09a - Backend DRE por Veiculo (Premium)
+ * ============================================================================
+ * RODAR (dry-run):   node correcao/FASE_2_MENUS/09a_backend_dre_veiculo.js
+ * RODAR (aplicar):   node correcao/FASE_2_MENUS/09a_backend_dre_veiculo.js --apply
+ * ============================================================================
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = path.resolve(__dirname, '../..');
+const BACKUP_DIR = path.resolve(ROOT, 'correcao/_backup');
+const APLICAR = process.argv.includes('--apply');
+const ARQUIVO = 'src/routes/dre_veiculo.js';
+
+const CONTEUDO = `const db = require('../database');
+
+module.exports = async function (fastify, options) {
+
+  // ==========================================================================
+  // DRE POR PLACA - Retorna KPIs + lancamentos + combustivel de UMA placa
+  // ==========================================================================
+  fastify.get('/api/dre/placa/:placa', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+    const { placa } = req.params;
+    const { mes, categoria, tipo } = req.query;
+
+    if (!mes) {
+      return reply.code(400).send({ erro: 'Parametro "mes" obrigatorio (YYYY-MM-DD).' });
+    }
+
+    try {
+      // Busca o veiculo
+      const vRes = await db.query(
+        "SELECT id, placa, modelo, marca FROM veiculos WHERE placa = $1 AND status = 'ATIVO'",
+        [placa.toUpperCase()]
+      );
+      if (vRes.rows.length === 0) {
+        return reply.code(404).send({ erro: 'Veiculo nao encontrado.' });
+      }
+      const veiculo = vRes.rows[0];
+
+      // Query base de lancamentos
+      let query = \`
+        SELECT 
+          l.id,
+          l.data_lancamento AS data,
+          l.tipo,
+          l.descricao,
+          l.valor,
+          c.nome AS categoria,
+          c.id AS categoria_id,
+          cc.id AS centro_custo_id,
+          cc.nome AS centro_custo_nome,
+          cc.codigo AS centro_custo_codigo,
+          l.created_at
+        FROM lancamentos_financeiros l
+        LEFT JOIN categorias_financeiras c ON c.id = l.categoria_id
+        LEFT JOIN centros_custo cc ON cc.id = l.centro_custo_id
+        WHERE l.veiculo_id = $1
+          AND DATE_TRUNC('month', l.data_lancamento) = $2::date
+          AND l.deleted_at IS NULL
+      \`;
+      const params = [veiculo.id, mes];
+      let idx = 3;
+
+      if (categoria) {
+        query += \` AND c.nome = $\${idx}\`;
+        params.push(categoria);
+        idx++;
+      }
+      if (tipo) {
+        query += \` AND l.tipo = $\${idx}\`;
+        params.push(tipo);
+        idx++;
+      }
+
+      query += ' ORDER BY l.data_lancamento DESC, l.created_at DESC';
+
+      const lancRes = await db.query(query, params);
+
+      // Calcula KPIs
+      let receita = 0;
+      let despesaManual = 0;
+      lancRes.rows.forEach(function(l) {
+        const v = parseFloat(l.valor) || 0;
+        if (l.tipo === 'Receita') receita += v;
+        if (l.tipo === 'Despesa') despesaManual += v;
+      });
+
+      // Busca combustivel automatico (abastecimentos do mes)
+      const abastRes = await db.query(\`
+        SELECT COALESCE(SUM(valor_total), 0) AS total, COALESCE(SUM(litros), 0) AS litros
+        FROM abastecimentos
+        WHERE veiculo_id = $1
+          AND DATE_TRUNC('month', data_abastecimento) = $2::date
+          AND deleted_at IS NULL
+      \`, [veiculo.id, mes]);
+
+      const combustivel = parseFloat(abastRes.rows[0].total) || 0;
+      const litros = parseFloat(abastRes.rows[0].litros) || 0;
+      const despesaTotal = despesaManual + combustivel;
+      const resultado = receita - despesaTotal;
+      const margem = receita > 0 ? (resultado / receita) * 100 : 0;
+
+      return reply.send({
+        veiculo: veiculo,
+        mes: mes,
+        kpis: {
+          receita: receita,
+          despesa_manual: despesaManual,
+          combustivel: combustivel,
+          litros: litros,
+          despesa_total: despesaTotal,
+          resultado: resultado,
+          margem: margem,
+          total_lancamentos: lancRes.rows.length,
+        },
+        lancamentos: lancRes.rows.map(function(l) {
+          return Object.assign({}, l, {
+            data: l.data instanceof Date ? l.data.toISOString().split('T')[0] : l.data,
+          });
+        }),
+      });
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+
+  // ==========================================================================
+  // LISTA DE CATEGORIAS DISPONIVEIS
+  // ==========================================================================
+  fastify.get('/api/dre/categorias', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+    try {
+      const res = await db.query(
+        'SELECT id, nome, tipo FROM categorias_financeiras WHERE ativo = true ORDER BY tipo, ordem, nome'
+      );
+      return reply.send(res.rows);
+    } catch (err) {
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+
+};
+`;
+
+function garantirBackup(relPath) {
+  const absPath = path.resolve(ROOT, relPath);
+  const backupPath = path.resolve(BACKUP_DIR, 'f2_09a_' + relPath.replace(/[\\/]/g, '__'));
+  if (!fs.existsSync(backupPath)) {
+    fs.mkdirSync(path.dirname(backupPath), { recursive: true });
+    fs.copyFileSync(absPath, backupPath);
+    return backupPath;
+  }
+  return backupPath;
+}
+
+console.log('\n=============================================');
+console.log('  FASE 2 / 09a - Backend DRE por Veiculo');
+console.log('  Modo: ' + (APLICAR ? 'APLICAR (--apply)' : 'DRY-RUN (sem alterar)'));
+console.log('=============================================\n');
+console.log('   Arquivo: ' + ARQUIVO);
+console.log('   Rotas:');
+console.log('     - GET /api/dre/placa/:placa?mes=YYYY-MM-DD');
+console.log('     - GET /api/dre/categorias');
+console.log('');
+
+if (!APLICAR) {
+  console.log('   [DRY] Arquivo seria criado (' + CONTEUDO.length + ' chars).');
+  console.log('         Rode com --apply para aplicar.\n');
+  process.exit(0);
+}
+
+const absPath = path.resolve(ROOT, ARQUIVO);
+if (fs.existsSync(absPath)) {
+  const backupPath = garantirBackup(ARQUIVO);
+  console.log('   [BACKUP] ' + backupPath);
+}
+fs.mkdirSync(path.dirname(absPath), { recursive: true });
+fs.writeFileSync(absPath, CONTEUDO, 'utf8');
+console.log('   [OK] Arquivo criado: ' + ARQUIVO);
+console.log('');
+console.log('PROXIMO PASSO OBRIGATORIO:');
+console.log('  1. Abra src/server.js');
+console.log('  2. Apos: fastify.register(require(\'./routes/lancamentos\'));');
+console.log('  3. Adicione: fastify.register(require(\'./routes/dre_veiculo\'));');
+console.log('  4. Salve, commit + push');
