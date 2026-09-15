@@ -4640,24 +4640,6 @@
       bindClick('btn-add-lancamento', addLancamentoRow);
       bindClick('btn-add-manutencao', addManutencaoRow);
       bindClick('btn-add-documento', addDocumentoRow);
-
-      // ==== INICIALIZACAO DRE POR VEICULO ====
-      if (typeof carregarPlacasDre === 'function') {
-        carregarPlacasDre().then(function() {
-          // Se houver placa no cache, seleciona a primeira automaticamente
-          if (__drePlacasCache && __drePlacasCache.length > 0) {
-            var sel = document.getElementById('dre-filtro-placa');
-            if (sel && !sel.value) {
-              sel.value = __drePlacasCache[0].placa;
-              loadDreDaAPI();
-            }
-          }
-        }).catch(function(e) { console.error('Erro ao carregar placas DRE:', e); });
-      }
-      if (typeof carregarCategoriasDre === 'function') {
-        carregarCategoriasDre().catch(function(e) { console.error('Erro categorias DRE:', e); });
-      }
-      window.__dreInicializado = true;
       
       document.getElementById('btn-print-report').addEventListener('click', () => {
         const resumoBtn = document.querySelector('[data-tab="tab-resumo"]');
@@ -5526,19 +5508,11 @@
       } catch (e) { alert("Erro: " + e.message); }
     }
 
-    // Listener dos filtros DRE (reforcado)
-    document.addEventListener('change', function(e) {
-      if (!e.target) return;
-      var id = e.target.id || '';
-      if (id === 'dre-filtro-placa' || id === 'dre-filtro-categoria' || id === 'dre-filtro-tipo') {
-        if (typeof loadDreDaAPI === 'function') loadDreDaAPI();
-      }
-      if (id === 'select-mes-dre' || id === 'select-mes-dre-consolidada') {
-        if (typeof loadDreDaAPI === 'function') loadDreDaAPI();
-        if (typeof loadDreConsolidadaDaAPI === 'function') loadDreConsolidadaDaAPI(true);
+    document.addEventListener("change", function(e) {
+      if (e.target && (e.target.id === "dre-filtro-placa" || e.target.id === "dre-filtro-categoria" || e.target.id === "dre-filtro-tipo")) {
+        loadDreDaAPI();
       }
     });
-    window.__dreFiltrosLigados = true;
 
     window.loadDreDaAPI = loadDreDaAPI;
     window.limparFiltrosDre = limparFiltrosDre;
@@ -5547,21 +5521,6 @@
     window.excluirLancamentoDre = excluirLancamentoDre;
     window.carregarPlacasDre = carregarPlacasDre;
     window.carregarCategoriasDre = carregarCategoriasDre;
-    // Auto-load da DRE ao trocar para a aba
-    document.addEventListener('click', function(e) {
-      var btn = e.target.closest ? e.target.closest('[data-tab="tab-dre"]') : null;
-      if (btn) {
-        setTimeout(function() {
-          if (typeof carregarPlacasDre === 'function' && (!__drePlacasCache || __drePlacasCache.length === 0)) {
-            carregarPlacasDre();
-          }
-          if (typeof carregarCategoriasDre === 'function' && (!__dreCategoriasCache || __dreCategoriasCache.length === 0)) {
-            carregarCategoriasDre();
-          }
-        }, 150);
-      }
-    });
-    window.__dreAutoCarregar = true;
 
     window.filtrarAuditoriaNaTela = filtrarAuditoriaNaTela;
     window.testarAuditoriaManual = testarAuditoriaManual;
@@ -5842,11 +5801,7 @@
 
         alert('Lancamento salvo com sucesso!');
         fecharModalLancamento();
-        // Recarrega TODAS as telas que mostram lancamentos
-        if (typeof loadLancamentosDaAPI === 'function') loadLancamentosDaAPI();
-        if (typeof loadDreDaAPI === 'function') loadDreDaAPI();
-        if (typeof loadDreConsolidadaDaAPI === 'function') loadDreConsolidadaDaAPI(true);
-        if (typeof loadDashboardData === 'function') loadDashboardData();
+        loadLancamentosDaAPI();
       } catch (e) {
         console.error(e);
         alert('Erro: ' + e.message);
