@@ -1929,7 +1929,7 @@
             <table class="data-table" id="table-dre-lanc-v2">
               <thead>
                 <tr>
-
+                  <th style="width: 100px;">Mês/Ano</th>
                   <th style="width: 110px;">Data</th>
                   <th style="width: 90px;">Tipo</th>
                   <th>Descrição</th>
@@ -2198,7 +2198,6 @@
           <table class="data-table" id="table-lancamentos">
             <thead>
               <tr>
-                <th style="width: 100px;">Mês/Ano</th>
                 <th style="width: 120px;">Data</th>
                 <th style="width: 100px;">Tipo</th>
                 <th>Descrição</th>
@@ -4072,7 +4071,7 @@
           var resResumo = await apiFetch("/lancamentos/resumo?" + params.toString());
           if (resResumo.ok) {
             var resumo = await resResumo.json();
-            renderResumoLancamentos();
+            renderResumoLancamentos(resumo);
           }
         } catch (e) { /* resumo opcional */ }
         if (__lancamentosCache.length === 0 && (params.toString())) {
@@ -4086,7 +4085,7 @@
           var resResumo = await apiFetch("/lancamentos/resumo?" + params.toString());
           if (resResumo.ok) {
             var resumo = await resResumo.json();
-            renderResumoLancamentos();
+            renderResumoLancamentos(resumo);
           }
         } catch (e) { /* resumo opcional */ }
       } catch (err) {
@@ -6726,28 +6725,18 @@
       }
     }
 
-    function renderResumoLancamentos() {
-      // Calcula os totais a partir de __lancamentosCache (ja filtrado)
-      var lista = __lancamentosCache || [];
-      var receitas = 0, despesas = 0, qtd = lista.length;
-      lista.forEach(function(l) {
-        var v = parseFloat(l.valor) || 0;
-        if (l.tipo === "Receita") receitas += v;
-        if (l.tipo === "Despesa") despesas += v;
-      });
-      var resultado = receitas - despesas;
-      var margem = receitas > 0 ? (resultado / receitas) * 100 : 0;
-
+    function renderResumoLancamentos(r) {
+      if (!r) r = {};
       var el = function(id) { return document.getElementById(id); };
-      if (el("lanc-receitas")) el("lanc-receitas").textContent = formatBRL(receitas);
-      if (el("lanc-despesas")) el("lanc-despesas").textContent = formatBRL(despesas);
-      if (el("lanc-resultado")) {
-        el("lanc-resultado").textContent = formatBRL(resultado);
-        el("lanc-resultado").className = "kpi-card-val " + (resultado >= 0 ? "pos" : "neg");
+      if (el('lanc-receitas')) el('lanc-receitas').textContent = formatBRL(r.receitas || 0);
+      if (el('lanc-despesas')) el('lanc-despesas').textContent = formatBRL(r.despesas || 0);
+      if (el('lanc-resultado')) {
+        el('lanc-resultado').textContent = formatBRL(r.resultado || 0);
+        el('lanc-resultado').className = 'kpi-card-val ' + (r.resultado >= 0 ? 'pos' : 'neg');
       }
-      if (el("lanc-res-card")) el("lanc-res-card").className = "kpi-card " + (resultado >= 0 ? "kpi-pos" : "kpi-neg");
-      if (el("lanc-margem")) el("lanc-margem").textContent = "Margem: " + formatPct(margem);
-      if (el("lanc-receitas-qtd")) el("lanc-receitas-qtd").textContent = qtd + " lancamentos";
+      if (el('lanc-res-card')) el('lanc-res-card').className = 'kpi-card ' + (r.resultado >= 0 ? 'kpi-pos' : 'kpi-neg');
+      if (el('lanc-margem')) el('lanc-margem').textContent = 'Margem: ' + formatPct(r.margem || 0);
+      if (el('lanc-receitas-qtd')) el('lanc-receitas-qtd').textContent = (r.total_lancamentos || 0) + ' lancamentos';
     }
 
     // ---------------------------------------------------------------------
