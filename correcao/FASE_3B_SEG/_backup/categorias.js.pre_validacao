@@ -1,8 +1,5 @@
 const db = require('../database');
 
-// FASE_3B_VALIDACAO_FINANCEIRO
-
-
 module.exports = async function (fastify, options) {
 
   // LISTAR CATEGORIAS
@@ -23,38 +20,7 @@ module.exports = async function (fastify, options) {
   });
 
   // CRIAR
-  fastify.post('/api/categorias', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "nome",
-                "tipo"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "nome": {
-                    "type": "string",
-                    "minLength": 2,
-                    "maxLength": 100
-                },
-                "tipo": {
-                    "type": "string",
-                    "enum": [
-                        "Receita",
-                        "Despesa"
-                    ]
-                },
-                "ordem": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "ativo": {
-                    "type": "boolean"
-                }
-            }
-        }
-    }, preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.post('/api/categorias', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { nome, tipo, ordem, ativo } = req.body || {};
     if (!nome || !tipo) return reply.code(400).send({ erro: 'Nome e tipo sao obrigatorios.' });
     if (tipo !== 'Receita' && tipo !== 'Despesa') return reply.code(400).send({ erro: 'Tipo deve ser Receita ou Despesa.' });
@@ -76,34 +42,7 @@ module.exports = async function (fastify, options) {
   });
 
   // ATUALIZAR
-  fastify.put('/api/categorias/:id', {
-    schema: {
-        "body": {
-            "type": "object",
-            "additionalProperties": true,
-            "properties": {
-                "nome": {
-                    "type": "string",
-                    "minLength": 2,
-                    "maxLength": 100
-                },
-                "tipo": {
-                    "type": "string",
-                    "enum": [
-                        "Receita",
-                        "Despesa"
-                    ]
-                },
-                "ordem": {
-                    "type": "integer",
-                    "minimum": 0
-                },
-                "ativo": {
-                    "type": "boolean"
-                }
-            }
-        }
-    }, preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.put('/api/categorias/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { id } = req.params;
     const { nome, tipo, ordem, ativo } = req.body || {};
     try {

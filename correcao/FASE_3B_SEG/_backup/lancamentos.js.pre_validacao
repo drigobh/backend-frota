@@ -1,8 +1,5 @@
 ﻿const db = require('../database');
 
-// FASE_3B_VALIDACAO_FINANCEIRO
-
-
 module.exports = async function (fastify, options) {
 
   // ==========================================================================
@@ -217,57 +214,7 @@ module.exports = async function (fastify, options) {
   // ==========================================================================
   // CRIAR LANCAMENTO
   // ==========================================================================
-  fastify.post('/api/lancamentos', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "data",
-                "tipo",
-                "categoria",
-                "descricao",
-                "valor"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "data": {
-                    "type": "string",
-                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
-                },
-                "tipo": {
-                    "type": "string",
-                    "enum": [
-                        "Receita",
-                        "Despesa"
-                    ]
-                },
-                "categoria": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 100
-                },
-                "descricao": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 255
-                },
-                "valor": {
-                    "type": "number",
-                    "minimum": 0.01
-                },
-                "placa": {
-                    "type": "string",
-                    "maxLength": 20
-                },
-                "centro_custo_id": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
-                }
-            }
-        }
-    }, preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.post('/api/lancamentos', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { placa, data, tipo, categoria, descricao, valor, centro_custo_id } = req.body || {};
 
     if (!data || !tipo || !categoria || !descricao || !valor) {
@@ -320,57 +267,7 @@ module.exports = async function (fastify, options) {
   // ==========================================================================
   // ATUALIZAR LANCAMENTO
   // ==========================================================================
-  fastify.put('/api/lancamentos/:id', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "data",
-                "tipo",
-                "categoria",
-                "descricao",
-                "valor"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "data": {
-                    "type": "string",
-                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
-                },
-                "tipo": {
-                    "type": "string",
-                    "enum": [
-                        "Receita",
-                        "Despesa"
-                    ]
-                },
-                "categoria": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 100
-                },
-                "descricao": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 255
-                },
-                "valor": {
-                    "type": "number",
-                    "minimum": 0.01
-                },
-                "placa": {
-                    "type": "string",
-                    "maxLength": 20
-                },
-                "centro_custo_id": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
-                }
-            }
-        }
-    }, preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.put('/api/lancamentos/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { id } = req.params;
     const { placa, data, tipo, categoria, descricao, valor, centro_custo_id } = req.body || {};
 
