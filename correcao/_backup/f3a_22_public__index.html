@@ -4016,7 +4016,8 @@
       try {
         // Carrega categorias/veiculos/anos nos selects (uma vez)
         await carregarFiltrosLancamentos();
-        // Anos e meses populados no auto-init
+        await popularAnosLancamentos();
+        popularMesesLancamentos();
 
         // Le os valores dos filtros
         function valorOuVazio(id) { var v = (document.getElementById(id) || {}).value || ""; return (v === "---------") ? "" : v; }
