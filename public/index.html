@@ -4016,7 +4016,8 @@
       try {
         // Carrega categorias/veiculos/anos nos selects (uma vez)
         await carregarFiltrosLancamentos();
-        popularAnosLancamentos();
+                popularAnosLancamentos();
+        popularMesesLancamentos();
 
         // Le os valores dos filtros
         var periodo = (document.getElementById("lanc-filtro-periodo") || {}).value || "";
@@ -7935,20 +7936,35 @@
   })();
   </script>
   <div id="toast-container" aria-live="polite"></div>
-  <div id="confirm-overlay" role="dialog" aria-modal="true">
-    <div id="confirm-modal">
-      <div class="confirm-header">
-        <div class="confirm-icon" id="confirm-icon">?</div>
-        <h3 class="confirm-title" id="confirm-title">Confirmar acao</h3>
-      </div>
-      <div class="confirm-body">
-        <p class="confirm-message" id="confirm-message">Tem certeza?</p>
-      </div>
-      <div class="confirm-footer">
-        <button class="confirm-btn confirm-btn-cancel" id="confirm-btn-cancel">Cancelar</button>
-        <button class="confirm-btn confirm-btn-confirm" id="confirm-btn-confirm">Confirmar</button>
-      </div>
-    </div>
-  </div>
+  <div id="confirm-overlay" role="dialog" aria-modal="true">
+
+    <div id="confirm-modal">
+
+      <div class="confirm-header">
+
+        <div class="confirm-icon" id="confirm-icon">?</div>
+
+        <h3 class="confirm-title" id="confirm-title">Confirmar acao</h3>
+
+      </div>
+
+      <div class="confirm-body">
+
+        <p class="confirm-message" id="confirm-message">Tem certeza?</p>
+
+      </div>
+
+      <div class="confirm-footer">
+
+        <button class="confirm-btn confirm-btn-cancel" id="confirm-btn-cancel">Cancelar</button>
+
+        <button class="confirm-btn confirm-btn-confirm" id="confirm-btn-confirm">Confirmar</button>
+
+      </div>
+
+    </div>
+
+  </div>
+
 </body>
 </html>

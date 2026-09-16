@@ -44,10 +44,21 @@ module.exports = async function (fastify, options) {
         if (diasNum > 0 && diasNum <= 365) {
           query += ` AND l.data_lancamento >= (CURRENT_DATE - INTERVAL '${diasNum} days')`;
         }
-      } else if (mes) {
-                query += ` AND DATE_TRUNC('month', l.data_lancamento) = $${idx}::date`;
+            } else if (mes) {
+        query += ` AND DATE_TRUNC('month', l.data_lancamento) = $${idx}::date`;
         params.push(mes);
         idx++;
+      } else {
+        if (ano) {
+          query += ` AND EXTRACT(YEAR FROM l.data_lancamento) = $${idx}::int`;
+          params.push(parseInt(ano));
+          idx++;
+        }
+        if (mesNumero) {
+          query += ` AND EXTRACT(MONTH FROM l.data_lancamento) = $${idx}::int`;
+          params.push(parseInt(mesNumero));
+          idx++;
+        }
       }
 
       if (tipo) {
