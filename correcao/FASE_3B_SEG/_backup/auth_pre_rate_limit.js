@@ -16,14 +16,7 @@ async function verificarSenha(senha, hash) {
 
 async function routes(fastify, options) {
 
-  fastify.post('/api/login', {
-      config: {
-        rateLimit: {
-          max: 5,
-          timeWindow: '1 minute'
-        }
-      } // FASE_3B_RATE_LIMIT
-    }, async (req, reply) => {
+  fastify.post('/api/login', async (req, reply) => {
     const { email, senha } = req.body || {};
     if (!email || !senha) {
       return reply.code(400).send({ erro: 'E-mail e senha são obrigatórios.' });

@@ -79,12 +79,13 @@ fastify.register(rateLimit, {
   timeWindow: '1 minute',               // janela de 1 minuto
   allowList: [],                        // sem excecoes
   keyGenerator: (req) => req.ip,        // bloqueia por IP
-  errorResponseBuilder: (req, context) => ({
-    statusCode: 429,
-    error: 'Too Many Requests',
-    message: 'Muitas tentativas de login. Aguarde ' + Math.ceil(context.ttl / 1000) + ' segundos antes de tentar novamente.',
-    retryAfter: Math.ceil(context.ttl / 1000)
-  }),
+  errorResponseBuilder: (req, context) => {
+    const retryAfter = Math.ceil(context.ttl / 1000);
+    const err = new Error('Muitas tentativas de login. Aguarde ' + retryAfter + ' segundos antes de tentar novamente.');
+    err.statusCode = 429;
+    err.retryAfter = retryAfter;
+    return err;
+  },
   addHeadersOnExceeding: {
     'x-ratelimit-limit': true,
     'x-ratelimit-remaining': true,
@@ -354,4 +355,3 @@ const start = async () => {
 };
 
 start();
-

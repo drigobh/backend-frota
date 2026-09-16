@@ -1,4 +1,4 @@
-﻿// =========================================================================
+// =========================================================================
 // CADERNINHO DE MOTORISTA - SERVIDOR PRINCIPAL
 // Stack: Fastify + PostgreSQL (Neon) + Render
 // =========================================================================
@@ -11,46 +11,46 @@ const fs = require('fs');
 require('dotenv').config();
 
 // =========================================================================
-// CONFIGURAÃ‡ÃƒO DE AMBIENTE
+// CONFIGURAÇÃO DE AMBIENTE
 // =========================================================================
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
-// ===== DIAGNÃ“STICO DE BOOT (aparece no log do Render) =====
-console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
-console.log('ðŸ” DIAGNÃ“STICO DE BOOT');
-console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
+// ===== DIAGNÓSTICO DE BOOT (aparece no log do Render) =====
+console.log('═══════════════════════════════════════════════════');
+console.log('🔍 DIAGNÓSTICO DE BOOT');
+console.log('═══════════════════════════════════════════════════');
 console.log('PORT           =', PORT);
 console.log('HOST           =', HOST);
-console.log('NODE_ENV       =', process.env.NODE_ENV || '(nÃ£o definido)');
-console.log('DATABASE_URL?  =', process.env.DATABASE_URL ? 'SIM âœ…' : 'NÃƒO âŒ');
-console.log('JWT_SECRET?    =', process.env.JWT_SECRET ? 'SIM âœ…' : 'NÃƒO âŒ');
+console.log('NODE_ENV       =', process.env.NODE_ENV || '(não definido)');
+console.log('DATABASE_URL?  =', process.env.DATABASE_URL ? 'SIM ✅' : 'NÃO ❌');
+console.log('JWT_SECRET?    =', process.env.JWT_SECRET ? 'SIM ✅' : 'NÃO ❌');
 console.log('CWD            =', process.cwd());
 console.log('__dirname      =', __dirname);
-console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
+console.log('═══════════════════════════════════════════════════');
 
 const ALLOWED_ORIGINS = [
   'https://backend-frota-72ni.onrender.com',
   'http://localhost:3000',
-  'http://127.0.0.1:3000',      // â† ADICIONADO (Chrome usa esse)
+  'http://127.0.0.1:3000',      // ← ADICIONADO (Chrome usa esse)
   'http://localhost:5500',
   'http://127.0.0.1:5500',
 ];
 // =========================================================================
-// WATCHDOG â€” se o listen nÃ£o rodar em 10s, derruba com log claro
+// WATCHDOG — se o listen não rodar em 10s, derruba com log claro
 // =========================================================================
 const watchdog = setTimeout(() => {
-  console.error('âŒ [WATCHDOG] Servidor NÃƒO abriu porta em 10 segundos.');
-  console.error('âŒ [WATCHDOG] Alguma coisa travou ANTES do listen().');
-  console.error('âŒ [WATCHDOG] PossÃ­veis causas:');
-  console.error('   - DATABASE_URL ausente ou inacessÃ­vel');
-  console.error('   - algum require() de rota estÃ¡ lanÃ§ando erro');
+  console.error('❌ [WATCHDOG] Servidor NÃO abriu porta em 10 segundos.');
+  console.error('❌ [WATCHDOG] Alguma coisa travou ANTES do listen().');
+  console.error('❌ [WATCHDOG] Possíveis causas:');
+  console.error('   - DATABASE_URL ausente ou inacessível');
+  console.error('   - algum require() de rota está lançando erro');
   console.error('   - Neon/Postgres lento respondendo');
   process.exit(1);
 }, 10000);
 
 // =========================================================================
-// CORS â€” Restrito aos domÃ­nios autorizados
+// CORS — Restrito aos domínios autorizados
 // =========================================================================
 fastify.register(cors, {
   origin: (origin, callback) => {
@@ -60,8 +60,8 @@ fastify.register(cors, {
       return callback(null, true);
     }
 
-    console.warn(`âš ï¸  CORS bloqueado para origem: ${origin}`);
-    return callback(new Error('Origem nÃ£o permitida pelo CORS'), false);
+    console.warn(`⚠️  CORS bloqueado para origem: ${origin}`);
+    return callback(new Error('Origem não permitida pelo CORS'), false);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -70,7 +70,7 @@ fastify.register(cors, {
 
 // =========================================================================
 // ===========================================================================
-// RATE LIMITING â€” Protege /api/login contra forca bruta
+// RATE LIMITING — Protege /api/login contra forca bruta
 // 5 tentativas por minuto por IP, com resposta 429 apos estourar
 // ===========================================================================
 fastify.register(rateLimit, {
@@ -80,9 +80,8 @@ fastify.register(rateLimit, {
   allowList: [],                        // sem excecoes
   keyGenerator: (req) => req.ip,        // bloqueia por IP
   errorResponseBuilder: (req, context) => ({
-    statusCode: 429,
-    error: 'Too Many Requests',
-    message: 'Muitas tentativas de login. Aguarde ' + Math.ceil(context.ttl / 1000) + ' segundos antes de tentar novamente.',
+    erro: 'Muitas tentativas de login. Aguarde ' + Math.ceil(context.ttl / 1000) + ' segundos antes de tentar novamente.',
+    codigo: 'RATE_LIMIT_EXCEEDED',
     retryAfter: Math.ceil(context.ttl / 1000)
   }),
   addHeadersOnExceeding: {
@@ -98,7 +97,7 @@ fastify.register(rateLimit, {
   }
 });
 
-// JWT â€” AutenticaÃ§Ã£o por token
+// JWT — Autenticação por token
 // =========================================================================
 fastify.register(require('@fastify/jwt'), {
   secret: process.env.JWT_SECRET || 'fallback-secret-trocar-em-producao',
@@ -109,12 +108,12 @@ fastify.decorate('autenticar', async (request, reply) => {
   try {
     await request.jwtVerify();
   } catch (err) {
-    reply.status(401).send({ erro: 'NÃ£o autenticado. FaÃ§a login novamente.' });
+    reply.status(401).send({ erro: 'Não autenticado. Faça login novamente.' });
   }
 });
 
 // =========================================================================
-// ARQUIVOS ESTÃTICOS (Frontend)
+// ARQUIVOS ESTÁTICOS (Frontend)
 // =========================================================================
 fastify.register(require('@fastify/static'), {
   root: path.join(__dirname, '../public'),
@@ -122,7 +121,7 @@ fastify.register(require('@fastify/static'), {
 });
 
 // =========================================================================
-// ROTAS DE API (por domÃ­nio) â€” com try/catch para nÃ£o travar o boot
+// ROTAS DE API (por domínio) — com try/catch para não travar o boot
 // =========================================================================
 const ROTAS = [
   './routes/cadastro',
@@ -153,12 +152,12 @@ ROTAS.forEach((caminho) => {
   try {
     fastify.register(require(caminho));
   } catch (err) {
-    console.error(`âŒ [BOOT] Falha ao carregar rota ${caminho}:`, err.message);
+    console.error(`❌ [BOOT] Falha ao carregar rota ${caminho}:`, err.message);
   }
 });
 
 // =========================================================================
-// ROTA PRINCIPAL â€” Serve o index.html
+// ROTA PRINCIPAL — Serve o index.html
 // =========================================================================
 fastify.get('/', (req, reply) => {
   const filePath = path.join(__dirname, '../public/Cad Moto.html');
@@ -171,7 +170,7 @@ fastify.get('/', (req, reply) => {
     return reply.type('text/html').send(fs.readFileSync(indexPath));
   }
 
-  reply.status(404).send({ erro: 'Arquivo HTML principal nÃ£o encontrado.' });
+  reply.status(404).send({ erro: 'Arquivo HTML principal não encontrado.' });
 });
 
 // =========================================================================
@@ -191,13 +190,13 @@ fastify.get('/health', async () => {
 fastify.setErrorHandler((error, request, reply) => {
   fastify.log.error(error);
 
-  if (error.message === 'Origem nÃ£o permitida pelo CORS') {
-    return reply.status(403).send({ erro: 'Origem nÃ£o autorizada.' });
+  if (error.message === 'Origem não permitida pelo CORS') {
+    return reply.status(403).send({ erro: 'Origem não autorizada.' });
   }
 
   if (error.validation) {
     return reply.status(400).send({
-      erro: 'Dados invÃ¡lidos na requisiÃ§Ã£o.',
+      erro: 'Dados inválidos na requisição.',
       detalhes: error.validation,
     });
   }
@@ -213,7 +212,7 @@ fastify.setErrorHandler((error, request, reply) => {
 // =========================================================================
 fastify.setNotFoundHandler((request, reply) => {
   if (request.url.startsWith('/api/')) {
-    return reply.status(404).send({ erro: 'Rota de API nÃ£o encontrada.' });
+    return reply.status(404).send({ erro: 'Rota de API não encontrada.' });
   }
 
   const indexPath = path.join(__dirname, '../public/index.html');
@@ -221,7 +220,7 @@ fastify.setNotFoundHandler((request, reply) => {
     return reply.type('text/html').send(fs.readFileSync(indexPath));
   }
 
-  reply.status(404).send({ erro: 'PÃ¡gina nÃ£o encontrada.' });
+  reply.status(404).send({ erro: 'Página não encontrada.' });
 });
 
 // =========================================================================
@@ -325,7 +324,7 @@ fastify.addHook('onSend', async (request, reply, payload) => {
 });
 
 // =========================================================================
-// INICIALIZAÃ‡ÃƒO
+// INICIALIZAÇÃO
 // =========================================================================
 const start = async () => {
   try {
@@ -335,23 +334,22 @@ const start = async () => {
 
     const address = fastify.server.address();
     console.log('');
-    console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
-    console.log('ðŸš›  CADERNINHO DE MOTORISTA â€” BACKEND ONLINE');
-    console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
-    console.log(`ðŸš€  Porta:       ${address.port}`);
-    console.log(`ðŸŒ  Ambiente:    ${process.env.NODE_ENV || 'development'}`);
-    console.log(`ðŸ”—  URL:         https://backend-frota-72ni.onrender.com`);
-    console.log(`ðŸ’¾  Banco:       PostgreSQL (Neon)`);
-    console.log(`ðŸ”’  CORS:        ${ALLOWED_ORIGINS.length} origem(ns) autorizada(s)`);
-    console.log(`ðŸ”  JWT:         ${process.env.JWT_SECRET ? 'Configurado âœ…' : 'FALTANDO âŒ'}`);
-    console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
+    console.log('═══════════════════════════════════════════════════');
+    console.log('🚛  CADERNINHO DE MOTORISTA — BACKEND ONLINE');
+    console.log('═══════════════════════════════════════════════════');
+    console.log(`🚀  Porta:       ${address.port}`);
+    console.log(`🌐  Ambiente:    ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔗  URL:         https://backend-frota-72ni.onrender.com`);
+    console.log(`💾  Banco:       PostgreSQL (Neon)`);
+    console.log(`🔒  CORS:        ${ALLOWED_ORIGINS.length} origem(ns) autorizada(s)`);
+    console.log(`🔐  JWT:         ${process.env.JWT_SECRET ? 'Configurado ✅' : 'FALTANDO ❌'}`);
+    console.log('═══════════════════════════════════════════════════');
     console.log('');
   } catch (err) {
     clearTimeout(watchdog);
-    console.error('âŒ [BOOT] Erro ao iniciar servidor:', err);
+    console.error('❌ [BOOT] Erro ao iniciar servidor:', err);
     process.exit(1);
   }
 };
 
 start();
-
