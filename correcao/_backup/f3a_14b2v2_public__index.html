@@ -3518,7 +3518,7 @@
     }
 
     async function deleteItem(tipo, id) {
-      if (!(await confirmarAcao('Deseja excluir este registro?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!confirm('Deseja excluir este registro?')) return;
       try {
         await apiFetch(`/${tipo}/${id}`, { method: 'DELETE' });
         loadCadastrosDaAPI();
@@ -3678,7 +3678,7 @@
     }
 
     async function deleteAcop(id) {
-      if (!(await confirmarAcao('Remover acoplamento?', { titulo: 'Confirmar Remocao', tipo: 'warning', textoConfirmar: 'Remover', icone: '\u26A0\uFE0F' }))) return;
+      if (!confirm('Remover acoplamento?')) return;
       try {
         await apiFetch(`/acoplamentos/${id}`, { method: 'DELETE' });
         loadAcoplamentosDaAPI();
@@ -3950,7 +3950,7 @@
     }
 
     async function deleteAbastecimento(id) {
-      if (!(await confirmarAcao('Deseja excluir este registro de abastecimento?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!confirm('Deseja excluir este registro de abastecimento?')) return;
       try {
         await apiFetch(`/abastecimentos/${id}`, { method: 'DELETE' });
         loadAbastecimentosDaAPI();
@@ -4142,7 +4142,7 @@
     }
 
     async function deleteLanc(id) {
-      if (!(await confirmarAcao('Deseja excluir este lançamento financeiro?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!confirm('Deseja excluir este lançamento financeiro?')) return;
       
       try {
         await apiFetch(`/financeiro/${id}`, { method: 'DELETE' });
@@ -4321,7 +4321,7 @@
     }
 
     async function deleteManutencao(id) {
-      if (!(await confirmarAcao('Deseja excluir este registro de manutenção?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!confirm('Deseja excluir este registro de manutenção?')) return;
       try {
         await apiFetch(`/manutencoes/${id}`, { method: 'DELETE' });
         loadManutencoesDaAPI();
@@ -4397,7 +4397,7 @@
     }
 
     async function deleteDocumento(id) {
-      if (!(await confirmarAcao('Deseja excluir este documento?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!confirm('Deseja excluir este documento?')) return;
       try {
         await apiFetch(`/documentos/${id}`, { method: 'DELETE' });
         loadDocumentosDaAPI();
@@ -5138,7 +5138,7 @@
     }
 
     async function desativarUsuario(id, nome) {
-      if (!(await confirmarAcao(`Desativar o usuario "${nome}"?`, { titulo: 'Desativar', tipo: 'warning', textoConfirmar: 'Desativar', icone: '\u26A0\uFE0F' }))) return;
+      if (!confirm(`Desativar o usuario "${nome}"?`)) return;
 
       try {
         const res = await apiFetch(`/usuarios/${id}`, { method: 'DELETE' });
@@ -5437,7 +5437,7 @@
     }
 
     async function excluirPerfil(id, nome) {
-      if (!(await confirmarAcao('Excluir o perfil "' + nome + '"?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!confirm('Excluir o perfil "' + nome + '"?')) return;
       try {
         var r = await apiFetch('/perfis/' + id, { method: 'DELETE' });
         if (!r.ok) { var e = await r.json(); alert(e.erro || 'Erro'); return; }
@@ -5752,7 +5752,7 @@
     }
 
     async function excluirLancamentoDre(id) {
-      if (!(await confirmarAcao("Excluir este lancamento?", { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!confirm("Excluir este lancamento?")) return;
       try {
         var res = await apiFetch("/lancamentos/" + id, { method: "DELETE" });
         if (!res.ok) { var err = await res.json(); alert(err.erro || "Erro ao excluir"); return; }
@@ -6112,7 +6112,7 @@
     function editarMeta(id) { abrirModalMeta(id); }
 
     async function excluirMeta(id) {
-      if (!(await confirmarAcao("Excluir esta meta?", { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!confirm("Excluir esta meta?")) return;
       try {
         var res = await apiFetch("/metas/" + id, { method: "DELETE" });
         if (!res.ok) { var err = await res.json(); alert(err.erro || "Erro"); return; }
@@ -6694,7 +6694,7 @@
     function editarLancamento(id) { abrirModalLancamento(id); }
 
     async function excluirLancamento(id) {
-      if (!(await confirmarAcao('Excluir este lancamento?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!confirm('Excluir este lancamento?')) return;
       try {
         var res = await apiFetch('/lancamentos/' + id, { method: 'DELETE' });
         if (!res.ok) {
@@ -6892,7 +6892,7 @@
     function editarCategoria(id) { abrirModalCategoria(id); }
 
     async function excluirCategoria(id, nome) {
-      if (!(await confirmarAcao('Excluir a categoria "' + nome + '"?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!confirm('Excluir a categoria "' + nome + '"?')) return;
       try {
         var res = await apiFetch('/categorias/' + id, { method: 'DELETE' });
         if (!res.ok) {
@@ -7084,7 +7084,7 @@
     function editarCentroCusto(id) { abrirModalCentroCusto(id); }
 
     async function excluirCentroCusto(id, nome) {
-      if (!(await confirmarAcao('Excluir o centro de custo "' + nome + '"?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!confirm('Excluir o centro de custo "' + nome + '"?')) return;
       try {
         var res = await apiFetch('/centros-custo/' + id, { method: 'DELETE' });
         if (!res.ok) {
