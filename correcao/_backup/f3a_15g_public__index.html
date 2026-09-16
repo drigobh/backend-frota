@@ -1438,16 +1438,6 @@
     @keyframes spinnerRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .btn-loading { position:relative; pointer-events:none; opacity:0.85; cursor:wait; }
     .btn-loading::before { content:""; display:inline-block; width:14px; height:14px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spinnerRotate 0.7s linear infinite; margin-right:6px; vertical-align:middle; }
-    /* ==== FILTROS COMPACTOS (FASE 3A / 15g) ==== */
-    .filtros-bar { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.25rem; margin-bottom:1.25rem; box-shadow:0 1px 3px rgba(0,0,0,0.05); display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-end; justify-content:space-between; }
-    .filtros-grid { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:0.75rem; flex:1; min-width:0; }
-    .filtro-item { display:flex; flex-direction:column; gap:4px; min-width:0; }
-    .filtro-item label { font-size:0.7rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.04em; }
-    .filtro-item select, .filtro-item input { width:100%; padding:0.5rem 0.75rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; font-weight:600; color:#0f2a4a; background:#fff; box-sizing:border-box; cursor:pointer; }
-    .filtro-item select:focus, .filtro-item input:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.15); }
-    .filtros-acoes { display:flex; gap:0.5rem; align-items:flex-end; }
-    @media (max-width: 1024px) { .filtros-grid { grid-template-columns:repeat(3, 1fr); } }
-    @media (max-width: 768px) { .filtros-bar { flex-direction:column; align-items:stretch; } .filtros-grid { grid-template-columns:1fr 1fr; } .filtros-acoes { justify-content:flex-end; } }
 </style>
 
 <script>
@@ -2116,48 +2106,34 @@
 
       <!-- TAB: LANCAMENTOS -->
       <section id="tab-lancamentos" class="tab-content">
-        <div class="filtros-bar">
-          <div class="filtros-grid">
-            <div class="filtro-item">
-              <label for="select-mes-lancamentos">Mes</label>
-              <select class="select-mes-global" id="select-mes-lancamentos"></select>
-            </div>
-            <div class="filtro-item">
-              <label for="lanc-filtro-periodo">Periodo</label>
-              <select id="lanc-filtro-periodo">
-                <option value="mes">Mes atual</option>
-                <option value="30">Ultimos 30 dias</option>
-                <option value="60">Ultimos 60 dias</option>
-                <option value="90">Ultimos 90 dias</option>
-                <option value="120">Ultimos 120 dias</option>
-                <option value="tudo">Tudo (sem filtro)</option>
-              </select>
-            </div>
-            <div class="filtro-item">
-              <label for="lanc-filtro-tipo">Tipo</label>
-              <select id="lanc-filtro-tipo">
-                <option value="">Todos os tipos</option>
-                <option value="Receita">Receitas</option>
-                <option value="Despesa">Despesas</option>
-              </select>
-            </div>
-            <div class="filtro-item">
-              <label for="lanc-filtro-categoria">Categoria</label>
-              <select id="lanc-filtro-categoria">
-                <option value="">Todas as categorias</option>
-              </select>
-            </div>
-            <div class="filtro-item">
-              <label for="lanc-filtro-veiculo">Veiculo</label>
-              <select id="lanc-filtro-veiculo">
-                <option value="">Todos os veiculos</option>
-              </select>
-            </div>
-          </div>
-          <div class="filtros-acoes">
+        <div class="bar-controls">
+          <div class="bar-controls-left">
+            <span class="label-month-select">Mês de Referência:</span>
+            <select class="select-month select-mes-global" id="select-mes-lancamentos"></select>
+            <select id="lanc-filtro-periodo" class="select-month" style="min-width:150px;">
+              <option value="mes">Mes atual</option>
+              <option value="30">Ultimos 30 dias</option>
+              <option value="60">Ultimos 60 dias</option>
+              <option value="90">Ultimos 90 dias</option>
+              <option value="120">Ultimos 120 dias</option>
+              <option value="tudo">Tudo (sem filtro)</option>
+            </select>
+            <select id="lanc-filtro-tipo" style="padding:0.5rem 1rem; border:1.5px solid #2563eb; border-radius:6px; font-weight:600; color:#0f2a4a;">
+              <option value="">Todos os tipos</option>
+              <option value="Receita">Receitas</option>
+              <option value="Despesa">Despesas</option>
+            </select>
+            <select id="lanc-filtro-categoria" style="padding:0.5rem 1rem; border:1.5px solid #2563eb; border-radius:6px; font-weight:600; color:#0f2a4a;">
+              <option value="">Todas as categorias</option>
+            </select>
+            <select id="lanc-filtro-veiculo" style="padding:0.5rem 1rem; border:1.5px solid #2563eb; border-radius:6px; font-weight:600; color:#0f2a4a;">
+              <option value="">Todos os veículos</option>
+            </select>
             <button class="btn-action btn-action-secondary" onclick="limparFiltrosLancamentos()">Limpar</button>
-            <button class="btn-action btn-action-secondary" onclick="exportarLancamentosCSV()">CSV</button>
-            <button class="btn-action btn-action-primary" onclick="abrirModalLancamento()">+ Novo</button>
+          </div>
+          <div class="bar-controls-right">
+            <button class="btn-action btn-action-secondary" onclick="exportarLancamentosCSV()">&#11015;&#65039; Exportar CSV</button>
+            <button class="btn-action btn-action-primary" onclick="abrirModalLancamento()">+ Novo Lançamento</button>
           </div>
         </div>
 
