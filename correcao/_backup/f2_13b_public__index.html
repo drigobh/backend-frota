@@ -4759,9 +4759,6 @@
     function initApp() {
       populateMonthSelectors();
       applyPermissions();
-      if (typeof carregarMinhasPermissoes === "function") {
-        carregarMinhasPermissoes();
-      }
       loadCadastrosDaAPI().then(() => {
         loadDashboardData();
         loadAcoplamentosDaAPI();
@@ -6115,86 +6112,6 @@
     window.excluirMeta = excluirMeta;
     window.exportarMetasCSV = exportarMetasCSV;
     window.imprimirMetas = imprimirMetas;
-
-    // ==== PERMISSOES NA UI ====
-    var __minhasPermissoes = [];
-    var __souAdmin = false;
-
-    async function carregarMinhasPermissoes() {
-      try {
-        var res = await apiFetch("/me/permissoes");
-        if (!res.ok) return;
-        var data = await res.json();
-        __minhasPermissoes = data.permissoes || [];
-        __souAdmin = !!data.administrador;
-        aplicarPermissoesNaUI();
-      } catch (e) { console.error("Erro permissoes:", e); }
-    }
-
-    function temPermissao(chave) {
-      if (__souAdmin) return true;
-      return __minhasPermissoes.indexOf(chave) !== -1;
-    }
-
-    function aplicarPermissoesNaUI() {
-      if (__souAdmin) return;
-
-      // 1) Esconde BOTOES do menu lateral com base nas permissoes
-      var mapa = {"tab-dashboard":"dashboard.visualizar","tab-cadastro":"veiculos.visualizar","tab-acoplamento":"acoplamentos.visualizar","tab-km":"km.visualizar","tab-abastecimentos":"abastecimentos.visualizar","tab-manutencoes":"manutencoes.visualizar","tab-documentos":"manutencoes.visualizar","tab-historico":"historico.visualizar","tab-lancamentos":"lancamentos.visualizar","tab-dre":"dre.visualizar","tab-dre-consolidada":"dre.consolidada.visualizar","tab-categorias":"categorias.visualizar","tab-centros-custo":"centros_custo.visualizar","tab-resumo":"resumo.visualizar","tab-graficos":"graficos.visualizar","tab-ranking":"ranking.visualizar","tab-metas":"metas.visualizar","tab-usuarios":"usuarios.visualizar","tab-perfis":"perfis.visualizar","tab-auditoria":"auditoria.visualizar"};
-      Object.keys(mapa).forEach(function(tabId) {
-        var perm = mapa[tabId];
-        var btns = document.querySelectorAll('[data-tab="' + tabId + '"]');
-        btns.forEach(function(btn) {
-          if (!temPermissao(perm)) {
-            btn.style.display = "none";
-          }
-        });
-      });
-
-      // 2) Esconde BOTOES de acao (criar/editar/excluir)
-      var acoes = [
-        { id: "btn-add-cavalo", perm: "veiculos.criar" },
-        { id: "btn-add-carreta", perm: "carretas.criar" },
-        { id: "btn-add-motorista", perm: "motoristas.criar" },
-        { id: "btn-add-acoplamento", perm: "acoplamentos.criar" },
-        { id: "btn-add-abastecimento", perm: "abastecimentos.criar" },
-        { id: "btn-add-lancamento", perm: "lancamentos.criar" },
-        { id: "btn-add-manutencao", perm: "manutencoes.criar" },
-        { id: "btn-add-documento", perm: "manutencoes.criar" },
-        { id: "btn-add-usuario", perm: "usuarios.criar" },
-        { id: "btn-add-perfil", perm: "perfis.criar" },
-      ];
-      acoes.forEach(function(a) {
-        var el = document.getElementById(a.id);
-        if (el && !temPermissao(a.perm)) el.style.display = "none";
-      });
-
-      // 3) Se estiver numa tab sem permissao, redireciona para Dashboard
-      var tabs = document.querySelectorAll(".tab-content");
-      tabs.forEach(function(tab) {
-        var perm = mapa[tab.id];
-        if (perm && !temPermissao(perm)) {
-          tab.style.display = "none";
-        }
-      });
-    }
-
-    // Intercepta cliques em tabs proibidas
-    document.addEventListener("click", function(e) {
-      var btn = e.target.closest ? e.target.closest("[data-tab]") : null;
-      if (!btn || __souAdmin) return;
-      var tabId = btn.getAttribute("data-tab");
-      var perm = {"tab-dashboard":"dashboard.visualizar","tab-cadastro":"veiculos.visualizar","tab-acoplamento":"acoplamentos.visualizar","tab-km":"km.visualizar","tab-abastecimentos":"abastecimentos.visualizar","tab-manutencoes":"manutencoes.visualizar","tab-documentos":"manutencoes.visualizar","tab-historico":"historico.visualizar","tab-lancamentos":"lancamentos.visualizar","tab-dre":"dre.visualizar","tab-dre-consolidada":"dre.consolidada.visualizar","tab-categorias":"categorias.visualizar","tab-centros-custo":"centros_custo.visualizar","tab-resumo":"resumo.visualizar","tab-graficos":"graficos.visualizar","tab-ranking":"ranking.visualizar","tab-metas":"metas.visualizar","tab-usuarios":"usuarios.visualizar","tab-perfis":"perfis.visualizar","tab-auditoria":"auditoria.visualizar"}[tabId];
-      if (perm && !temPermissao(perm)) {
-        e.preventDefault();
-        e.stopPropagation();
-        alert("Voce nao tem permissao para acessar: " + tabId.replace("tab-", ""));
-      }
-    }, true);
-
-    window.carregarMinhasPermissoes = carregarMinhasPermissoes;
-    window.temPermissao = temPermissao;
-
 
     window.limparFiltrosRanking = limparFiltrosRanking;
     window.exportarRankingCSV = exportarRankingCSV;
