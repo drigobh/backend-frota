@@ -6506,84 +6506,52 @@
     }
 
     async function salvarLancamento() {
-      var data = document.getElementById("modal-lanc-data").value;
-      var tipo = document.getElementById("modal-lanc-tipo").value;
-      var categoria = document.getElementById("modal-lanc-categoria").value;
-      var placa = document.getElementById("modal-lanc-veiculo").value;
-      var descricao = document.getElementById("modal-lanc-descricao").value.trim();
-      var valorStr = document.getElementById("modal-lanc-valor").value;
-      var valor = (typeof parsePtNumber === "function") ? parsePtNumber(valorStr) : parseFloat(String(valorStr).replace(",", "."));
+      var data = document.getElementById('modal-lanc-data').value;
+      var tipo = document.getElementById('modal-lanc-tipo').value;
+      var categoria = document.getElementById('modal-lanc-categoria').value;
+      var placa = document.getElementById('modal-lanc-veiculo').value;
+      var descricao = document.getElementById('modal-lanc-descricao').value.trim();
+      var valorStr = document.getElementById('modal-lanc-valor').value;
+      var valor = (typeof parsePtNumber === 'function') ? parsePtNumber(valorStr) : parseFloat(String(valorStr).replace(',', '.'));
 
       if (!data || !tipo || !categoria || !descricao || !valor) {
-        alert("Preencha todos os campos obrigatorios.");
+        alert('Preencha todos os campos obrigatorios.');
         return;
       }
-      if (valor <= 0) { alert("Valor deve ser maior que zero."); return; }
 
-      // UX Premium: avisa se a data for de outro mes diferente do filtro atual
-      var mesData = data.substring(0, 7); // YYYY-MM
-      var mesFiltro = "";
-      if (state && state.currentMonth && typeof getMonthYearKey === "function") {
-        mesFiltro = getMonthYearKey(state.currentMonth);
+      if (valor <= 0) {
+        alert('Valor deve ser maior que zero.');
+        return;
       }
 
-      if (mesFiltro && mesData !== mesFiltro) {
-        var meses = { "01":"Janeiro","02":"Fevereiro","03":"Marco","04":"Abril","05":"Maio","06":"Junho","07":"Julho","08":"Agosto","09":"Setembro","10":"Outubro","11":"Novembro","12":"Dezembro" };
-        var nomeMesData = meses[data.substring(5,7)] + "/" + data.substring(0,4);
-        if (typeof mostrarToast === "function") {
-          mostrarToast("Salvando lancamento em " + nomeMesData + ". O filtro sera ajustado automaticamente.", "warning", "Mes diferente");
-        }
-      }
-
-      var selCC = document.getElementById("modal-lanc-centro-custo");
-      var centro_custo_id = selCC ? selCC.value : "";
+      var selCC = document.getElementById('modal-lanc-centro-custo');
+      var centro_custo_id = selCC ? selCC.value : '';
       var payload = { placa: placa, data: data, tipo: tipo, categoria: categoria, descricao: descricao, valor: valor, centro_custo_id: centro_custo_id || null };
 
       try {
         var res;
         if (__lancEditandoId) {
-          res = await apiFetch("/lancamentos/" + __lancEditandoId, { method: "PUT", body: JSON.stringify(payload) });
+          res = await apiFetch('/lancamentos/' + __lancEditandoId, { method: 'PUT', body: JSON.stringify(payload) });
         } else {
-          res = await apiFetch("/lancamentos", { method: "POST", body: JSON.stringify(payload) });
+          res = await apiFetch('/lancamentos', { method: 'POST', body: JSON.stringify(payload) });
         }
 
         if (!res.ok) {
           var err = await res.json();
-          alert(err.erro || "Erro ao salvar");
+          alert(err.erro || 'Erro ao salvar');
           return;
         }
 
-        alert("Lancamento salvo com sucesso!");
+        alert('Lancamento salvo com sucesso!');
         fecharModalLancamento();
-
-        // UX Premium: se o mes do lancamento for diferente do filtro, troca o filtro automaticamente
-        if (mesFiltro && mesData !== mesFiltro) {
-          var nomeMes = (function(m) {
-            var partes = m.split("-");
-            var mapa = { "01":"Janeiro","02":"Fevereiro","03":"Marco","04":"Abril","05":"Maio","06":"Junho","07":"Julho","08":"Agosto","09":"Setembro","10":"Outubro","11":"Novembro","12":"Dezembro" };
-            return mapa[partes[1]] + "/" + partes[0];
-          })(mesData);
-
-          // Se o mes existe na lista de meses, seleciona
-          if (state.meses && state.meses.indexOf(nomeMes) !== -1) {
-            state.currentMonth = nomeMes;
-            var selects = document.querySelectorAll(".select-mes-global");
-            selects.forEach(function(s) { s.value = nomeMes; });
-          } else {
-            state.currentMonth = nomeMes;
-            if (state.meses) state.meses.push(nomeMes);
-            if (typeof populateMonthSelectors === "function") populateMonthSelectors();
-          }
-        }
-
-        // Recarrega todas as telas afetadas
-        if (typeof loadLancamentosDaAPI === "function") loadLancamentosDaAPI();
-        if (typeof loadDreDaAPI === "function") loadDreDaAPI();
-        if (typeof loadDreConsolidadaDaAPI === "function") loadDreConsolidadaDaAPI(true);
-        if (typeof loadDashboardData === "function") loadDashboardData();
+        // Recarrega TODAS as telas que mostram lancamentos
+        if (typeof loadLancamentosDaAPI === 'function') loadLancamentosDaAPI();
+        if (typeof loadDreDaAPI === 'function') loadDreDaAPI();
+        if (typeof loadDreConsolidadaDaAPI === 'function') loadDreConsolidadaDaAPI(true);
+        if (typeof loadDashboardData === 'function') loadDashboardData();
       } catch (e) {
         console.error(e);
-        alert("Erro: " + e.message);
+        alert('Erro: ' + e.message);
       }
     }
 
