@@ -1440,7 +1440,7 @@
     .btn-loading::before { content:""; display:inline-block; width:14px; height:14px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spinnerRotate 0.7s linear infinite; margin-right:6px; vertical-align:middle; }
     /* ==== FILTROS COMPACTOS (FASE 3A / 15g) ==== */
     .filtros-bar { background:#fff; border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.25rem; margin-bottom:1.25rem; box-shadow:0 1px 3px rgba(0,0,0,0.05); display:flex; flex-wrap:wrap; gap:1rem; align-items:flex-end; justify-content:space-between; }
-    .filtros-grid { display:grid; grid-template-columns:repeat(6, minmax(0, 1fr)); gap:0.75rem; flex:1; min-width:0; }
+    .filtros-grid { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:0.75rem; flex:1; min-width:0; }
     .filtro-item { display:flex; flex-direction:column; gap:4px; min-width:0; }
     .filtro-item label { font-size:0.7rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.04em; }
     .filtro-item select, .filtro-item input { width:100%; padding:0.5rem 0.75rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; font-weight:600; color:#0f2a4a; background:#fff; box-sizing:border-box; cursor:pointer; }
@@ -2122,31 +2122,21 @@
               <label for="lanc-filtro-periodo">Período</label>
               <select id="lanc-filtro-periodo">
                 <option value="">---------</option>
-                <option value="7">Últimos 7 dias</option>
-                <option value="15">Últimos 15 dias</option>
-                <option value="45">Últimos 45 dias</option>
+                <option value="30">Últimos 30 dias</option>
                 <option value="60">Últimos 60 dias</option>
                 <option value="90">Últimos 90 dias</option>
                 <option value="120">Últimos 120 dias</option>
-                <option value="tudo">Tudo (todos os meses)</option>
+                <option value="tudo">Tudo (sem filtro)</option>
               </select>
             </div>
             <div class="filtro-item">
-              <label for="lanc-filtro-ano">Ano</label>
-              <select id="lanc-filtro-ano">
-                <option value="">---------</option>
-              </select>
-            </div>
-            <div class="filtro-item">
-              <label for="lanc-filtro-mes">Mês</label>
-              <select id="lanc-filtro-mes">
-                <option value="">---------</option>
-              </select>
+              <label for="select-mes-lancamentos">Mês</label>
+              <select class="select-mes-global" id="select-mes-lancamentos"></select>
             </div>
             <div class="filtro-item">
               <label for="lanc-filtro-tipo">Tipo</label>
               <select id="lanc-filtro-tipo">
-                <option value="">---------</option>
+                <option value="">Todos os tipos</option>
                 <option value="Receita">Receitas</option>
                 <option value="Despesa">Despesas</option>
               </select>
@@ -2154,19 +2144,19 @@
             <div class="filtro-item">
               <label for="lanc-filtro-categoria">Categoria</label>
               <select id="lanc-filtro-categoria">
-                <option value="">---------</option>
+                <option value="">Todas as categorias</option>
               </select>
             </div>
             <div class="filtro-item">
               <label for="lanc-filtro-veiculo">Veículo</label>
               <select id="lanc-filtro-veiculo">
-                <option value="">---------</option>
+                <option value="">Todos os veiculos</option>
               </select>
             </div>
           </div>
           <div class="filtros-acoes">
             <button class="btn-action btn-action-secondary" onclick="limparFiltrosLancamentos()">Limpar</button>
-            <button class="btn-action btn-action-secondary" onclick="exportarLancamentosCSV()">&#11015;&#65039; CSV</button>
+            <button class="btn-action btn-action-secondary" onclick="exportarLancamentosCSV()">CSV</button>
             <button class="btn-action btn-action-primary" onclick="abrirModalLancamento()">+ Novo</button>
           </div>
         </div>
@@ -4010,83 +4000,17 @@
     // API E RENDERIZAÇÃO: FINANCEIRO (DRE)
     // =========================================================================
     async function loadLancamentosDaAPI() {
-      var tbody = document.getElementById("tbody-lancamentos");
-      if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#64748b;">Carregando...</td></tr>';
-
       try {
-        // Carrega categorias/veiculos/anos nos selects (uma vez)
-        await carregarFiltrosLancamentos();
-        popularAnosLancamentos();
-
-        // Le os valores dos filtros
-        var periodo = (document.getElementById("lanc-filtro-periodo") || {}).value || "";
-        var ano = (document.getElementById("lanc-filtro-ano") || {}).value || "";
-        var mes = (document.getElementById("lanc-filtro-mes") || {}).value || "";
-        var tipo = (document.getElementById("lanc-filtro-tipo") || {}).value || "";
-        var cat = (document.getElementById("lanc-filtro-categoria") || {}).value || "";
-        var veic = (document.getElementById("lanc-filtro-veiculo") || {}).value || "";
-
-        var params = new URLSearchParams();
-
-        // Aplica PERIODO primeiro (sobrepoe ano/mes)
-        if (periodo === "tudo") {
-          params.append("periodo", "tudo");
-        } else if (periodo) {
-          params.append("dias", periodo);
-        } else {
-          // Se nao tem periodo, aplica ano e mes
-          if (ano) params.append("ano", ano);
-          if (mes) params.append("mesNumero", mes); // 1-12
-        }
-
-        if (tipo) params.append("tipo", tipo);
-        if (cat) params.append("categoria", cat);
-        if (veic) params.append("veiculo", veic);
-
-        var url = "/lancamentos" + (params.toString() ? "?" + params.toString() : "");
-        var res = await apiFetch(url);
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        var data = await res.json();
-        __lancamentosCache = data || [];
-        renderLancamentos(__lancamentosCache);
-
-        // Carrega resumo (usa o mesmo filtro)
-        try {
-          var resResumo = await apiFetch("/lancamentos/resumo?" + params.toString());
-          if (resResumo.ok) {
-            var resumo = await resResumo.json();
-            renderResumoLancamentos(resumo);
-          }
-        } catch (e) { /* resumo opcional */ }
-      } catch (err) {
-        console.error("Erro ao carregar lancamentos:", err);
-        if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#dc2626;">Erro: ' + err.message + '</td></tr>';
-      }
-    }
-
-    // Popula o select de Anos (2020 ate ano atual + 1)
-    function popularAnosLancamentos() {
-      var sel = document.getElementById("lanc-filtro-ano");
-      if (!sel || sel.options.length > 1) return;
-      var anoAtual = new Date().getFullYear();
-      for (var a = anoAtual + 1; a >= 2020; a--) {
-        var o = document.createElement("option");
-        o.value = a;
-        o.textContent = a;
-        sel.appendChild(o);
-      }
-    }
-
-    // Popula o select de Meses (1-12)
-    function popularMesesLancamentos() {
-      var sel = document.getElementById("lanc-filtro-mes");
-      if (!sel || sel.options.length > 1) return;
-      var meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-      for (var m = 0; m < 12; m++) {
-        var o = document.createElement("option");
-        o.value = String(m + 1).padStart(2, "0");
-        o.textContent = meses[m];
-        sel.appendChild(o);
+        const monthKey = getFirstDayOfMonth(state.currentMonth);
+        const res = await apiFetch(`/financeiro/${monthKey}`);
+        const data = await res.json();
+        state.lancamentos = data;
+        
+        renderDre();
+        renderResumo();
+        renderGraficos();
+      } catch (error) {
+        console.error('Erro ao carregar DRE:', error);
       }
     }
 
@@ -6911,10 +6835,10 @@
       } catch (e) { alert('Erro: ' + e.message); }
     }
 
-        function limparFiltrosLancamentos() {
-      ["lanc-filtro-periodo","lanc-filtro-ano","lanc-filtro-mes","lanc-filtro-tipo","lanc-filtro-categoria","lanc-filtro-veiculo"].forEach(function(id) {
+    function limparFiltrosLancamentos() {
+      ['lanc-filtro-tipo','lanc-filtro-categoria','lanc-filtro-veiculo','lanc-filtro-periodo'].forEach(function(id) {
         var el = document.getElementById(id);
-        if (el) el.value = "";
+        if (el) el.value = '';
       });
       loadLancamentosDaAPI();
     }

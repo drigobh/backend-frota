@@ -4010,83 +4010,17 @@
     // API E RENDERIZAÇÃO: FINANCEIRO (DRE)
     // =========================================================================
     async function loadLancamentosDaAPI() {
-      var tbody = document.getElementById("tbody-lancamentos");
-      if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#64748b;">Carregando...</td></tr>';
-
       try {
-        // Carrega categorias/veiculos/anos nos selects (uma vez)
-        await carregarFiltrosLancamentos();
-        popularAnosLancamentos();
-
-        // Le os valores dos filtros
-        var periodo = (document.getElementById("lanc-filtro-periodo") || {}).value || "";
-        var ano = (document.getElementById("lanc-filtro-ano") || {}).value || "";
-        var mes = (document.getElementById("lanc-filtro-mes") || {}).value || "";
-        var tipo = (document.getElementById("lanc-filtro-tipo") || {}).value || "";
-        var cat = (document.getElementById("lanc-filtro-categoria") || {}).value || "";
-        var veic = (document.getElementById("lanc-filtro-veiculo") || {}).value || "";
-
-        var params = new URLSearchParams();
-
-        // Aplica PERIODO primeiro (sobrepoe ano/mes)
-        if (periodo === "tudo") {
-          params.append("periodo", "tudo");
-        } else if (periodo) {
-          params.append("dias", periodo);
-        } else {
-          // Se nao tem periodo, aplica ano e mes
-          if (ano) params.append("ano", ano);
-          if (mes) params.append("mesNumero", mes); // 1-12
-        }
-
-        if (tipo) params.append("tipo", tipo);
-        if (cat) params.append("categoria", cat);
-        if (veic) params.append("veiculo", veic);
-
-        var url = "/lancamentos" + (params.toString() ? "?" + params.toString() : "");
-        var res = await apiFetch(url);
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        var data = await res.json();
-        __lancamentosCache = data || [];
-        renderLancamentos(__lancamentosCache);
-
-        // Carrega resumo (usa o mesmo filtro)
-        try {
-          var resResumo = await apiFetch("/lancamentos/resumo?" + params.toString());
-          if (resResumo.ok) {
-            var resumo = await resResumo.json();
-            renderResumoLancamentos(resumo);
-          }
-        } catch (e) { /* resumo opcional */ }
-      } catch (err) {
-        console.error("Erro ao carregar lancamentos:", err);
-        if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#dc2626;">Erro: ' + err.message + '</td></tr>';
-      }
-    }
-
-    // Popula o select de Anos (2020 ate ano atual + 1)
-    function popularAnosLancamentos() {
-      var sel = document.getElementById("lanc-filtro-ano");
-      if (!sel || sel.options.length > 1) return;
-      var anoAtual = new Date().getFullYear();
-      for (var a = anoAtual + 1; a >= 2020; a--) {
-        var o = document.createElement("option");
-        o.value = a;
-        o.textContent = a;
-        sel.appendChild(o);
-      }
-    }
-
-    // Popula o select de Meses (1-12)
-    function popularMesesLancamentos() {
-      var sel = document.getElementById("lanc-filtro-mes");
-      if (!sel || sel.options.length > 1) return;
-      var meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-      for (var m = 0; m < 12; m++) {
-        var o = document.createElement("option");
-        o.value = String(m + 1).padStart(2, "0");
-        o.textContent = meses[m];
-        sel.appendChild(o);
+        const monthKey = getFirstDayOfMonth(state.currentMonth);
+        const res = await apiFetch(`/financeiro/${monthKey}`);
+        const data = await res.json();
+        state.lancamentos = data;
+        
+        renderDre();
+        renderResumo();
+        renderGraficos();
+      } catch (error) {
+        console.error('Erro ao carregar DRE:', error);
       }
     }
 
@@ -6911,10 +6845,10 @@
       } catch (e) { alert('Erro: ' + e.message); }
     }
 
-        function limparFiltrosLancamentos() {
-      ["lanc-filtro-periodo","lanc-filtro-ano","lanc-filtro-mes","lanc-filtro-tipo","lanc-filtro-categoria","lanc-filtro-veiculo"].forEach(function(id) {
+    function limparFiltrosLancamentos() {
+      ['lanc-filtro-tipo','lanc-filtro-categoria','lanc-filtro-veiculo','lanc-filtro-periodo'].forEach(function(id) {
         var el = document.getElementById(id);
-        if (el) el.value = "";
+        if (el) el.value = '';
       });
       loadLancamentosDaAPI();
     }

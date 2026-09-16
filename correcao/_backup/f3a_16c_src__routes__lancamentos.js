@@ -6,7 +6,7 @@ module.exports = async function (fastify, options) {
   // LISTAR LANCAMENTOS (com filtros)
   // ==========================================================================
   fastify.get('/api/lancamentos', { preHandler: [fastify.autenticar] }, async (req, reply) => {
-    const { mes, mesNumero, ano, tipo, categoria, veiculo, dias, periodo } = req.query;
+    const { mes, tipo, categoria, veiculo, dias, periodo } = req.query;
 
     try {
       let query = `
