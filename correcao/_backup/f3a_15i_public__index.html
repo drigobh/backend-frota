@@ -1931,11 +1931,11 @@
                 <tr>
                   <th style="width: 110px;">Data</th>
                   <th style="width: 90px;">Tipo</th>
-                  <th>Descrição</th>
+                  <th>Descricao</th>
                   <th style="width: 150px;">Categoria</th>
                   <th style="width: 160px;">Centro de Custo</th>
                   <th class="col-num" style="width: 120px;">Valor</th>
-                  <th style="width: 100px;" class="col-center">Ações</th>
+                  <th style="width: 100px;" class="col-center">Acoes</th>
                 </tr>
               </thead>
               <tbody id="tbody-dre-lanc-v2"></tbody>
@@ -2119,19 +2119,19 @@
         <div class="filtros-bar">
           <div class="filtros-grid">
             <div class="filtro-item">
-              <label for="lanc-filtro-periodo">Período</label>
-              <select id="lanc-filtro-periodo">
-                <option value="">---------</option>
-                <option value="30">Últimos 30 dias</option>
-                <option value="60">Últimos 60 dias</option>
-                <option value="90">Últimos 90 dias</option>
-                <option value="120">Últimos 120 dias</option>
-                <option value="tudo">Tudo (sem filtro)</option>
-              </select>
+              <label for="select-mes-lancamentos">Mes</label>
+              <select class="select-mes-global" id="select-mes-lancamentos"></select>
             </div>
             <div class="filtro-item">
-              <label for="select-mes-lancamentos">Mês</label>
-              <select class="select-mes-global" id="select-mes-lancamentos"></select>
+              <label for="lanc-filtro-periodo">Periodo</label>
+              <select id="lanc-filtro-periodo">
+                <option value="mes">Mensal (mes selecionado)</option>
+                <option value="30">Ultimos 30 dias</option>
+                <option value="60">Ultimos 60 dias</option>
+                <option value="90">Ultimos 90 dias</option>
+                <option value="120">Ultimos 120 dias</option>
+                <option value="tudo">Tudo (sem filtro)</option>
+              </select>
             </div>
             <div class="filtro-item">
               <label for="lanc-filtro-tipo">Tipo</label>
@@ -2148,7 +2148,7 @@
               </select>
             </div>
             <div class="filtro-item">
-              <label for="lanc-filtro-veiculo">Veículo</label>
+              <label for="lanc-filtro-veiculo">Veiculo</label>
               <select id="lanc-filtro-veiculo">
                 <option value="">Todos os veiculos</option>
               </select>
