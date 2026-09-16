@@ -2110,14 +2110,6 @@
           <div class="bar-controls-left">
             <span class="label-month-select">Mês de Referência:</span>
             <select class="select-month select-mes-global" id="select-mes-lancamentos"></select>
-            <select id="lanc-filtro-periodo" class="select-month" style="min-width:150px;">
-              <option value="mes">Mes atual</option>
-              <option value="30">Ultimos 30 dias</option>
-              <option value="60">Ultimos 60 dias</option>
-              <option value="90">Ultimos 90 dias</option>
-              <option value="120">Ultimos 120 dias</option>
-              <option value="tudo">Tudo (sem filtro)</option>
-            </select>
             <select id="lanc-filtro-tipo" style="padding:0.5rem 1rem; border:1.5px solid #2563eb; border-radius:6px; font-weight:600; color:#0f2a4a;">
               <option value="">Todos os tipos</option>
               <option value="Receita">Receitas</option>
@@ -6812,7 +6804,7 @@
     }
 
     function limparFiltrosLancamentos() {
-      ['lanc-filtro-tipo','lanc-filtro-categoria','lanc-filtro-veiculo','lanc-filtro-periodo'].forEach(function(id) {
+      ['lanc-filtro-tipo','lanc-filtro-categoria','lanc-filtro-veiculo'].forEach(function(id) {
         var el = document.getElementById(id);
         if (el) el.value = '';
       });

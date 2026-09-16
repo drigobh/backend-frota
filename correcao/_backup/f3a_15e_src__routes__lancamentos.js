@@ -6,7 +6,7 @@ module.exports = async function (fastify, options) {
   // LISTAR LANCAMENTOS (com filtros)
   // ==========================================================================
   fastify.get('/api/lancamentos', { preHandler: [fastify.autenticar] }, async (req, reply) => {
-    const { mes, tipo, categoria, veiculo, dias, periodo } = req.query;
+    const { mes, tipo, categoria, veiculo } = req.query;
 
     try {
       let query = `
@@ -35,17 +35,9 @@ module.exports = async function (fastify, options) {
       const params = [];
       let idx = 1;
 
-      // Filtro: mes | dias | tudo
-      if (periodo === 'tudo') {
-        // Sem filtro de data
-      } else if (dias) {
-        // Ultimos N dias
-        const diasNum = parseInt(dias);
-        if (diasNum > 0 && diasNum <= 365) {
-          query += ` AND l.data_lancamento >= (CURRENT_DATE - INTERVAL '${diasNum} days')`;
-        }
-      } else if (mes) {
-        query += ` AND DATE_TRUNC('month', l.data_lancamento) = ${idx}::date`;
+      // Filtro: mes (YYYY-MM-DD do primeiro dia)
+      if (mes) {
+        query += ` AND DATE_TRUNC('month', l.data_lancamento) = $${idx}::date`;
         params.push(mes);
         idx++;
       }
