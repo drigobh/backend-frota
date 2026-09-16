@@ -1,8 +1,5 @@
 const db = require('../database');
 
-// FASE_3B_VALIDACAO_OPERACAO
-
-
 module.exports = async function (fastify, options) {
 
   fastify.get('/api/abastecimentos/:mes', {
@@ -24,56 +21,6 @@ module.exports = async function (fastify, options) {
   });
 
   fastify.post('/api/abastecimentos', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "placa",
-                "litros",
-                "valor_total"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "placa": {
-                    "type": "string",
-                    "minLength": 3,
-                    "maxLength": 20
-                },
-                "data_abastecimento": {
-                    "type": "string",
-                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
-                },
-                "posto": {
-                    "type": "string",
-                    "maxLength": 150
-                },
-                "cidade": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "km_atual": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "litros": {
-                    "type": "number",
-                    "minimum": 0.01
-                },
-                "valor_litro": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "valor_total": {
-                    "type": "number",
-                    "minimum": 0.01
-                },
-                "nota_fiscal": {
-                    "type": "string",
-                    "maxLength": 100
-                }
-            }
-        }
-    },
     preHandler: [fastify.autenticar],
   }, async (request, reply) => {
     const {

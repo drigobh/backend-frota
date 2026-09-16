@@ -1,8 +1,5 @@
 const db = require('../database');
 
-// FASE_3B_VALIDACAO_OPERACAO
-
-
 module.exports = async function (fastify, options) {
 
   // Listar acoplamentos do mês
@@ -21,42 +18,6 @@ module.exports = async function (fastify, options) {
 
   // Criar acoplamento com validação de integridade
   fastify.post('/api/acoplamentos', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "mes_referencia"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "mes_referencia": {
-                    "type": "string",
-                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
-                },
-                "veiculo_id": {
-                    "type": [
-                        "string",
-                        "number",
-                        "null"
-                    ]
-                },
-                "carreta_id": {
-                    "type": [
-                        "string",
-                        "number",
-                        "null"
-                    ]
-                },
-                "motorista_id": {
-                    "type": [
-                        "string",
-                        "number",
-                        "null"
-                    ]
-                }
-            }
-        }
-    },
     preHandler: [fastify.autenticar],
   }, async (request, reply) => {
     const {

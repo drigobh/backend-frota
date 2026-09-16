@@ -1,8 +1,5 @@
 const db = require('../database');
 
-// FASE_3B_VALIDACAO_OPERACAO
-
-
 module.exports = async function (fastify, options) {
 
   fastify.get('/api/km/:mes', {
@@ -27,43 +24,6 @@ module.exports = async function (fastify, options) {
   });
 
   fastify.post('/api/km', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "placa",
-                "mes_referencia"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "placa": {
-                    "type": "string",
-                    "minLength": 3,
-                    "maxLength": 20
-                },
-                "mes_referencia": {
-                    "type": "string",
-                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
-                },
-                "inicial": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "final": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "litros": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "precoLitro": {
-                    "type": "number",
-                    "minimum": 0
-                }
-            }
-        }
-    },
     preHandler: [fastify.autenticar],
   }, async (request, reply) => {
     const { placa, mes_referencia, inicial, final, litros, precoLitro } = request.body;
