@@ -4080,7 +4080,13 @@
         }
 
         // Carrega resumo (usa o mesmo filtro)
-        
+        try {
+          var resResumo = await apiFetch("/lancamentos/resumo?" + params.toString());
+          if (resResumo.ok) {
+            var resumo = await resResumo.json();
+            renderResumoLancamentos(resumo);
+          }
+        } catch (e) { /* resumo opcional */ }
       } catch (err) {
         console.error("Erro ao carregar lancamentos:", err);
         if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#dc2626;">Erro: ' + err.message + '</td></tr>';

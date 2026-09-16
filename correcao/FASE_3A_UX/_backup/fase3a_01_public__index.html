@@ -4070,7 +4070,7 @@
           var resResumo = await apiFetch("/lancamentos/resumo?" + params.toString());
           if (resResumo.ok) {
             var resumo = await resResumo.json();
-            renderResumoLancamentos(resumo);
+            renderResumoLancamentos();
           }
         } catch (e) { /* resumo opcional */ }
         if (__lancamentosCache.length === 0 && (params.toString())) {
@@ -4080,7 +4080,13 @@
         }
 
         // Carrega resumo (usa o mesmo filtro)
-        
+        try {
+          var resResumo = await apiFetch("/lancamentos/resumo?" + params.toString());
+          if (resResumo.ok) {
+            var resumo = await resResumo.json();
+            renderResumoLancamentos();
+          }
+        } catch (e) { /* resumo opcional */ }
       } catch (err) {
         console.error("Erro ao carregar lancamentos:", err);
         if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#dc2626;">Erro: ' + err.message + '</td></tr>';
@@ -6718,38 +6724,15 @@
       }
     }
 
-    function renderResumoLancamentos(resumoDoServidor) {
-  var receitas = 0, despesas = 0, qtd = 0;
-
-  if (resumoDoServidor && typeof resumoDoServidor === 'object') {
-    receitas = parseFloat(resumoDoServidor.receitas) || 0;
-    despesas = parseFloat(resumoDoServidor.despesas) || 0;
-    qtd = parseInt(resumoDoServidor.total_lancamentos) || 0;
-  } else {
-    var lista = __lancamentosCache || [];
-    qtd = lista.length;
-    lista.forEach(function(l) {
-      var v = parseFloat(l.valor) || 0;
-      if (l.tipo === "Receita") receitas += v;
-      if (l.tipo === "Despesa") despesas += v;
-    });
-  }
-
-  var resultado = receitas - despesas;
-  var margem = receitas > 0 ? (resultado / receitas) * 100 : 0;
-
-  var el = function(id) { return document.getElementById(id); };
-  if (el("lanc-receitas")) el("lanc-receitas").textContent = formatBRL(receitas);
-  if (el("lanc-despesas")) el("lanc-despesas").textContent = formatBRL(despesas);
-  if (el("lanc-resultado")) {
-    el("lanc-resultado").textContent = formatBRL(resultado);
-    el("lanc-resultado").className = "kpi-card-val " + (resultado >= 0 ? "pos" : "neg");
-  }
-  if (el("lanc-res-card")) el("lanc-res-card").className = "kpi-card " + (resultado >= 0 ? "kpi-pos" : "kpi-neg");
-  if (el("lanc-margem")) el("lanc-margem").textContent = "Margem: " + formatPct(margem);
-  if (el("lanc-receitas-qtd")) el("lanc-receitas-qtd").textContent = qtd + " lancamentos";
-  if (el("lanc-despesas-qtd")) el("lanc-despesas-qtd").textContent = qtd + " lancamentos";
-});
+    function renderResumoLancamentos() {
+      // Calcula os totais a partir de __lancamentosCache (ja filtrado)
+      var lista = __lancamentosCache || [];
+      var receitas = 0, despesas = 0, qtd = lista.length;
+      lista.forEach(function(l) {
+        var v = parseFloat(l.valor) || 0;
+        if (l.tipo === "Receita") receitas += v;
+        if (l.tipo === "Despesa") despesas += v;
+      });
       var resultado = receitas - despesas;
       var margem = receitas > 0 ? (resultado / receitas) * 100 : 0;
 
