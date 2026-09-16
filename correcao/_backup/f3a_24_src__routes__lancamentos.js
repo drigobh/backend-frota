@@ -50,10 +50,10 @@ module.exports = async function (fastify, options) {
       if (periodo === 'tudo') {
         // Sem filtro de data
       } else if (dias) {
-        // Ultimos N dias (de hoje para tras, sem incluir o futuro)
+        // Ultimos N dias
         const diasNum = parseInt(dias);
         if (diasNum > 0 && diasNum <= 365) {
-          query += ` AND l.data_lancamento >= (CURRENT_DATE - INTERVAL '${diasNum} days') AND l.data_lancamento <= CURRENT_DATE`;
+          query += ` AND l.data_lancamento >= (CURRENT_DATE - INTERVAL '${diasNum} days')`;
         }
             } else if (mes) {
         query += ` AND DATE_TRUNC('month', l.data_lancamento) = $${idx}::date`;
