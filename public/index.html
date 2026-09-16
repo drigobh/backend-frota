@@ -2884,28 +2884,14 @@
     const API_URL = '/api';
 
     function apiFetch(endpoint, options = {}) {
-      const token = localStorage.getItem("token");
-      const method = (options.method || "GET").toUpperCase();
-      const temCorpo = options.body !== undefined && options.body !== null && options.body !== "";
-      const headers = {};
-      if (temCorpo) headers["Content-Type"] = "application/json";
-      if (options.headers) Object.assign(headers, options.headers);
+      const token = localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(options.headers || {}),
+      };
       if (token) {
-        headers["Authorization"] = "Bearer " + token;
+        headers['Authorization'] = `Bearer ${token}`;
       }
-      const fetchOptions = { method: method, headers: headers };
-      if (options.body !== undefined) fetchOptions.body = options.body;
-      if (options.signal) fetchOptions.signal = options.signal;
-      return fetch(API_URL + endpoint, fetchOptions).then((res) => {
-        if (res.status === 401) {
-          localStorage.removeItem("token");
-          const loginScreen = document.getElementById("login-screen");
-          if (loginScreen) loginScreen.style.display = "flex";
-          throw new Error("Sessao expirada. Faca login novamente.");
-        }
-        return res;
-      });
-    }
       return fetch(`${API_URL}${endpoint}`, {
         ...options,
         headers,
