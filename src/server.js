@@ -76,6 +76,7 @@ fastify.register(require('./routes/lancamentos'));
 fastify.register(require('./routes/dre_veiculo'));
 fastify.register(require('./routes/ranking'));
 fastify.register(require('./routes/metas'));
+fastify.register(require('./routes/me_permissoes'));
 fastify.register(require('./routes/categorias'));
 fastify.register(require('./routes/centros_custo'));
 fastify.register(require('./routes/dre_consolidada'));
