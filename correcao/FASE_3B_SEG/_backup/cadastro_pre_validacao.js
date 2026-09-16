@@ -1,8 +1,5 @@
 const db = require('../database');
 
-// FASE_3B_VALIDACAO_CADASTROS
-
-
 module.exports = async function (fastify, options) {
 
   // ==========================================================================
@@ -22,34 +19,6 @@ module.exports = async function (fastify, options) {
   });
 
   fastify.post('/api/veiculos', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "placa"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "placa": {
-                    "type": "string",
-                    "minLength": 7,
-                    "maxLength": 8
-                },
-                "modelo": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "ano": {
-                    "type": "string",
-                    "maxLength": 10
-                },
-                "obs": {
-                    "type": "string",
-                    "maxLength": 1000
-                }
-            }
-        }
-    },
     preHandler: [fastify.autenticar],
     schema: {
       body: {
@@ -81,34 +50,6 @@ module.exports = async function (fastify, options) {
   });
 
   fastify.put('/api/veiculos/:id', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "placa"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "placa": {
-                    "type": "string",
-                    "minLength": 7,
-                    "maxLength": 8
-                },
-                "modelo": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "ano": {
-                    "type": "string",
-                    "maxLength": 10
-                },
-                "obs": {
-                    "type": "string",
-                    "maxLength": 1000
-                }
-            }
-        }
-    },
     preHandler: [fastify.autenticar],
   }, async (request, reply) => {
     const { id } = request.params;
@@ -148,30 +89,6 @@ module.exports = async function (fastify, options) {
   });
 
   fastify.post('/api/carretas', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "codigo"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "codigo": {
-                    "type": "string",
-                    "minLength": 3,
-                    "maxLength": 50
-                },
-                "tipo": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "obs": {
-                    "type": "string",
-                    "maxLength": 1000
-                }
-            }
-        }
-    },
     preHandler: [fastify.autenticar],
     schema: {
       body: {
@@ -201,30 +118,6 @@ module.exports = async function (fastify, options) {
   });
 
   fastify.put('/api/carretas/:id', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "codigo"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "codigo": {
-                    "type": "string",
-                    "minLength": 3,
-                    "maxLength": 50
-                },
-                "tipo": {
-                    "type": "string",
-                    "maxLength": 100
-                },
-                "obs": {
-                    "type": "string",
-                    "maxLength": 1000
-                }
-            }
-        }
-    },
     preHandler: [fastify.autenticar],
   }, async (request, reply) => {
     const { id } = request.params;
@@ -263,34 +156,6 @@ module.exports = async function (fastify, options) {
   });
 
   fastify.post('/api/motoristas', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "nome"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "nome": {
-                    "type": "string",
-                    "minLength": 2,
-                    "maxLength": 150
-                },
-                "cnh": {
-                    "type": "string",
-                    "maxLength": 20
-                },
-                "telefone": {
-                    "type": "string",
-                    "maxLength": 20
-                },
-                "obs": {
-                    "type": "string",
-                    "maxLength": 1000
-                }
-            }
-        }
-    },
     preHandler: [fastify.autenticar],
     schema: {
       body: {
@@ -321,34 +186,6 @@ module.exports = async function (fastify, options) {
   });
 
   fastify.put('/api/motoristas/:id', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "nome"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "nome": {
-                    "type": "string",
-                    "minLength": 2,
-                    "maxLength": 150
-                },
-                "cnh": {
-                    "type": "string",
-                    "maxLength": 20
-                },
-                "telefone": {
-                    "type": "string",
-                    "maxLength": 20
-                },
-                "obs": {
-                    "type": "string",
-                    "maxLength": 1000
-                }
-            }
-        }
-    },
     preHandler: [fastify.autenticar],
   }, async (request, reply) => {
     const { id } = request.params;
