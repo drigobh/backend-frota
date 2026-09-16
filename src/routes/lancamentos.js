@@ -45,7 +45,7 @@ module.exports = async function (fastify, options) {
           query += ` AND l.data_lancamento >= (CURRENT_DATE - INTERVAL '${diasNum} days')`;
         }
       } else if (mes) {
-        query += ` AND DATE_TRUNC('month', l.data_lancamento) = ${idx}::date`;
+                query += ` AND DATE_TRUNC('month', l.data_lancamento) = $${idx}::date`;
         params.push(mes);
         idx++;
       }
