@@ -6583,6 +6583,46 @@
     var __veiculosCache = null;
     var __lancEditandoId = null;
 
+    async function loadLancamentosDaAPI() {
+      var tbody = document.getElementById('tbody-lancamentos');
+      if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#64748b;">Carregando...</td></tr>';
+
+      try {
+        // Carrega categorias e veiculos para os filtros (uma vez)
+        await carregarFiltrosLancamentos();
+
+        var mes = state.currentMonth || '';
+        var mesKey = (typeof getFirstDayOfMonth === 'function') ? getFirstDayOfMonth(mes) : '';
+        var tipo = (document.getElementById('lanc-filtro-tipo') || {}).value || '';
+        var cat = (document.getElementById('lanc-filtro-categoria') || {}).value || '';
+        var veic = (document.getElementById('lanc-filtro-veiculo') || {}).value || '';
+
+        var params = new URLSearchParams();
+        if (mesKey) params.append('mes', mesKey);
+        if (tipo) params.append('tipo', tipo);
+        if (cat) params.append('categoria', cat);
+        if (veic) params.append('veiculo', veic);
+
+        var url = '/lancamentos' + (params.toString() ? '?' + params.toString() : '');
+        var res = await apiFetch(url);
+        if (!res.ok) { throw new Error('HTTP ' + res.status); }
+        var data = await res.json();
+        __lancamentosCache = data || [];
+        renderLancamentos(__lancamentosCache);
+
+        // Carrega resumo
+        if (mesKey) {
+          var resResumo = await apiFetch('/lancamentos/resumo?mes=' + mesKey);
+          if (resResumo.ok) {
+            var resumo = await resResumo.json();
+            renderResumoLancamentos(resumo);
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao carregar lancamentos:', err);
+        if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#dc2626;">Erro: ' + err.message + '</td></tr>';
+      }
+    }
 
     async function carregarFiltrosLancamentos() {
       // Categorias
