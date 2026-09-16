@@ -13,7 +13,20 @@ require('dotenv').config();
 // CONFIGURAÇÃO DE AMBIENTE
 // =========================================================================
 const PORT = process.env.PORT || 3000;
-const HOST = '0.0.0.0';
+const HOST = process.env.HOST || '0.0.0.0';
+
+// ===== DIAGNÓSTICO DE BOOT (aparece no log do Render) =====
+console.log('═══════════════════════════════════════════════════');
+console.log('🔍 DIAGNÓSTICO DE BOOT');
+console.log('═══════════════════════════════════════════════════');
+console.log('PORT           =', PORT);
+console.log('HOST           =', HOST);
+console.log('NODE_ENV       =', process.env.NODE_ENV || '(não definido)');
+console.log('DATABASE_URL?  =', process.env.DATABASE_URL ? 'SIM ✅' : 'NÃO ❌');
+console.log('JWT_SECRET?    =', process.env.JWT_SECRET ? 'SIM ✅' : 'NÃO ❌');
+console.log('CWD            =', process.cwd());
+console.log('__dirname      =', __dirname);
+console.log('═══════════════════════════════════════════════════');
 
 const ALLOWED_ORIGINS = [
   'https://backend-frota-72ni.onrender.com',
@@ -21,6 +34,19 @@ const ALLOWED_ORIGINS = [
   'http://localhost:5500',
   'http://127.0.0.1:5500',
 ];
+
+// =========================================================================
+// WATCHDOG — se o listen não rodar em 10s, derruba com log claro
+// =========================================================================
+const watchdog = setTimeout(() => {
+  console.error('❌ [WATCHDOG] Servidor NÃO abriu porta em 10 segundos.');
+  console.error('❌ [WATCHDOG] Alguma coisa travou ANTES do listen().');
+  console.error('❌ [WATCHDOG] Possíveis causas:');
+  console.error('   - DATABASE_URL ausente ou inacessível');
+  console.error('   - algum require() de rota está lançando erro');
+  console.error('   - Neon/Postgres lento respondendo');
+  process.exit(1);
+}, 10000);
 
 // =========================================================================
 // CORS — Restrito aos domínios autorizados
@@ -45,7 +71,7 @@ fastify.register(cors, {
 // JWT — Autenticação por token
 // =========================================================================
 fastify.register(require('@fastify/jwt'), {
-  secret: process.env.JWT_SECRET,
+  secret: process.env.JWT_SECRET || 'fallback-secret-trocar-em-producao',
   sign: { expiresIn: '8h' },
 });
 
@@ -66,30 +92,40 @@ fastify.register(require('@fastify/static'), {
 });
 
 // =========================================================================
-// ROTAS DE API (por domínio)
+// ROTAS DE API (por domínio) — com try/catch para não travar o boot
 // =========================================================================
-fastify.register(require('./routes/cadastro'));
-fastify.register(require('./routes/acoplamentos'));
-fastify.register(require('./routes/km'));
-fastify.register(require('./routes/financeiro'));
-fastify.register(require('./routes/lancamentos'));
-fastify.register(require('./routes/dre_veiculo'));
-fastify.register(require('./routes/ranking'));
-fastify.register(require('./routes/metas'));
-fastify.register(require('./routes/me_permissoes'));
-fastify.register(require('./routes/categorias'));
-fastify.register(require('./routes/centros_custo'));
-fastify.register(require('./routes/dre_consolidada'));
-fastify.register(require('./routes/dashboard'));
-fastify.register(require('./routes/auth'));
-fastify.register(require('./routes/abastecimentos'));
-fastify.register(require('./routes/frota_avancada'));
-fastify.register(require('./routes/usuarios'));
-fastify.register(require('./routes/perfis'));
-fastify.register(require('./routes/auditoria'));
-fastify.register(require('./routes/fechamento'));
-fastify.register(require('./routes/alertas'));
-fastify.register(require('./routes/historico'));
+const ROTAS = [
+  './routes/cadastro',
+  './routes/acoplamentos',
+  './routes/km',
+  './routes/financeiro',
+  './routes/lancamentos',
+  './routes/dre_veiculo',
+  './routes/ranking',
+  './routes/metas',
+  './routes/me_permissoes',
+  './routes/categorias',
+  './routes/centros_custo',
+  './routes/dre_consolidada',
+  './routes/dashboard',
+  './routes/auth',
+  './routes/abastecimentos',
+  './routes/frota_avancada',
+  './routes/usuarios',
+  './routes/perfis',
+  './routes/auditoria',
+  './routes/fechamento',
+  './routes/alertas',
+  './routes/historico',
+];
+
+ROTAS.forEach((caminho) => {
+  try {
+    fastify.register(require(caminho));
+  } catch (err) {
+    console.error(`❌ [BOOT] Falha ao carregar rota ${caminho}:`, err.message);
+  }
+});
 
 // =========================================================================
 // ROTA PRINCIPAL — Serve o index.html
@@ -159,10 +195,6 @@ fastify.setNotFoundHandler((request, reply) => {
 });
 
 // =========================================================================
-// INICIALIZAÇÃO
-// =========================================================================
-
-// =========================================================================
 // AUDITORIA AUTOMATICA - Hook global que registra POST/PUT/DELETE
 // =========================================================================
 const ROTAS_IGNORADAS_AUDIT = [
@@ -221,7 +253,6 @@ async function registrarAuditoria(request, reply, payload) {
 
     if (!deveAuditar(url, method)) return;
 
-    // Extrai dados do usuario (se autenticado)
     var user = request.user || {};
     var usuario_nome = user.nome || (url.indexOf('/api/login') === 0 ? (payload && payload.email) || 'Anonimo' : 'Sistema');
     var usuario_email = user.email || (payload && payload.email) || '';
@@ -244,21 +275,17 @@ async function registrarAuditoria(request, reply, payload) {
       [usuario_nome, usuario_email, acao, modulo, detalhes]
     );
   } catch (err) {
-    // Auditoria NUNCA deve quebrar a request principal
     console.error('[AUDITORIA] Erro ao registrar:', err.message);
   }
 }
 
 fastify.addHook('onRequest', async (request, reply) => {
-  // Guarda o payload do body para uso posterior (opcional)
   request._auditBody = null;
 });
 
 fastify.addHook('onSend', async (request, reply, payload) => {
-  // So audita se a resposta foi de sucesso (2xx)
   var statusCode = reply.statusCode;
   if (statusCode >= 200 && statusCode < 300) {
-    // Nao bloqueia a resposta: roda em background
     var body = request.body || null;
     registrarAuditoria(request, reply, body).catch(function(e) {
       console.error('[AUDITORIA] Erro:', e.message);
@@ -267,10 +294,14 @@ fastify.addHook('onSend', async (request, reply, payload) => {
   return payload;
 });
 
-
+// =========================================================================
+// INICIALIZAÇÃO
+// =========================================================================
 const start = async () => {
   try {
-    await fastify.listen({ port: PORT, host: HOST });
+    console.log('[BOOT] Chamando fastify.listen...');
+    await fastify.listen({ port: Number(PORT), host: HOST });
+    clearTimeout(watchdog);
 
     const address = fastify.server.address();
     console.log('');
@@ -286,7 +317,8 @@ const start = async () => {
     console.log('═══════════════════════════════════════════════════');
     console.log('');
   } catch (err) {
-    fastify.log.error(err);
+    clearTimeout(watchdog);
+    console.error('❌ [BOOT] Erro ao iniciar servidor:', err);
     process.exit(1);
   }
 };
