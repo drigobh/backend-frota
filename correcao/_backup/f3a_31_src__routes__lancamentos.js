@@ -46,46 +46,29 @@ module.exports = async function (fastify, options) {
       const params = [];
       let idx = 1;
 
-      // ===== FILTROS DE DATA - TODOS SE COMBINAM (AND) =====
-
-      // 1) Filtro ANO
-      if (ano) {
-        query += ` AND EXTRACT(YEAR FROM l.data_lancamento) = ${idx}::int`;
-        params.push(parseInt(ano));
-        idx++;
-      }
-
-      // 2) Filtro MES (numero 01-12)
-      if (mesNumero) {
-        query += ` AND EXTRACT(MONTH FROM l.data_lancamento) = ${idx}::int`;
-        params.push(parseInt(mesNumero));
-        idx++;
-      }
-
-      // 3) Filtro MES (formato YYYY-MM-DD)
-      if (mes && !ano && !mesNumero) {
-        query += ` AND DATE_TRUNC('month', l.data_lancamento) = ${idx}::date`;
-        params.push(mes);
-        idx++;
-      }
-
-      // 4) Filtro DIAS
-      if (dias && periodo !== 'tudo') {
+      // Filtro: mes | dias | tudo
+      if (periodo === 'tudo') {
+        // Sem filtro de data
+      } else if (dias) {
+        // Ultimos N dias (de hoje para tras, sem incluir o futuro)
         const diasNum = parseInt(dias);
         if (diasNum > 0 && diasNum <= 365) {
-          if (ano || mesNumero) {
-            query += ` AND l.data_lancamento >= (
-              (SELECT MAX(data_lancamento) FROM lancamentos_financeiros 
-               WHERE EXTRACT(YEAR FROM data_lancamento) = COALESCE(${idx}::int, EXTRACT(YEAR FROM CURRENT_DATE))
-                 AND EXTRACT(MONTH FROM data_lancamento) = COALESCE(${idx + 1}::int, EXTRACT(MONTH FROM CURRENT_DATE))
-                 AND deleted_at IS NULL) - INTERVAL '${diasNum} days'
-            )`;
-            params.push(ano ? parseInt(ano) : null);
-            params.push(mesNumero ? parseInt(mesNumero) : null);
-            idx += 2;
-          } else {
-            query += ` AND l.data_lancamento >= (CURRENT_DATE - INTERVAL '${diasNum} days') AND l.data_lancamento <= CURRENT_DATE`;
-          }
+          query += ` AND l.data_lancamento >= (CURRENT_DATE - INTERVAL '${diasNum} days') AND l.data_lancamento <= CURRENT_DATE`;
+        }
+            } else if (mes) {
+        query += ` AND DATE_TRUNC('month', l.data_lancamento) = $${idx}::date`;
+        params.push(mes);
+        idx++;
+      } else {
+        if (ano) {
+          query += ` AND EXTRACT(YEAR FROM l.data_lancamento) = $${idx}::int`;
+          params.push(parseInt(ano));
+          idx++;
+        }
+        if (mesNumero) {
+          query += ` AND EXTRACT(MONTH FROM l.data_lancamento) = $${idx}::int`;
+          params.push(parseInt(mesNumero));
+          idx++;
         }
       }
 

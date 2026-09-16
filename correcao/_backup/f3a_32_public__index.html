@@ -4032,14 +4032,16 @@
 
         var params = new URLSearchParams();
 
-        // Aplica TODOS os filtros (combinados com AND no backend)
+        // Aplica PERIODO primeiro (sobrepoe ano/mes)
         if (periodo === "tudo") {
           params.append("periodo", "tudo");
         } else if (periodo) {
           params.append("dias", periodo);
+        } else {
+          // Se nao tem periodo, aplica ano e mes
+          if (ano) params.append("ano", ano);
+          if (mes) params.append("mesNumero", mes); // 1-12
         }
-        if (ano) params.append("ano", ano);
-        if (mes) params.append("mesNumero", mes);
 
         if (tipo) params.append("tipo", tipo);
         if (cat) params.append("categoria", cat);
