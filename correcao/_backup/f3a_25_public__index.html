@@ -6666,12 +6666,6 @@
         if (l.tipo === 'Despesa') totDesp += valor;
 
         var dataFmt = l.data ? new Date(l.data + 'T12:00:00').toLocaleDateString('pt-BR') : '-';
-        var mesAnoFmt = '-';
-        if (l.data) {
-          var dt = new Date(l.data + 'T12:00:00');
-          var mesesNomes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-          mesAnoFmt = mesesNomes[dt.getMonth()] + '/' + dt.getFullYear();
-        }
         var tipoBadge = l.tipo === 'Receita'
           ? '<span class="badge-pos">Receita</span>'
           : '<span class="badge-neg">Despesa</span>';
