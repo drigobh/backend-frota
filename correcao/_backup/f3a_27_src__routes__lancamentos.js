@@ -112,48 +112,22 @@ module.exports = async function (fastify, options) {
   // RESUMO (receitas / despesas / resultado do mes)
   // ==========================================================================
   fastify.get('/api/lancamentos/resumo', { preHandler: [fastify.autenticar] }, async (req, reply) => {
-    let { mes, mesNumero, ano, tipo, categoria, veiculo, dias, periodo } = req.query;
-
-    function limpar(v) { return (v === '---------' || v === '' || v === undefined) ? undefined : v; }
-    mes = limpar(mes); mesNumero = limpar(mesNumero); ano = limpar(ano);
-    tipo = limpar(tipo); categoria = limpar(categoria); veiculo = limpar(veiculo);
-    dias = limpar(dias); periodo = limpar(periodo);
+    const { mes } = req.query;
 
     try {
-
-      // Monta query dinamicamente com os mesmos filtros da lista
-      let query = `
-        SELECT 
-          COALESCE(SUM(CASE WHEN l.tipo = 'Receita' THEN l.valor ELSE 0 END), 0) AS receitas,
-          COALESCE(SUM(CASE WHEN l.tipo = 'Despesa' THEN l.valor ELSE 0 END), 0) AS despesas,
-          COUNT(*) AS total_lancamentos
-        FROM lancamentos_financeiros l
-        LEFT JOIN veiculos v ON v.id = l.veiculo_id
-        LEFT JOIN categorias_financeiras c ON c.id = l.categoria_id
-        WHERE l.deleted_at IS NULL
-      `;
-      const params = [];
-      let idx = 1;
-
-      if (periodo === 'tudo') {
-        // sem filtro
-      } else if (dias) {
-        const diasNum = parseInt(dias);
-        if (diasNum > 0 && diasNum <= 365) {
-          query += ` AND l.data_lancamento >= (CURRENT_DATE - INTERVAL '${diasNum} days') AND l.data_lancamento <= CURRENT_DATE`;
-        }
-      } else if (mes) {
-        query += ` AND DATE_TRUNC('month', l.data_lancamento) = ${idx}::date`;
-        params.push(mes); idx++;
-      } else {
-        if (ano) { query += ` AND EXTRACT(YEAR FROM l.data_lancamento) = ${idx}::int`; params.push(parseInt(ano)); idx++; }
-        if (mesNumero) { query += ` AND EXTRACT(MONTH FROM l.data_lancamento) = ${idx}::int`; params.push(parseInt(mesNumero)); idx++; }
+      if (!mes) {
+        return reply.code(400).send({ erro: 'Parametro "mes" obrigatorio.' });
       }
-      if (tipo) { query += ` AND l.tipo = ${idx}`; params.push(tipo); idx++; }
-      if (categoria) { query += ` AND c.nome = ${idx}`; params.push(categoria); idx++; }
-      if (veiculo) { query += ` AND v.placa = ${idx}`; params.push(veiculo); idx++; }
 
-      const result = await db.query(query, params);
+      const result = await db.query(`
+        SELECT 
+          COALESCE(SUM(CASE WHEN tipo = 'Receita' THEN valor ELSE 0 END), 0) AS receitas,
+          COALESCE(SUM(CASE WHEN tipo = 'Despesa' THEN valor ELSE 0 END), 0) AS despesas,
+          COUNT(*) AS total_lancamentos
+        FROM lancamentos_financeiros
+        WHERE DATE_TRUNC('month', data_lancamento) = $1::date
+          AND deleted_at IS NULL
+      `, [mes]);
 
       const receitas = parseFloat(result.rows[0].receitas) || 0;
       const despesas = parseFloat(result.rows[0].despesas) || 0;

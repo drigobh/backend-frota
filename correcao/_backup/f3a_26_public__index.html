@@ -4051,29 +4051,6 @@
         var data = await res.json();
         __lancamentosCache = data || [];
         renderLancamentos(__lancamentosCache);
-
-        // Garante que os selects estao populados
-        if (typeof popularAnosLancamentos === "function") {
-          var selAno = document.getElementById("lanc-filtro-ano");
-          if (selAno && selAno.options.length <= 1) {
-            await popularAnosLancamentos();
-          }
-        }
-        if (typeof popularMesesLancamentos === "function") {
-          var selMes = document.getElementById("lanc-filtro-mes");
-          if (selMes && selMes.options.length <= 1) {
-            popularMesesLancamentos();
-          }
-        }
-
-        // Carrega resumo com os MESMOS filtros da lista
-        try {
-          var resResumo = await apiFetch("/lancamentos/resumo?" + params.toString());
-          if (resResumo.ok) {
-            var resumo = await resResumo.json();
-            renderResumoLancamentos(resumo);
-          }
-        } catch (e) { /* resumo opcional */ }
         if (__lancamentosCache.length === 0 && (params.toString())) {
           if (typeof mostrarToast === "function") {
             mostrarToast("Nenhum lancamento encontrado com os filtros aplicados.", "warning", "Sem resultados");
@@ -6726,7 +6703,6 @@
     }
 
     function renderResumoLancamentos(r) {
-      if (!r) r = {};
       var el = function(id) { return document.getElementById(id); };
       if (el('lanc-receitas')) el('lanc-receitas').textContent = formatBRL(r.receitas || 0);
       if (el('lanc-despesas')) el('lanc-despesas').textContent = formatBRL(r.despesas || 0);
