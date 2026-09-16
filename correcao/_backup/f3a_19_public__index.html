@@ -6913,15 +6913,47 @@
 
     // Auto-load nos selects de filtro
     document.addEventListener('change', function(e) {
-      if (!e.target) return;
-      var ids = ['lanc-filtro-periodo','lanc-filtro-ano','lanc-filtro-mes','lanc-filtro-tipo','lanc-filtro-categoria','lanc-filtro-veiculo'];
-      if (ids.indexOf(e.target.id) !== -1) {
+      if (e.target && (e.target.id === 'lanc-filtro-tipo' || e.target.id === 'lanc-filtro-categoria' || e.target.id === 'lanc-filtro-veiculo')) {
         loadLancamentosDaAPI();
       }
     });
 
     window.loadLancamentosDaAPI = loadLancamentosDaAPI;
-    // (Logica antiga de exclusao de filtros removida - nao se aplica mais)
+    // ==== LOGICA DO FILTRO DE PERIODO (FASE 3A / 15h) ====
+    function atualizarInterfacePeriodo() {
+      var selPeriodo = document.getElementById("lanc-filtro-periodo");
+      var selMes = document.getElementById("select-mes-lancamentos");
+      if (!selPeriodo || !selMes) return;
+
+      var periodoAtivo = selPeriodo.value !== "mes";
+
+      // Desabilita o select de MES quando um periodo movel esta ativo
+      selMes.disabled = periodoAtivo;
+      selMes.style.opacity = periodoAtivo ? "0.5" : "1";
+      selMes.style.cursor = periodoAtivo ? "not-allowed" : "pointer";
+
+      // Atualiza o label do mes para indicar que esta ignorado
+      var labelMes = document.querySelector('label[for="select-mes-lancamentos"]');
+      if (labelMes) {
+        if (periodoAtivo) {
+          labelMes.innerHTML = 'MES <span style="color:#94a3b8; text-transform:none; font-weight:400;">(ignorado)</span>';
+        } else {
+          labelMes.textContent = "MES";
+        }
+      }
+    }
+
+    // Auto-aplica quando o periodo muda
+    document.addEventListener("change", function(e) {
+      if (e.target && e.target.id === "lanc-filtro-periodo") {
+        atualizarInterfacePeriodo();
+      }
+    });
+
+    // Aplica estado inicial quando o DOM carrega
+    document.addEventListener("DOMContentLoaded", function() {
+      setTimeout(atualizarInterfacePeriodo, 300);
+    });
 
     window.abrirModalLancamento = abrirModalLancamento;
     window.fecharModalLancamento = fecharModalLancamento;
