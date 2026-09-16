@@ -55,7 +55,6 @@ const helmet = require('@fastify/helmet'); // FASE_3B_HELMET // FASE_3B_RATE_LIM
 const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
-const db = require('./database');
 
 // =========================================================================
 // CONFIGURAÃ‡ÃƒO DE AMBIENTE
@@ -256,79 +255,12 @@ fastify.get('/', (req, reply) => {
 // =========================================================================
 // HEALTH CHECK
 // =========================================================================
-// ===========================================================================
-// // FASE_3B_HEALTH_DETALHADO
-// Health check detalhado — PUBLICO (sem auth) para monitoramento externo
-// Retorna 200 se tudo OK, 503 se DB caiu
-// ===========================================================================
-const TBL_CHECK = ['usuarios', 'veiculos', 'carretas', 'motoristas', 'lancamentos_financeiros', 'categorias_financeiras', 'abastecimentos', 'controle_km', 'manutencoes', 'documentos', 'auditoria'];
-
-fastify.get('/health', async (req, reply) => {
-  const inicio = Date.now();
-  const checks = {};
-  let tudoOk = true;
-
-  // 1) DB — SELECT 1 com latencia
-  try {
-    const t0 = Date.now();
-    const r = await db.query('SELECT 1 AS ok');
-    checks.database = {
-      status: r.rows[0].ok === 1 ? 'ok' : 'error',
-      latency_ms: Date.now() - t0
-    };
-  } catch (err) {
-    checks.database = { status: 'error', error: err.message };
-    tudoOk = false;
-  }
-
-  // 2) JWT — apenas verifica se a env var existe
-  checks.jwt = {
-    status: process.env.JWT_SECRET ? 'ok' : 'error'
-  };
-  if (!process.env.JWT_SECRET) tudoOk = false;
-
-  // 3) Tabelas — verifica se as principais existem
-  try {
-    const r = await db.query(
-      'SELECT tablename FROM pg_tables WHERE schemaname = $1 AND tablename = ANY($2)',
-      ['public', TBL_CHECK]
-    );
-    const existentes = r.rows.map(function (x) { return x.tablename; });
-    const faltando = TBL_CHECK.filter(function (t) { return existentes.indexOf(t) === -1; });
-    checks.tables = {
-      status: faltando.length === 0 ? 'ok' : 'warning',
-      total_esperado: TBL_CHECK.length,
-      total_encontrado: existentes.length,
-      faltando: faltando
-    };
-  } catch (err) {
-    checks.tables = { status: 'error', error: err.message };
-    tudoOk = false;
-  }
-
-  // 4) Uptime
-  checks.uptime = {
-    seconds: Math.floor(process.uptime()),
-    human: Math.floor(process.uptime() / 3600) + 'h ' + Math.floor((process.uptime() % 3600) / 60) + 'm'
-  };
-
-  // 5) Versoes
-  checks.version = {
-    app: '2.0.0',
-    node: process.version,
-    env: process.env.NODE_ENV || 'development'
-  };
-
-  const body = {
-    status: tudoOk ? 'ok' : 'error',
+fastify.get('/health', async () => {
+  return {
+    status: 'ok',
     timestamp: new Date().toISOString(),
     service: 'caderninho-frota-backend',
-    response_time_ms: Date.now() - inicio,
-    checks: checks
   };
-
-  const statusCode = tudoOk ? 200 : 503;
-  return reply.code(statusCode).send(body);
 });
 
 // =========================================================================
@@ -500,6 +432,5 @@ const start = async () => {
 };
 
 start();
-
 
 
