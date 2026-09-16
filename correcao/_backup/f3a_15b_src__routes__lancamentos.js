@@ -191,7 +191,7 @@ module.exports = async function (fastify, options) {
   // ==========================================================================
   fastify.put('/api/lancamentos/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { id } = req.params;
-    const { placa, data, tipo, categoria, descricao, valor, centro_custo_id } = req.body || {};
+    const { data, tipo, categoria, descricao, valor, centro_custo_id } = req.body || {};
 
     if (!data || !tipo || !categoria || !descricao || !valor) {
       return reply.code(400).send({ erro: 'Campos obrigatorios faltando.' });
@@ -215,13 +215,6 @@ module.exports = async function (fastify, options) {
         categoria_id = cRes.rows[0].id;
       }
 
-      // Resolve veiculo_id (opcional) a partir da placa
-      let veiculo_id = null;
-      if (placa) {
-        const vRes = await db.query('SELECT id FROM veiculos WHERE placa = $1', [placa.toUpperCase()]);
-        if (vRes.rows.length > 0) veiculo_id = vRes.rows[0].id;
-      }
-
       const result = await db.query(`
         UPDATE lancamentos_financeiros
         SET data_lancamento = $1,
@@ -230,12 +223,11 @@ module.exports = async function (fastify, options) {
             descricao = $4,
             valor = $5,
             centro_custo_id = $6,
-            veiculo_id = $7,
             updated_at = CURRENT_TIMESTAMP,
-            updated_by = $8
-        WHERE id = $9 AND deleted_at IS NULL
+            updated_by = $7
+        WHERE id = $8 AND deleted_at IS NULL
         RETURNING id
-      `, [data, tipo, categoria_id, descricao, parseFloat(valor), centro_custo_id || null, veiculo_id, req.user.id, id]);
+      `, [data, tipo, categoria_id, descricao, parseFloat(valor), centro_custo_id || null, req.user.id, id]);
 
       if (result.rows.length === 0) {
         return reply.code(404).send({ erro: 'Lancamento nao encontrado.' });
