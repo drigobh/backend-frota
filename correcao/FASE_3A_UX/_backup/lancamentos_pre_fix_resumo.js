@@ -74,20 +74,20 @@ module.exports = async function (fastify, options) {
         const diasNum = parseInt(dias);
         if (diasNum > 0 && diasNum <= 365) {
           if (ano && mesNumero) {
-            query += ` AND l.data_lancamento >= (MAKE_DATE($${idx}::int, ${idx + 1}::int, 1) - INTERVAL '${diasNum} days')`;
+            query += ` AND l.data_lancamento >= (MAKE_DATE(${idx}::int, ${idx + 1}::int, 1) - INTERVAL '${diasNum} days')`;
             params.push(parseInt(ano));
             params.push(parseInt(mesNumero));
             idx += 2;
           } else if (ano) {
-            query += ` AND l.data_lancamento >= (MAKE_DATE($${idx}::int, 1, 1) - INTERVAL '${diasNum} days')`;
+            query += ` AND l.data_lancamento >= (MAKE_DATE(${idx}::int, 1, 1) - INTERVAL '${diasNum} days')`;
             params.push(parseInt(ano));
             idx++;
           } else if (mesNumero) {
-            query += ` AND l.data_lancamento >= (MAKE_DATE(EXTRACT(YEAR FROM CURRENT_DATE)::int, $${idx}::int, 1) - INTERVAL '${diasNum} days')`;
+            query += ` AND l.data_lancamento >= (MAKE_DATE(EXTRACT(YEAR FROM CURRENT_DATE)::int, ${idx}::int, 1) - INTERVAL '${diasNum} days')`;
             params.push(parseInt(mesNumero));
             idx++;
           } else {
-            query += ` AND l.data_lancamento >= (CURRENT_DATE - INTERVAL '$${diasNum} days') AND l.data_lancamento <= CURRENT_DATE`;
+            query += ` AND l.data_lancamento >= (CURRENT_DATE - INTERVAL '${diasNum} days') AND l.data_lancamento <= CURRENT_DATE`;
           }
         }
       }

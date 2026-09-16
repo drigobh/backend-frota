@@ -4,3 +4,6 @@ node_modules/
 *.bak
 *.ps1
 
+
+.env.local
+.env.*.local

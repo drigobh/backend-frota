@@ -5,7 +5,8 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
+    "dev": "node --env-file=.env.local src/server.js",
+    "dev:watch": "node --watch --env-file=.env.local src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

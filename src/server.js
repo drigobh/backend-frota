@@ -31,10 +31,10 @@ console.log('══════════════════════�
 const ALLOWED_ORIGINS = [
   'https://backend-frota-72ni.onrender.com',
   'http://localhost:3000',
+  'http://127.0.0.1:3000',      // ← ADICIONADO (Chrome usa esse)
   'http://localhost:5500',
   'http://127.0.0.1:5500',
 ];
-
 // =========================================================================
 // WATCHDOG — se o listen não rodar em 10s, derruba com log claro
 // =========================================================================

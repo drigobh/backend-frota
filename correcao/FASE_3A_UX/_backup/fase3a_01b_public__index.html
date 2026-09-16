@@ -7953,43 +7953,7 @@
     window.skipShell = { fmt: fmt };
     window.skipChart = { bar: bar, line: line, donut: donut };
   })();
-  
-
-    /* FASE_3A_CARDS_FIX_V2 */
-    (function() {
-      window.renderResumoLancamentos = function(resumoDoServidor) {
-        var receitas = 0, despesas = 0, qtd = 0;
-        if (resumoDoServidor && typeof resumoDoServidor === "object") {
-          receitas = parseFloat(resumoDoServidor.receitas) || 0;
-          despesas = parseFloat(resumoDoServidor.despesas) || 0;
-          qtd = parseInt(resumoDoServidor.total_lancamentos) || 0;
-        } else {
-          var lista = (typeof __lancamentosCache !== "undefined" && __lancamentosCache) || [];
-          qtd = lista.length;
-          lista.forEach(function(l) {
-            var v = parseFloat(l.valor) || 0;
-            if (l.tipo === "Receita") receitas += v;
-            if (l.tipo === "Despesa") despesas += v;
-          });
-        }
-        var resultado = receitas - despesas;
-        var margem = receitas > 0 ? (resultado / receitas) * 100 : 0;
-        var el = function(id) { return document.getElementById(id); };
-        if (el("lanc-receitas")) el("lanc-receitas").textContent = formatBRL(receitas);
-        if (el("lanc-despesas")) el("lanc-despesas").textContent = formatBRL(despesas);
-        if (el("lanc-resultado")) {
-          el("lanc-resultado").textContent = formatBRL(resultado);
-          el("lanc-resultado").className = "kpi-card-val " + (resultado >= 0 ? "pos" : "neg");
-        }
-        if (el("lanc-res-card")) el("lanc-res-card").className = "kpi-card " + (resultado >= 0 ? "kpi-pos" : "kpi-neg");
-        if (el("lanc-margem")) el("lanc-margem").textContent = "Margem: " + formatPct(margem);
-        if (el("lanc-receitas-qtd")) el("lanc-receitas-qtd").textContent = qtd + " lancamentos";
-        if (el("lanc-despesas-qtd")) el("lanc-despesas-qtd").textContent = qtd + " lancamentos";
-      };
-      console.log("[FASE_3A] Fix dos cards instalado.");
-    })();
-
-</script>
+  </script>
   <div id="toast-container" aria-live="polite"></div>
   <div id="confirm-overlay" role="dialog" aria-modal="true">
 
