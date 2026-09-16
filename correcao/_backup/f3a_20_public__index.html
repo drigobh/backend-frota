@@ -4051,11 +4051,6 @@
         var data = await res.json();
         __lancamentosCache = data || [];
         renderLancamentos(__lancamentosCache);
-        if (__lancamentosCache.length === 0 && (params.toString())) {
-          if (typeof mostrarToast === "function") {
-            mostrarToast("Nenhum lancamento encontrado com os filtros aplicados.", "warning", "Sem resultados");
-          }
-        }
 
         // Carrega resumo (usa o mesmo filtro)
         try {
@@ -6926,29 +6921,6 @@
     });
 
     window.loadLancamentosDaAPI = loadLancamentosDaAPI;
-
-    // ==== AUTO-INIT DOS FILTROS DE LANCAMENTOS (FASE 3A / 20) ====
-    async function inicializarFiltrosLancamentos() {
-      try {
-        await popularAnosLancamentos();
-        if (typeof popularMesesLancamentos === "function") popularMesesLancamentos();
-        if (typeof carregarFiltrosLancamentos === "function") await carregarFiltrosLancamentos();
-        // Recarrega os lancamentos com filtros vazios
-        if (typeof loadLancamentosDaAPI === "function") {
-          setTimeout(function() { loadLancamentosDaAPI(); }, 100);
-        }
-      } catch (e) {
-        console.error("[INIT] Erro ao carregar filtros:", e);
-      }
-    }
-
-    // Registra no boot
-    document.addEventListener("DOMContentLoaded", function() {
-      setTimeout(inicializarFiltrosLancamentos, 500);
-    });
-
-    window.inicializarFiltrosLancamentos = inicializarFiltrosLancamentos;
-
     // (Logica antiga de exclusao de filtros removida - nao se aplica mais)
 
     window.abrirModalLancamento = abrirModalLancamento;
