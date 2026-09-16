@@ -6,18 +6,7 @@ module.exports = async function (fastify, options) {
   // LISTAR LANCAMENTOS (com filtros)
   // ==========================================================================
   fastify.get('/api/lancamentos', { preHandler: [fastify.autenticar] }, async (req, reply) => {
-    let { mes, mesNumero, ano, tipo, categoria, veiculo, dias, periodo } = req.query;
-
-      // Normaliza: '---------' e '' viram undefined
-      function limpar(v) { return (v === '---------' || v === '' || v === undefined) ? undefined : v; }
-      mes = limpar(mes);
-      mesNumero = limpar(mesNumero);
-      ano = limpar(ano);
-      tipo = limpar(tipo);
-      categoria = limpar(categoria);
-      veiculo = limpar(veiculo);
-      dias = limpar(dias);
-      periodo = limpar(periodo);
+    const { mes, mesNumero, ano, tipo, categoria, veiculo, dias, periodo } = req.query;
 
     try {
       let query = `
@@ -296,21 +285,6 @@ module.exports = async function (fastify, options) {
       }
 
       return reply.send({ sucesso: true });
-    } catch (err) {
-      fastify.log.error(err);
-      return reply.code(500).send({ erro: err.message });
-    }
-  });
-
-  // ==========================================================================
-  // LISTA DE ANOS DISPONIVEIS (dos lancamentos cadastrados)
-  // ==========================================================================
-  fastify.get('/api/lancamentos/anos-disponiveis', { preHandler: [fastify.autenticar] }, async (req, reply) => {
-    try {
-      const res = await db.query(
-        "SELECT DISTINCT EXTRACT(YEAR FROM data_lancamento)::int AS ano FROM lancamentos_financeiros WHERE deleted_at IS NULL ORDER BY ano DESC"
-      );
-      return reply.send(res.rows.map(function(r) { return r.ano; }));
     } catch (err) {
       fastify.log.error(err);
       return reply.code(500).send({ erro: err.message });

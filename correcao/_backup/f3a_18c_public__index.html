@@ -4016,17 +4016,16 @@
       try {
         // Carrega categorias/veiculos/anos nos selects (uma vez)
         await carregarFiltrosLancamentos();
-        await popularAnosLancamentos();
+                popularAnosLancamentos();
         popularMesesLancamentos();
 
         // Le os valores dos filtros
-        function valorOuVazio(id) { var v = (document.getElementById(id) || {}).value || ""; return (v === "---------") ? "" : v; }
-        var periodo = valorOuVazio("lanc-filtro-periodo");
-        var ano = valorOuVazio("lanc-filtro-ano");
-        var mes = valorOuVazio("lanc-filtro-mes");
-        var tipo = valorOuVazio("lanc-filtro-tipo");
-        var cat = valorOuVazio("lanc-filtro-categoria");
-        var veic = valorOuVazio("lanc-filtro-veiculo");
+        var periodo = (document.getElementById("lanc-filtro-periodo") || {}).value || "";
+        var ano = (document.getElementById("lanc-filtro-ano") || {}).value || "";
+        var mes = (document.getElementById("lanc-filtro-mes") || {}).value || "";
+        var tipo = (document.getElementById("lanc-filtro-tipo") || {}).value || "";
+        var cat = (document.getElementById("lanc-filtro-categoria") || {}).value || "";
+        var veic = (document.getElementById("lanc-filtro-veiculo") || {}).value || "";
 
         var params = new URLSearchParams();
 
@@ -4067,23 +4066,16 @@
     }
 
     // Popula o select de Anos (2020 ate ano atual + 1)
-    async function popularAnosLancamentos() {
+    function popularAnosLancamentos() {
       var sel = document.getElementById("lanc-filtro-ano");
-      if (!sel) return;
-      // Nao recarrega se ja tem opcoes
-      if (sel.options.length > 1) return;
-      try {
-        var res = await apiFetch("/lancamentos/anos-disponiveis");
-        if (!res.ok) return;
-        var anos = await res.json();
-        if (!Array.isArray(anos)) return;
-        anos.forEach(function(a) {
-          var o = document.createElement("option");
-          o.value = a;
-          o.textContent = a;
-          sel.appendChild(o);
-        });
-      } catch (e) { console.error("Erro ao carregar anos:", e); }
+      if (!sel || sel.options.length > 1) return;
+      var anoAtual = new Date().getFullYear();
+      for (var a = anoAtual + 1; a >= 2020; a--) {
+        var o = document.createElement("option");
+        o.value = a;
+        o.textContent = a;
+        sel.appendChild(o);
+      }
     }
 
     // Popula o select de Meses (1-12)

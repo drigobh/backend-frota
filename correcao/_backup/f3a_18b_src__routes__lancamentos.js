@@ -6,18 +6,7 @@ module.exports = async function (fastify, options) {
   // LISTAR LANCAMENTOS (com filtros)
   // ==========================================================================
   fastify.get('/api/lancamentos', { preHandler: [fastify.autenticar] }, async (req, reply) => {
-    let { mes, mesNumero, ano, tipo, categoria, veiculo, dias, periodo } = req.query;
-
-      // Normaliza: '---------' e '' viram undefined
-      function limpar(v) { return (v === '---------' || v === '' || v === undefined) ? undefined : v; }
-      mes = limpar(mes);
-      mesNumero = limpar(mesNumero);
-      ano = limpar(ano);
-      tipo = limpar(tipo);
-      categoria = limpar(categoria);
-      veiculo = limpar(veiculo);
-      dias = limpar(dias);
-      periodo = limpar(periodo);
+    const { mes, mesNumero, ano, tipo, categoria, veiculo, dias, periodo } = req.query;
 
     try {
       let query = `
