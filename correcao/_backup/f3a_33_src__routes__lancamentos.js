@@ -73,26 +73,21 @@ module.exports = async function (fastify, options) {
       if (dias && periodo !== 'tudo') {
         const diasNum = parseInt(dias);
         if (diasNum > 0 && diasNum <= 365) {
-          if (ano && mesNumero) {
-            query += ` AND l.data_lancamento >= (MAKE_DATE(${idx}::int, ${idx + 1}::int, 1) - INTERVAL '${diasNum} days')`;
-            params.push(parseInt(ano));
-            params.push(parseInt(mesNumero));
+          if (ano || mesNumero) {
+            query += ` AND l.data_lancamento >= (
+              (SELECT MAX(data_lancamento) FROM lancamentos_financeiros 
+               WHERE EXTRACT(YEAR FROM data_lancamento) = COALESCE(${idx}::int, EXTRACT(YEAR FROM CURRENT_DATE))
+                 AND EXTRACT(MONTH FROM data_lancamento) = COALESCE(${idx + 1}::int, EXTRACT(MONTH FROM CURRENT_DATE))
+                 AND deleted_at IS NULL) - INTERVAL '${diasNum} days'
+            )`;
+            params.push(ano ? parseInt(ano) : null);
+            params.push(mesNumero ? parseInt(mesNumero) : null);
             idx += 2;
-          } else if (ano) {
-            query += ` AND l.data_lancamento >= (MAKE_DATE(${idx}::int, 1, 1) - INTERVAL '${diasNum} days')`;
-            params.push(parseInt(ano));
-            idx++;
-          } else if (mesNumero) {
-            query += ` AND l.data_lancamento >= (MAKE_DATE(EXTRACT(YEAR FROM CURRENT_DATE)::int, ${idx}::int, 1) - INTERVAL '${diasNum} days')`;
-            params.push(parseInt(mesNumero));
-            idx++;
           } else {
             query += ` AND l.data_lancamento >= (CURRENT_DATE - INTERVAL '${diasNum} days') AND l.data_lancamento <= CURRENT_DATE`;
           }
         }
       }
-
-      
 
       if (tipo) {
         query += ` AND l.tipo = $${idx}`;
