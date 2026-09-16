@@ -3,52 +3,7 @@
 // Stack: Fastify + PostgreSQL (Neon) + Render
 // =========================================================================
 
-const fastify = require('fastify')({
-  // FASE_3B_LOGS_ESTRUTURADOS
-  logger: {
-    level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-    redact: {
-      paths: [
-        'req.headers.authorization',
-        'req.headers.cookie',
-        'req.body.senha',
-        'req.body.password',
-        'req.body.senha_hash',
-        'req.body.token',
-        'req.body.jwt',
-        'req.body.api_key',
-        'res.headers["set-cookie"]',
-        '*.senha',
-        '*.password',
-        '*.senha_hash',
-        '*.token',
-        '*.jwt',
-        '*.api_key'
-      ],
-      censor: '[REDACTED]'
-    },
-    serializers: {
-      req: function (req) {
-        return {
-          method: req.method,
-          url: req.url,
-          remoteAddress: req.ip || (req.socket && req.socket.remoteAddress),
-          userAgent: req.headers && req.headers['user-agent']
-        };
-      },
-      res: function (reply) {
-        return { statusCode: reply.statusCode };
-      },
-      err: function (err) {
-        return {
-          type: err.name,
-          message: err.message,
-          stack: process.env.NODE_ENV !== 'production' ? err.stack : undefined
-        };
-      }
-    }
-  }
-});
+const fastify = require('fastify')({ logger: true });
 const cors = require('@fastify/cors');
 const rateLimit = require('@fastify/rate-limit');
 const helmet = require('@fastify/helmet'); // FASE_3B_HELMET // FASE_3B_RATE_LIMIT
