@@ -4075,42 +4075,33 @@
     async function popularAnosLancamentos() {
       var sel = document.getElementById("lanc-filtro-ano");
       if (!sel) return;
-      // Guarda o valor selecionado para restaurar
-      var valorAtual = sel.value;
+      // Nao recarrega se ja tem opcoes
+      if (sel.options.length > 1) return;
       try {
         var res = await apiFetch("/lancamentos/anos-disponiveis");
         if (!res.ok) return;
         var anos = await res.json();
         if (!Array.isArray(anos)) return;
-        // Limpa e repopula SEMPRE (dados podem ter mudado)
-        sel.innerHTML = '<option value="">---------</option>';
         anos.forEach(function(a) {
           var o = document.createElement("option");
           o.value = a;
           o.textContent = a;
           sel.appendChild(o);
         });
-        // Restaura valor anterior se ainda existir
-        if (valorAtual && anos.indexOf(parseInt(valorAtual)) !== -1) {
-          sel.value = valorAtual;
-        }
       } catch (e) { console.error("Erro ao carregar anos:", e); }
     }
 
     // Popula o select de Meses (1-12)
     function popularMesesLancamentos() {
       var sel = document.getElementById("lanc-filtro-mes");
-      if (!sel) return;
-      var valorAtual = sel.value;
+      if (!sel || sel.options.length > 1) return;
       var meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-      sel.innerHTML = '<option value="">---------</option>';
       for (var m = 0; m < 12; m++) {
         var o = document.createElement("option");
         o.value = String(m + 1).padStart(2, "0");
         o.textContent = meses[m];
         sel.appendChild(o);
       }
-      if (valorAtual) sel.value = valorAtual;
     }
 
     function getFuelExpenseForPlate(placa, month) {
@@ -6953,7 +6944,7 @@
 
     // Registra no boot
     document.addEventListener("DOMContentLoaded", function() {
-      setTimeout(inicializarFiltrosLancamentos, 1500);
+      setTimeout(inicializarFiltrosLancamentos, 500);
     });
 
     window.inicializarFiltrosLancamentos = inicializarFiltrosLancamentos;
