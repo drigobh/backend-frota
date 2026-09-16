@@ -50,21 +50,21 @@ module.exports = async function (fastify, options) {
 
       // 1) Filtro ANO
       if (ano) {
-        query += ` AND EXTRACT(YEAR FROM l.data_lancamento) = ${idx}::int`;
+                query += ` AND EXTRACT(YEAR FROM l.data_lancamento) = $${idx}::int`;
         params.push(parseInt(ano));
         idx++;
       }
 
       // 2) Filtro MES (numero 01-12)
       if (mesNumero) {
-        query += ` AND EXTRACT(MONTH FROM l.data_lancamento) = ${idx}::int`;
+        query += ` AND EXTRACT(MONTH FROM l.data_lancamento) = $${idx}::int`;
         params.push(parseInt(mesNumero));
         idx++;
       }
 
       // 3) Filtro MES (formato YYYY-MM-DD)
       if (mes && !ano && !mesNumero) {
-        query += ` AND DATE_TRUNC('month', l.data_lancamento) = ${idx}::date`;
+        query += ` AND DATE_TRUNC('month', l.data_lancamento) = $${idx}::date`;
         params.push(mes);
         idx++;
       }
