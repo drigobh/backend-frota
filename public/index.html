@@ -8833,5 +8833,133 @@
 [data-theme="dark"] .chart-box svg text { fill: #8b949e !important; }
 </style>
 
+
+<style>
+/* ============================================================================
+   FASE_3A_MODO_ESCURO_FIX_V2
+   Corrigir elementos <code> e badges de codigo no modo escuro.
+   ============================================================================ */
+
+/* --- Codigo do Centro de Custo na tabela --- */
+[data-theme="dark"] table.data-table code,
+[data-theme="dark"] .data-table td code,
+[data-theme="dark"] #tbody-centros-custo code {
+  background: #1c2330 !important;
+  color: #58a6ff !important;
+  border: 1px solid rgba(88,166,255,0.20) !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+}
+
+/* --- Badges de sistema e permissao --- */
+[data-theme="dark"] .badge-perm {
+  background: rgba(37,99,235,0.20) !important;
+  color: #58a6ff !important;
+}
+[data-theme="dark"] .badge-sistema {
+  background: rgba(187,128,9,0.20) !important;
+  color: #d29922 !important;
+}
+
+/* --- Timeline badges --- */
+[data-theme="dark"] .timeline-badge.badge-cadastro { background: rgba(35,134,54,0.20) !important; color: #3fb950 !important; }
+[data-theme="dark"] .timeline-badge.badge-operacao { background: rgba(187,128,9,0.20) !important; color: #d29922 !important; }
+[data-theme="dark"] .timeline-badge.badge-financeiro { background: rgba(136,87,255,0.20) !important; color: #a371f7 !important; }
+[data-theme="dark"] .timeline-badge.badge-administracao { background: rgba(248,81,73,0.20) !important; color: #f85149 !important; }
+[data-theme="dark"] .timeline-badge.badge-sistema { background: rgba(110,118,129,0.20) !important; color: #8b949e !important; }
+[data-theme="dark"] .timeline-badge.badge-outro { background: rgba(110,118,129,0.20) !important; color: #8b949e !important; }
+
+/* --- KPI card sub com fundo claro --- */
+[data-theme="dark"] .kpi-card-sub .badge-pos,
+[data-theme="dark"] .kpi-card-sub .badge-neg { font-size: 0.7rem !important; }
+
+/* --- Categorias: nome e codigo --- */
+[data-theme="dark"] #tbody-categorias td,
+[data-theme="dark"] #tbody-centros-custo td,
+[data-theme="dark"] #tbody-perfis td,
+[data-theme="dark"] #tbody-usuarios td,
+[data-theme="dark"] #tbody-auditoria td {
+  color: #e6edf3 !important;
+}
+[data-theme="dark"] #tbody-categorias code,
+[data-theme="dark"] #tbody-perfis code,
+[data-theme="dark"] #tbody-usuarios code {
+  background: #1c2330 !important;
+  color: #58a6ff !important;
+}
+
+/* --- Celulas com fundo claro (linha par) ja tratadas, mas forcamos --- */
+[data-theme="dark"] table.data-table tbody tr td {
+  background-color: transparent !important;
+}
+
+/* --- Botoes de acao (action-btn) --- */
+[data-theme="dark"] .action-btn {
+  background: #1c2330 !important;
+  color: #e6edf3 !important;
+}
+[data-theme="dark"] .action-btn:hover { background: #252a33 !important; }
+[data-theme="dark"] .action-btn-edit { background: rgba(37,99,235,0.15) !important; color: #58a6ff !important; }
+[data-theme="dark"] .action-btn-edit:hover { background: rgba(37,99,235,0.25) !important; }
+[data-theme="dark"] .action-btn-key { background: rgba(187,128,9,0.15) !important; color: #d29922 !important; }
+[data-theme="dark"] .action-btn-key:hover { background: rgba(187,128,9,0.25) !important; }
+[data-theme="dark"] .action-btn-delete { background: rgba(248,81,73,0.15) !important; color: #f85149 !important; }
+[data-theme="dark"] .action-btn-delete:hover { background: rgba(248,81,73,0.25) !important; }
+[data-theme="dark"] .action-btn-disabled { opacity: 0.3 !important; }
+
+/* --- Modais de confirmacao (botoes) --- */
+[data-theme="dark"] .confirm-btn-confirm { background: #da3633 !important; color: #fff !important; }
+[data-theme="dark"] .confirm-btn-confirm.tipo-info { background: #1f6feb !important; }
+[data-theme="dark"] .confirm-btn-confirm.tipo-warning { background: #9e6a03 !important; }
+[data-theme="dark"] .confirm-btn-confirm.tipo-success { background: #238636 !important; }
+
+/* --- Botoes de subtabs --- */
+[data-theme="dark"] .subtabs-nav { border-bottom-color: rgba(230,237,243,0.10) !important; }
+
+/* --- Placeholder em todos os inputs --- */
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #6e7681 !important;
+  opacity: 1 !important;
+}
+
+/* --- Filtros de historico --- */
+[data-theme="dark"] .historico-filtro-item label { color: #8b949e !important; }
+[data-theme="dark"] .historico-filtro-item input,
+[data-theme="dark"] .historico-filtro-item select {
+  background: #1c2330 !important;
+  color: #e6edf3 !important;
+  border-color: rgba(230,237,243,0.20) !important;
+}
+
+/* --- Selects especificos com cor #0f2a4a hardcoded --- */
+[data-theme="dark"] #cat-filtro-tipo,
+[data-theme="dark"] #cat-filtro-ativo,
+[data-theme="dark"] #cc-filtro-ativo {
+  color: #e6edf3 !important;
+  background: #1c2330 !important;
+}
+
+/* --- Cards de totais (faturamento, resultado) --- */
+[data-theme="dark"] .kpi-card .kpi-card-val.pos { color: #3fb950 !important; }
+[data-theme="dark"] .kpi-card .kpi-card-val.neg { color: #f85149 !important; }
+
+/* --- Badge de status mes --- */
+[data-theme="dark"] #badge-status-mes.lock-badge.unlocked {
+  background: rgba(35,134,54,0.20) !important;
+  color: #3fb950 !important;
+  border-color: rgba(63,185,80,0.40) !important;
+}
+[data-theme="dark"] #badge-status-mes.lock-badge.locked {
+  background: rgba(248,81,73,0.20) !important;
+  color: #f85149 !important;
+  border-color: rgba(248,81,73,0.40) !important;
+}
+
+/* --- Botao Congelar Mes --- */
+[data-theme="dark"] #btn-toggle-fechamento { background: #1f6feb !important; color: #fff !important; }
+</style>
+
 </body>
 </html>
