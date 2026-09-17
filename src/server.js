@@ -64,22 +64,22 @@ const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
 // ===== DIAGNÓSTICO DE BOOT (aparece no log do Render) =====
-console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
-console.log('ðŸ” DIAGNÃ“STICO DE BOOT');
-console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
+console.log('-----------------------------------------------------------------------');
+console.log('🔍 DIAGNÓSTICO DE BOOT');
+console.log('-----------------------------------------------------------------------');
 console.log('PORT           =', PORT);
 console.log('HOST           =', HOST);
 console.log('NODE_ENV       =', process.env.NODE_ENV || '(não definido)');
-console.log('DATABASE_URL?  =', process.env.DATABASE_URL ? 'SIM âœ…' : 'NÃO âŒ');
-console.log('JWT_SECRET?    =', process.env.JWT_SECRET ? 'SIM âœ…' : 'NÃO âŒ');
+console.log('DATABASE_URL?  =', process.env.DATABASE_URL ? 'SIM ✅' : 'NÃO ❌');
+console.log('JWT_SECRET?    =', process.env.JWT_SECRET ? 'SIM ✅' : 'NÃO ❌');
 console.log('CWD            =', process.cwd());
 console.log('__dirname      =', __dirname);
-console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
+console.log('-----------------------------------------------------------------------');
 
 const ALLOWED_ORIGINS = [
   'https://backend-frota-72ni.onrender.com',
   'http://localhost:3000',
-  'http://127.0.0.1:3000',      // â† ADICIONADO (Chrome usa esse)
+  'http://127.0.0.1:3000',      // â† ADICIONADO (Chrome usa esse)
   'http://localhost:5500',
   'http://127.0.0.1:5500',
 ];
@@ -87,9 +87,8 @@ const ALLOWED_ORIGINS = [
 // WATCHDOG — se o listen não rodar em 10s, derruba com log claro
 // =========================================================================
 const watchdog = setTimeout(() => {
-  console.error('âŒ [WATCHDOG] Servidor NÃO abriu porta em 10 segundos.');
-  console.error('âŒ [WATCHDOG] Alguma coisa travou ANTES do listen().');
-  console.error('âŒ [WATCHDOG] Possíveis causas:');
+  console.error('⚠️ [WATCHDOG] Alguma coisa travou ANTES do listen().');
+  console.error('⚠️ [WATCHDOG] Possíveis causas:');
   console.error('   - DATABASE_URL ausente ou inacessível');
   console.error('   - algum require() de rota está lançando erro');
   console.error('   - Neon/Postgres lento respondendo');
@@ -139,7 +138,7 @@ fastify.register(cors, {
       return callback(null, true);
     }
 
-    console.warn(`âš ï¸  CORS bloqueado para origem: ${origin}`);
+    console.warn(`⚠️  CORS bloqueado para origem: ${origin}`);
     return callback(new Error('Origem não permitida pelo CORS'), false);
   },
   credentials: true,
@@ -193,7 +192,7 @@ fastify.decorate('autenticar', async (request, reply) => {
 });
 
 // =========================================================================
-// ARQUIVOS ESTÃTICOS (Frontend)
+// ARQUIVOS ESTÃTICOS (Frontend)
 // =========================================================================
 fastify.register(require('@fastify/static'), {
   root: path.join(__dirname, '../public'),
@@ -245,7 +244,7 @@ ROTAS.forEach((caminho) => {
   try {
     fastify.register(require(caminho));
   } catch (err) {
-    console.error(`âŒ [BOOT] Falha ao carregar rota ${caminho}:`, err.message);
+    console.error(`⚠️  [BOOT] Falha ao carregar rota ${caminho}:`, err.message);
   }
 });
 
@@ -484,7 +483,7 @@ fastify.addHook('onSend', async (request, reply, payload) => {
 });
 
 // =========================================================================
-// INICIALIZAÃ‡ÃO
+// INICIALIZAÇÃO
 // =========================================================================
 const start = async () => {
   try {
@@ -494,20 +493,19 @@ const start = async () => {
 
     const address = fastify.server.address();
     console.log('');
-    console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
-    console.log('ðŸš›  CADERNINHO DE MOTORISTA — BACKEND ONLINE');
-    console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
-    console.log(`ðŸš€  Porta:       ${address.port}`);
-    console.log(`ðŸŒ  Ambiente:    ${process.env.NODE_ENV || 'development'}`);
-    console.log(`ðŸ”—  URL:         https://backend-frota-72ni.onrender.com`);
-    console.log(`ðŸ’¾  Banco:       PostgreSQL (Neon)`);
-    console.log(`ðŸ”’  CORS:        ${ALLOWED_ORIGINS.length} origem(ns) autorizada(s)`);
-    console.log(`ðŸ”  JWT:         ${process.env.JWT_SECRET ? 'Configurado âœ…' : 'FALTANDO âŒ'}`);
-    console.log('â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•');
+console.log('-----------------------------------------------------------------------');
+    console.log('🚛  CADERNINHO DE MOTORISTA — BACKEND ONLINE');
+console.log('-----------------------------------------------------------------------');
+    console.log(`🚀  Porta:       ${address.port}`);
+    console.log(`🌐  Ambiente:    ${process.env.NODE_ENV || 'development'}`);
+    console.log(`💰  Banco:       PostgreSQL (Neon)`);
+    console.log(`🔍  CORS:        ${ALLOWED_ORIGINS.length} origem(ns) autorizada(s)`);
+    console.log(`🔍  JWT:         ${process.env.JWT_SECRET ? 'Configurado ✅' : 'FALTANDO ❌'}`);
+console.log('-----------------------------------------------------------------------');
     console.log('');
   } catch (err) {
     clearTimeout(watchdog);
-    console.error('âŒ [BOOT] Erro ao iniciar servidor:', err);
+    console.error('âŒ [BOOT] Erro ao iniciar servidor:', err);
     process.exit(1);
   }
 };
