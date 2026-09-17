@@ -4015,7 +4015,7 @@
     // =========================================================================
     async function loadLancamentosDaAPI() {
       var tbody = document.getElementById("tbody-lancamentos");
-      if (tbody) renderSkeletonTable(tbody.id, 8, 5);
+      if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#64748b;">Carregando...</td></tr>';
 
       try {
         // Carrega categorias/veiculos/anos nos selects (uma vez)
@@ -5953,7 +5953,7 @@
 
     async function loadRankingDaAPI() {
       var tbody = document.getElementById("tbody-ranking");
-      if (tbody) renderSkeletonTable(tbody.id, 8, 5);
+      if (tbody) tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:1.5rem; color:#64748b;">Carregando...</td></tr>';
       try {
         var mes = state.currentMonth || "";
         var mesKey = (typeof getFirstDayOfMonth === "function") ? getFirstDayOfMonth(mes) : "";
@@ -6097,7 +6097,7 @@
 
     async function loadMetasDaAPI() {
       var tbody = document.getElementById("tbody-metas");
-      if (tbody) renderSkeletonTable(tbody.id, 8, 5);
+      if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#64748b;">Carregando...</td></tr>';
       try {
         var mes = state.currentMonth || "";
         var mesKey = (typeof getFirstDayOfMonth === "function") ? getFirstDayOfMonth(mes) : "";
@@ -7022,7 +7022,7 @@
 
     async function loadCategoriasDaAPI() {
       var tbody = document.getElementById('tbody-categorias');
-      if (tbody) renderSkeletonTable(tbody.id, 8, 5);
+      if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:1.5rem; color:#64748b;">Carregando...</td></tr>';
 
       try {
         var tipo = (document.getElementById('cat-filtro-tipo') || {}).value || '';
@@ -7216,7 +7216,7 @@
 
     async function loadCentrosCustoDaAPI() {
       var tbody = document.getElementById('tbody-centros-custo');
-      if (tbody) renderSkeletonTable(tbody.id, 8, 5);
+      if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#64748b;">Carregando...</td></tr>';
 
       try {
         var ativo = (document.getElementById('cc-filtro-ativo') || {}).value || '';
@@ -7400,7 +7400,7 @@
     async function loadDreConsolidadaDaAPI(forceRefresh) {
       var tbody = document.getElementById('tbody-dre-consolidada');
       if (tbody && !forceRefresh) {
-        renderSkeletonTable(tbody.id, 8, 5);
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:1.5rem; color:#64748b;">Carregando...</td></tr>';
       }
 
       try {
@@ -8072,30 +8072,6 @@
     .theme-toggle-btn:hover { background: var(--ds-surface); }
     .theme-toggle-btn-sidebar { width: 100%; margin: 0.5rem 1rem; background: rgba(255, 255, 255, 0.08); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.1); }
     .theme-toggle-btn-sidebar:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
-    /* FASE_3D_SKELETON_CSS */
-    @keyframes ds-shimmer {
-      0%   { background-position: -800px 0; }
-      100% { background-position: 800px 0; }
-    }
-    .ds-skeleton {
-      display: inline-block;
-      height: 14px;
-      width: 100%;
-      border-radius: 4px;
-      background: linear-gradient(90deg, #e2e8f0 0%, #f1f5f9 50%, #e2e8f0 100%);
-      background-size: 800px 100%;
-      animation: ds-shimmer 1.4s linear infinite;
-    }
-    [data-theme="dark"] .ds-skeleton {
-      background: linear-gradient(90deg, #1c2330 0%, #2a3444 50%, #1c2330 100%);
-      background-size: 800px 100%;
-    }
-    .ds-skeleton-row td {
-      padding: 12px 10px !important;
-    }
-    .ds-skeleton-cell-sm { width: 60%; }
-    .ds-skeleton-cell-md { width: 80%; }
-    .ds-skeleton-cell-lg { width: 95%; }
 </style>
 <script>
     // FASE_3A_MODO_ESCURO_JS
@@ -8126,51 +8102,6 @@
       window.toggleTheme = toggle;
       window.applyTheme = applyTheme;
     })();
-</script>
-<script>
-    // FASE_3D_SKELETON_JS
-    function renderSkeletonTable(tbodyId, colunas, linhas) {
-      colunas = colunas || 6;
-      linhas  = linhas  || 5;
-      var tbody = document.getElementById(tbodyId);
-      if (!tbody) return;
-      var html = "";
-      for (var i = 0; i < linhas; i++) {
-        html += "<tr class=\"ds-skeleton-row\">";
-        for (var c = 0; c < colunas; c++) {
-          var larg = "ds-skeleton-cell-md";
-          if (c === 0) larg = "ds-skeleton-cell-sm";
-          if (c === colunas - 1) larg = "ds-skeleton-cell-sm";
-          html += "<td><span class=\"ds-skeleton " + larg + "\"></span></td>";
-        }
-        html += "</tr>";
-      }
-      tbody.innerHTML = html;
-    }
-
-    // Aplica skeleton em todas as tabelas principais ao carregar a pagina
-    function aplicarSkeletonsIniciais() {
-      var tabelas = [
-        ["tbody-cavalos",        6, 4],
-        ["tbody-carretas",       5, 4],
-        ["tbody-motoristas",     6, 4],
-        ["tbody-lancamentos",    8, 5],
-        ["tbody-abastecimentos", 10, 5],
-        ["tbody-km-mensal",      8, 5],
-        ["tbody-acoplamento",    6, 4],
-        ["tbody-manutencoes",    8, 4]
-      ];
-      tabelas.forEach(function(t) {
-        renderSkeletonTable(t[0], t[1], t[2]);
-      });
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-      setTimeout(aplicarSkeletonsIniciais, 100);
-    });
-
-    window.renderSkeletonTable = renderSkeletonTable;
-    window.aplicarSkeletonsIniciais = aplicarSkeletonsIniciais;
 </script>
 </body>
 </html>
