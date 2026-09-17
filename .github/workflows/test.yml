@@ -1,0 +1,35 @@
+name: Tests & Lint
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    name: Rodar testes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Verificar sintaxe (lint)
+        run: npm run lint
+
+      - name: Rodar testes
+        run: npm test
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-secret-para-ci
+          DATABASE_URL: postgres://test:test@localhost:5432/test

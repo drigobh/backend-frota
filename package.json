@@ -1,13 +1,16 @@
 {
   "name": "projeto-caderninho-frota",
   "version": "2.0.0",
-  "description": "Sistema Corporativo de Gestão de Frota — Caderninho de Motorista",
+  "description": "Sistema Corporativo de Gestao de Frota - Caderninho de Motorista",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --env-file=.env.local src/server.js",
     "dev:watch": "node --watch --env-file=.env.local src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --runInBand --forceExit",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage --runInBand --forceExit",
+    "lint": "node --check src/server.js && node --check src/database.js && node --check src/auto_migrate.js"
   },
   "keywords": [
     "frota",
@@ -33,5 +36,9 @@
   },
   "allowScripts": {
     "bcrypt@6.0.0": true
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4"
   }
 }
