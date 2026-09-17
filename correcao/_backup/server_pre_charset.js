@@ -198,19 +198,6 @@ fastify.decorate('autenticar', async (request, reply) => {
 fastify.register(require('@fastify/static'), {
   root: path.join(__dirname, '../public'),
   prefix: '/',
-  setHeaders: function (res, filepath) {
-    if (filepath.endsWith('.html')) {
-      res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    } else if (filepath.endsWith('.json')) {
-      res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    } else if (filepath.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
-    } else if (filepath.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css; charset=utf-8');
-    } else if (filepath.endsWith('.svg')) {
-      res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
-    }
-  }
 });
 
 // =========================================================================
@@ -255,12 +242,12 @@ ROTAS.forEach((caminho) => {
 fastify.get('/', (req, reply) => {
   const filePath = path.join(__dirname, '../public/Cad Moto.html');
   if (fs.existsSync(filePath)) {
-    return reply.type('text/html; charset=utf-8').send(fs.readFileSync(filePath));
+    return reply.type('text/html').send(fs.readFileSync(filePath));
   }
 
   const indexPath = path.join(__dirname, '../public/index.html');
   if (fs.existsSync(indexPath)) {
-    return reply.type('text/html; charset=utf-8').send(fs.readFileSync(indexPath));
+    return reply.type('text/html').send(fs.readFileSync(indexPath));
   }
 
   reply.status(404).send({ erro: 'Arquivo HTML principal nÃ£o encontrado.' });
@@ -377,7 +364,7 @@ fastify.setNotFoundHandler((request, reply) => {
 
   const indexPath = path.join(__dirname, '../public/index.html');
   if (fs.existsSync(indexPath)) {
-    return reply.type('text/html; charset=utf-8').send(fs.readFileSync(indexPath));
+    return reply.type('text/html').send(fs.readFileSync(indexPath));
   }
 
   reply.status(404).send({ erro: 'PÃ¡gina nÃ£o encontrada.' });

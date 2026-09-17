@@ -1,0 +1,44 @@
+{
+  "name": "Caderninho de Motorista",
+  "short_name": "Caderninho",
+  "description": "Sistema Integrado de Gestao de Frotas e Operacoes",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f2a4a",
+  "theme_color": "#0f2a4a",
+  "orientation": "any",
+  "scope": "/",
+  "lang": "pt-BR",
+  "categories": [
+    "business",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "/?tab=dashboard",
+      "description": "Ir para o Dashboard"
+    },
+    {
+      "name": "Lancamentos",
+      "short_name": "Lancamentos",
+      "url": "/?tab=lancamentos",
+      "description": "Ir para Lancamentos Financeiros"
+    },
+    {
+      "name": "Abastecimentos",
+      "short_name": "Abastecimentos",
+      "url": "/?tab=abastecimentos",
+      "description": "Registrar Abastecimento"
+    }
+  ]
+}

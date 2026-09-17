@@ -255,12 +255,12 @@ ROTAS.forEach((caminho) => {
 fastify.get('/', (req, reply) => {
   const filePath = path.join(__dirname, '../public/Cad Moto.html');
   if (fs.existsSync(filePath)) {
-    return reply.type('text/html; charset=utf-8').send(fs.readFileSync(filePath));
+    return reply.type('text/html; charset=utf-8').send(fs.readFileSync(filePath, 'utf8'));
   }
 
   const indexPath = path.join(__dirname, '../public/index.html');
   if (fs.existsSync(indexPath)) {
-    return reply.type('text/html; charset=utf-8').send(fs.readFileSync(indexPath));
+    return reply.type('text/html; charset=utf-8').send(fs.readFileSync(indexPath, 'utf8'));
   }
 
   reply.status(404).send({ erro: 'Arquivo HTML principal nÃ£o encontrado.' });
@@ -377,7 +377,7 @@ fastify.setNotFoundHandler((request, reply) => {
 
   const indexPath = path.join(__dirname, '../public/index.html');
   if (fs.existsSync(indexPath)) {
-    return reply.type('text/html; charset=utf-8').send(fs.readFileSync(indexPath));
+    return reply.type('text/html; charset=utf-8').send(fs.readFileSync(indexPath, 'utf8'));
   }
 
   reply.status(404).send({ erro: 'PÃ¡gina nÃ£o encontrada.' });
