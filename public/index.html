@@ -1488,7 +1488,7 @@
           body: JSON.stringify(payload)
         });
         const data = await res.json();
-        alert(data.mensagem || 'Concluí­do');
+        alert(data.mensagem || 'Concluído');
         await loadAuditoriaDaAPI();
       } catch (err) { alert('Erro ao limpar: ' + err.message); }
     }
@@ -1665,10 +1665,10 @@
           <div class="kpi-card kpi-neg">
             <div class="kpi-card-title">Despesas Totais</div>
             <div class="kpi-card-val neg" id="dash-despesas">R$ 0,00</div>
-            <div class="kpi-card-sub">Manuais + Combustí­vel automático</div>
+            <div class="kpi-card-sub">Manuais + Combustível automático</div>
           </div>
           <div class="kpi-card" id="dash-res-card">
-            <div class="kpi-card-title">Resultado Lí­quido</div>
+            <div class="kpi-card-title">Resultado Líquido</div>
             <div class="kpi-card-val" id="dash-resultado">R$ 0,00</div>
             <div class="kpi-card-sub" id="dash-margem">Margem: 0,0%</div>
           </div>
@@ -2051,7 +2051,7 @@
           <div class="kpi-card kpi-neg">
             <div class="kpi-card-title">Despesas</div>
             <div class="kpi-card-val neg" id="cat-despesas">0</div>
-            <div class="kpi-card-sub">Categorias de saí­da</div>
+            <div class="kpi-card-sub">Categorias de saída</div>
           </div>
           <div class="kpi-card kpi-warning">
             <div class="kpi-card-title">Inativas</div>
@@ -2091,7 +2091,7 @@
           <div class="modal-body">
             <div class="modal-field">
               <label for="modal-cat-nome">Nome *</label>
-              <input type="text" id="modal-cat-nome" maxlength="100" required placeholder="Ex: Combustí­vel">
+              <input type="text" id="modal-cat-nome" maxlength="100" required placeholder="Ex: Combustível">
             </div>
             <div class="modal-field">
               <label for="modal-cat-tipo">Tipo *</label>
@@ -2122,7 +2122,7 @@
         <div class="filtros-bar">
           <div class="filtros-grid">
             <div class="filtro-item">
-              <label for="lanc-filtro-periodo">Perí­odo</label>
+              <label for="lanc-filtro-periodo">Período</label>
               <select id="lanc-filtro-periodo">
                 <option value="">---------</option>
                 <option value="7">Últimos 7 dias</option>
@@ -2186,7 +2186,7 @@
             <div class="kpi-card-sub" id="lanc-despesas-qtd">0 lançamentos</div>
           </div>
           <div class="kpi-card" id="lanc-res-card">
-            <div class="kpi-card-title">Resultado Lí­quido</div>
+            <div class="kpi-card-title">Resultado Líquido</div>
             <div class="kpi-card-val" id="lanc-resultado">R$ 0,00</div>
             <div class="kpi-card-sub" id="lanc-margem">Margem: 0,0%</div>
           </div>
@@ -2242,7 +2242,7 @@
             <div class="modal-field">
               <label for="modal-lanc-veiculo">Veículo (opcional)</label>
               <select id="modal-lanc-veiculo">
-                <option value="">— Sem ví­nculo —</option>
+                <option value="">— Sem vínculo —</option>
               </select>
             </div>
             <div class="modal-field">
@@ -2384,10 +2384,10 @@
           <div class="kpi-card kpi-neg">
             <div class="kpi-card-title">Despesa Total</div>
             <div class="kpi-card-val neg" id="drec-despesa">R$ 0,00</div>
-            <div class="kpi-card-sub">Manuais + Combustí­vel</div>
+            <div class="kpi-card-sub">Manuais + Combustível</div>
           </div>
           <div class="kpi-card" id="drec-res-card">
-            <div class="kpi-card-title">Resultado Lí­quido</div>
+            <div class="kpi-card-title">Resultado Líquido</div>
             <div class="kpi-card-val" id="drec-resultado">R$ 0,00</div>
             <div class="kpi-card-sub" id="drec-margem">Margem: 0,0%</div>
           </div>
@@ -2409,7 +2409,7 @@
                 <th style="width: 50px;">#</th>
                 <th style="width: 150px;">Veículo</th>
                 <th class="col-num">Receita (R$)</th>
-                <th class="col-num">Combustí­vel (R$)</th>
+                <th class="col-num">Combustível (R$)</th>
                 <th class="col-num">Outras Despesas (R$)</th>
                 <th class="col-num">Despesa Total (R$)</th>
                 <th class="col-num">Resultado (R$)</th>
@@ -2679,10 +2679,10 @@
           <div class="kpi-card kpi-neg">
             <div class="kpi-card-title">Despesas Totais</div>
             <div class="kpi-card-val neg" id="kpi-res-despesas">R$ 0,00</div>
-            <div class="kpi-card-sub">Operação + Combustí­vel</div>
+            <div class="kpi-card-sub">Operação + Combustível</div>
           </div>
           <div class="kpi-card" id="kpi-res-card-resultado">
-            <div class="kpi-card-title">Resultado Lí­quido</div>
+            <div class="kpi-card-title">Resultado Líquido</div>
             <div class="kpi-card-val" id="kpi-res-resultado">R$ 0,00</div>
             <div class="kpi-card-sub" id="kpi-res-margem">Margem: 0,0%</div>
           </div>
@@ -2994,7 +2994,7 @@
 
     const INITIAL_MONTHS = ['Julho/2026', 'Agosto/2026', 'Setembro/2026'];
     const CATEGORIAS = [
-      'Faturamento', 'Operacionais', 'Pedágio', 'Manutenção', 'Combustí­vel', 
+      'Faturamento', 'Operacionais', 'Pedágio', 'Manutenção', 'Combustível', 
       'Finame', 'Salário', 'Pneus', 'Seguro', 'IPVA/Licenciamento', 'Multas'
     ];
 
@@ -3085,7 +3085,7 @@
 
       const confirmar = confirm(
         acaoDesejada
-          ? `Deseja CONGELAR a competência de "${mes}"? Operadores não poderão alterar dados deste perí­odo.`
+          ? `Deseja CONGELAR a competência de "${mes}"? Operadores não poderão alterar dados deste período.`
           : `Deseja DESCONGELAR a competência de "${mes}"? O mês voltará a aceitar edições.`
       );
       if (!confirmar) return;
@@ -3120,7 +3120,7 @@
     }
 
     // =========================================================================
-    // EXPORTAÇíO PARA CSV
+    // EXPORTAÇÃO PARA CSV
     // =========================================================================
     function exportTableToCSV(filename, tableId) {
       const table = document.getElementById(tableId);
@@ -3165,7 +3165,7 @@
     }
 
     // =========================================================================
-    // UTILITíRIOS DE FORMATAÇíO
+    // UTILITíRIOS DE FORMATAÇÃO
     // =========================================================================
     function formatBRL(val) {
       return (Number(val) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -3281,7 +3281,7 @@
     }
 
     // =========================================================================
-    // CONTROLE DE NAVEGAÇíO DE MíŠS
+    // CONTROLE DE NAVEGAÇÃO DE MÊS
     // =========================================================================
     function populateMonthSelectors() {
       document.querySelectorAll('.select-mes-global').forEach(sel => {
@@ -3328,7 +3328,7 @@
     }
 
     // =========================================================================
-    // API E RENDERIZAÇíO: DASHBOARD
+    // API E RENDERIZAÇÃO: DASHBOARD
     // =========================================================================
     async function loadDashboardData() {
       const monthKey = getFirstDayOfMonth(state.currentMonth);
@@ -3366,7 +3366,7 @@
     }
 
     // =========================================================================
-    // API E RENDERIZAÇíO: CADASTROS
+    // API E RENDERIZAÇÃO: CADASTROS
     // =========================================================================
     async function loadCadastrosDaAPI() {
       try {
@@ -3627,7 +3627,7 @@
     }
 
     // =========================================================================
-    // API E RENDERIZAÇíO: ACOPLAMENTO
+    // API E RENDERIZAÇÃO: ACOPLAMENTO
     // =========================================================================
     async function loadAcoplamentosDaAPI() {
       try {
@@ -3754,7 +3754,7 @@
     }
 
     // =========================================================================
-    // API E RENDERIZAÇíO: KM MENSAL
+    // API E RENDERIZAÇÃO: KM MENSAL
     // =========================================================================
     async function loadKmDaAPI() {
       try {
@@ -3893,7 +3893,7 @@
     }
 
     // =========================================================================
-    // API E RENDERIZAÇíO: ABASTECIMENTOS DETALHADOS (Prioridade 11)
+    // API E RENDERIZAÇÃO: ABASTECIMENTOS DETALHADOS (Prioridade 11)
     // =========================================================================
     async function loadAbastecimentosDaAPI() {
       try {
@@ -3950,7 +3950,7 @@
       if (tfoot) {
         tfoot.innerHTML = `
           <tr>
-            <td colspan="5"><strong>TOTAIS DO MíŠS</strong></td>
+            <td colspan="5"><strong>TOTAIS DO MÊS</strong></td>
             <td class="col-num"><strong>${formatNum(totLitros, 2)} L</strong></td>
             <td></td>
             <td class="col-num"><strong>${formatBRL(totValor)}</strong></td>
@@ -4011,7 +4011,7 @@
     }
 
     // =========================================================================
-    // API E RENDERIZAÇíO: FINANCEIRO (DRE)
+    // API E RENDERIZAÇÃO: FINANCEIRO (DRE)
     // =========================================================================
     async function loadLancamentosDaAPI() {
       var tbody = document.getElementById("tbody-lancamentos");
@@ -4407,7 +4407,7 @@
     }
 
     // =========================================================================
-    // API E RENDERIZAÇíO: MANUTENÇíO (Prioridade 15)
+    // API E RENDERIZAÇÃO: MANUTENÇÃO (Prioridade 15)
     // =========================================================================
     async function loadManutencoesDaAPI() {
       try {
@@ -4491,7 +4491,7 @@
     }
 
     // =========================================================================
-    // API E RENDERIZAÇíO: DOCUMENTOS (Prioridade 16)
+    // API E RENDERIZAÇÃO: DOCUMENTOS (Prioridade 16)
     // =========================================================================
     async function loadDocumentosDaAPI() {
       try {
@@ -4567,7 +4567,7 @@
     }
 
     // =========================================================================
-    // API E RENDERIZAÇíO: RESUMO EXECUTIVO
+    // API E RENDERIZAÇÃO: RESUMO EXECUTIVO
     // =========================================================================
     function renderResumo() {
       const tbody = document.getElementById('tbody-resumo-veiculos');
@@ -4736,7 +4736,7 @@
         state.cavalos.forEach(c => {
           totalCombustivelMes += getFuelExpenseForPlate(c.placa, month);
         });
-        despPorCat['Combustí­vel'] = (despPorCat['Combustí­vel'] || 0) + totalCombustivelMes;
+        despPorCat['Combustível'] = (despPorCat['Combustível'] || 0) + totalCombustivelMes;
 
         state.lancamentos.forEach(l => {
           if (l.tipo === 'Despesa') {
@@ -4902,7 +4902,7 @@
               <div class="alert-card-title"><span>🔧</span> Manutenção Preventiva</div>
               <span class="alert-badge success">Revisões em dia</span>
             </div>
-            <p style="margin:0; font-size:0.85rem; color:#15803d;">Nenhum veí­culo com revisão pendente ou próxima (menos de 1.000 km).</p>
+            <p style="margin:0; font-size:0.85rem; color:#15803d;">Nenhum veículo com revisão pendente ou próxima (menos de 1.000 km).</p>
           </div>`;
       } else {
         const cardClass = manutCriticas.length > 0 ? 'alert-card-danger' : 'alert-card-warning';
@@ -6719,7 +6719,7 @@
       if (tfoot) {
         tfoot.innerHTML =
           '<tr>' +
-            '<td colspan="5"><strong>TOTAIS DO MíŠS</strong></td>' +
+            '<td colspan="5"><strong>TOTAIS DO MÊS</strong></td>' +
             '<td class="col-num"><strong class="pos">' + formatBRL(totRec) + '</strong> / <strong class="neg">' + formatBRL(totDesp) + '</strong></td>' +
             '<td></td>' +
           '</tr>';
@@ -7445,7 +7445,7 @@
       if (tbody) tbody.innerHTML = '';
 
       if (porVeiculo.length === 0) {
-        if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhum veí­culo ativo.</td></tr>';
+        if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhum veículo ativo.</td></tr>';
       } else {
         porVeiculo.forEach(function(v, idx) {
           var tr = document.createElement('tr');
