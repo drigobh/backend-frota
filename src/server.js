@@ -200,14 +200,16 @@ fastify.register(require('@fastify/static'), {
   // NAO serve index.html pelo static — deixar a rota / cuidar disso
   index: false,
   setHeaders: function (res, filepath) {
-    if (filepath.endsWith('.json')) {
-      res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    } else if (filepath.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
-    } else if (filepath.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css; charset=utf-8');
-    } else if (filepath.endsWith('.svg')) {
-      res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+    // Fastify v5: res e um objeto plain de headers
+    var ext = filepath.substring(filepath.lastIndexOf('.'));
+    var tipos = {
+      '.json': 'application/json; charset=utf-8',
+      '.js':   'application/javascript; charset=utf-8',
+      '.css':  'text/css; charset=utf-8',
+      '.svg':  'image/svg+xml; charset=utf-8'
+    };
+    if (tipos[ext]) {
+      res['Content-Type'] = tipos[ext];
     }
   }
 });
