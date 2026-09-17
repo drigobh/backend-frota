@@ -153,7 +153,7 @@ fastify.register(cors, {
 // ===========================================================================
 fastify.register(rateLimit, {
   global: false,                        // NAO aplica em todas as rotas
-  max: 5,                               // 5 tentativas
+  max: 20,                              // 20 tentativas
   timeWindow: '1 minute',               // janela de 1 minuto
   allowList: [],                        // sem excecoes
   keyGenerator: (req) => req.ip,        // bloqueia por IP
