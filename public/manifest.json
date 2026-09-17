@@ -1,44 +1,76 @@
 {
-  "name": "Caderninho de Motorista",
+  "name": "Caderninho de Motorista - Gestao de Frota",
   "short_name": "Caderninho",
-  "description": "Sistema Integrado de Gestao de Frotas e Operacoes",
+  "description": "Sistema corporativo de gestao de frota: veiculos, motoristas, lancamentos, DRE, metas e relatorios.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#0f2a4a",
   "theme_color": "#0f2a4a",
-  "orientation": "any",
-  "scope": "/",
   "lang": "pt-BR",
+  "dir": "ltr",
   "categories": [
     "business",
-    "productivity"
+    "productivity",
+    "finance"
   ],
   "icons": [
     {
-      "src": "/icons/icon.svg",
-      "sizes": "any",
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ],
   "shortcuts": [
     {
-      "name": "Dashboard",
-      "short_name": "Dashboard",
-      "url": "/?tab=dashboard",
-      "description": "Ir para o Dashboard"
-    },
-    {
       "name": "Lancamentos",
       "short_name": "Lancamentos",
-      "url": "/?tab=lancamentos",
-      "description": "Ir para Lancamentos Financeiros"
+      "description": "Ver lancamentos financeiros",
+      "url": "/?tab=tab-lancamentos",
+      "icons": [
+        {
+          "src": "/icon-192.svg",
+          "sizes": "192x192"
+        }
+      ]
     },
     {
-      "name": "Abastecimentos",
-      "short_name": "Abastecimentos",
-      "url": "/?tab=abastecimentos",
-      "description": "Registrar Abastecimento"
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Ver dashboard geral",
+      "url": "/?tab=tab-dashboard",
+      "icons": [
+        {
+          "src": "/icon-192.svg",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "DRE",
+      "short_name": "DRE",
+      "description": "Ver DRE consolidada",
+      "url": "/?tab=tab-dre-consolidada",
+      "icons": [
+        {
+          "src": "/icon-192.svg",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

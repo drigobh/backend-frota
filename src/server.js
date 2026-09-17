@@ -249,7 +249,23 @@ ROTAS.forEach((caminho) => {
 });
 
 // =========================================================================
-// ROTA PRINCIPAL — Serve o index.html
+
+// =========================================================================
+// SERVICE WORKER (PWA) - Headers especiais
+// =========================================================================
+fastify.get('/sw.js', (req, reply) => {
+  const swPath = path.join(__dirname, '../public/sw.js');
+  if (!fs.existsSync(swPath)) {
+    return reply.status(404).send('SW nao encontrado');
+  }
+  reply
+    .type('application/javascript; charset=utf-8')
+    .header('Service-Worker-Allowed', '/')
+    .header('Cache-Control', 'no-cache, no-store, must-revalidate')
+    .send(fs.readFileSync(swPath, 'utf8'));
+});
+
+// ROTA PRINCIPAL - Serve o index.html — Serve o index.html
 // =========================================================================
 fastify.get('/', (req, reply) => {
   const filePath = path.join(__dirname, '../public/Cad Moto.html');
