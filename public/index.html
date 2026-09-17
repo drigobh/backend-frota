@@ -8961,5 +8961,20 @@
 [data-theme="dark"] #btn-toggle-fechamento { background: #1f6feb !important; color: #fff !important; }
 </style>
 
+  <!-- FASE_3D_PWA_REGISTRO -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function() {
+        navigator.serviceWorker.register("/sw.js")
+          .then(function(reg) {
+            console.log("[PWA] Service Worker registrado:", reg.scope);
+          })
+          .catch(function(err) {
+            console.warn("[PWA] Erro ao registrar SW:", err);
+          });
+      });
+    }
+  </script>
+
 </body>
 </html>
