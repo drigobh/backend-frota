@@ -1796,7 +1796,7 @@
             <button class="btn-action btn-action-secondary" id="btn-novo-mes-km">+ Novo Mês</button>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-secondary" id="btn-export-km"><span>â¬‡ï¸</span> Exportar Excel (CSV)</button>
+            <button class="btn-action btn-action-secondary" id="btn-export-km"><span>⬇️</span> Exportar Excel (CSV)</button>
           </div>
         </div>
 
@@ -1832,7 +1832,7 @@
             <select class="select-month select-mes-global" id="select-mes-abastecimentos"></select>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-secondary" id="btn-export-abast"><span>â¬‡ï¸</span> Exportar CSV</button>
+            <button class="btn-action btn-action-secondary" id="btn-export-abast"><span>⬇️</span> Exportar CSV</button>
             <button class="btn-action btn-action-primary" id="btn-add-abastecimento">+ Novo Abastecimento</button>
           </div>
         </div>
@@ -1954,7 +1954,7 @@
             <span class="label-month-select">Gestão de Manutenção:</span>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-secondary" id="btn-export-manut"><span>â¬‡ï¸</span> Exportar CSV</button>
+            <button class="btn-action btn-action-secondary" id="btn-export-manut"><span>⬇️</span> Exportar CSV</button>
             <button class="btn-action btn-action-primary" id="btn-add-manutencao">+ Registrar Manutenção</button>
           </div>
         </div>
@@ -1989,7 +1989,7 @@
             <span class="label-month-select">Vencimentos & Licenças:</span>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-secondary" id="btn-export-doc"><span>â¬‡ï¸</span> Exportar CSV</button>
+            <button class="btn-action btn-action-secondary" id="btn-export-doc"><span>⬇️</span> Exportar CSV</button>
             <button class="btn-action btn-action-primary" id="btn-add-documento">+ Novo Documento</button>
           </div>
         </div>
@@ -2930,7 +2930,7 @@
             <button class="btn-action btn-action-secondary" onclick="loadAuditoriaDaAPI()">🔍„ Atualizar</button>
             <button class="btn-action" style="background:#0284c7;color:#fff;" onclick="testarAuditoriaManual()">🧪 Testar</button>
             <button class="btn-action" style="background:#dc2626;color:#fff;" onclick="abrirModalLimparAuditoria()">🗑️ Limpar Logs</button>
-            <button class="btn-action btn-action-secondary" onclick="exportTableToCSV('Trilha_Auditoria.csv', 'table-auditoria')">â¬‡ï¸ Exportar CSV</button>
+            <button class="btn-action btn-action-secondary" onclick="exportTableToCSV('Trilha_Auditoria.csv', 'table-auditoria')">⬇️ Exportar CSV</button>
           </div>
         </div>
 
@@ -8226,7 +8226,7 @@
         document.querySelectorAll("[data-theme-toggle]").forEach(function(btn) {
           var i = btn.querySelector(".theme-toggle-icon");
           var l = btn.querySelector(".theme-toggle-label");
-          if (t === "dark") { if (i) i.textContent = "â˜€ï¸"; if (l) l.textContent = "Claro"; }
+          if (t === "dark") { if (i) i.textContent = "☀️"; if (l) l.textContent = "Claro"; }
           else { if (i) i.textContent = "🌙"; if (l) l.textContent = "Escuro"; }
         });
       }
