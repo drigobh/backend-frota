@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Caderninho">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="versao-sistema" content="v1977-36">
+  <meta name="versao-sistema" content="v1977-37">
   <title>Caderninho de Motorista — Gestão de Frota</title>
   <!-- Basecoat CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@1.0.2/dist/basecoat.cdn.min.css">
@@ -10106,26 +10106,28 @@
 <!-- FASE_5_RESET_SENHA — Modal de recuperar senha + tela /reset -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 
-<div id="modal-recuperar-senha" style="display:none;position:fixed;inset:0;background:rgba(11,30,58,0.85);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;padding:16px;">
-  <div style="background:#ffffff;border-radius:16px;padding:32px 28px;max-width:440px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.4);position:relative;">
-    <button onclick="document.getElementById('modal-recuperar-senha').style.display='none'" style="position:absolute;top:14px;right:14px;background:transparent;border:0;font-size:22px;color:#94a3b8;cursor:pointer;line-height:1;">&times;</button>
+<!-- FASE_5_MODAL_DARK -->
+<div id="modal-recuperar-senha" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,rgba(11,30,58,0.85) 0%,rgba(30,58,95,0.85) 40%,rgba(49,46,129,0.85) 100%);backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:36px 28px;max-width:440px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.45),0 0 0 1px rgba(255,255,255,0.06) inset;position:relative;color:#f1f5f9;">
+    <button onclick="document.getElementById('modal-recuperar-senha').style.display='none'" style="position:absolute;top:14px;right:14px;background:transparent;border:0;font-size:24px;color:#94a3b8;cursor:pointer;line-height:1;padding:6px;border-radius:6px;transition:color .2s,background .2s;" onmouseover="this.style.color='#e2e8f0';this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.color='#94a3b8';this.style.background='transparent'">&times;</button>
 
-    <div style="text-align:center;margin-bottom:20px;">
-      <div style="display:inline-block;width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);line-height:56px;font-size:26px;">&#128273;</div>
-      <h2 style="margin:14px 0 6px;font-size:1.3rem;color:#0f2a4a;">Recuperar senha</h2>
-      <p style="margin:0;font-size:0.85rem;color:#64748b;">Digite o e-mail cadastrado e enviaremos um link para criar uma nova senha.</p>
+    <div style="text-align:center;margin-bottom:22px;">
+      <div style="display:inline-block;width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);line-height:64px;font-size:30px;box-shadow:0 8px 24px rgba(59,130,246,0.45);">&#128273;</div>
+      <h2 style="margin:16px 0 6px;font-size:1.4rem;color:#ffffff;font-weight:700;letter-spacing:-0.02em;">Recuperar senha</h2>
+      <p style="margin:0;font-size:0.875rem;color:#cbd5e1;">Digite o e-mail cadastrado e enviaremos um link para criar uma nova senha.</p>
     </div>
 
     <div id="recuperar-form">
-      <div style="margin-bottom:14px;text-align:left;">
-        <label for="input-email-recuperar" style="display:block;font-size:0.8rem;color:#475569;margin-bottom:6px;font-weight:600;">E-mail cadastrado</label>
-        <input type="email" id="input-email-recuperar" placeholder="seu@email.com" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #cbd5e1;border-radius:10px;font-size:0.95rem;outline:none;font-family:inherit;" autocomplete="email">
+      <div style="margin-bottom:16px;text-align:left;">
+        <label for="input-email-recuperar" style="display:block;font-size:0.8rem;color:#cbd5e1;margin-bottom:8px;font-weight:600;">E-mail cadastrado</label>
+        <input type="email" id="input-email-recuperar" placeholder="seu@email.com" style="width:100%;box-sizing:border-box;padding:13px 14px;border:1px solid rgba(255,255,255,0.18);border-radius:10px;background:rgba(15,23,42,0.55);color:#f1f5f9;font-size:0.95rem;outline:none;font-family:inherit;transition:border-color .2s,box-shadow .2s,background .2s;" autocomplete="email" onfocus="this.style.borderColor='#3b82f6';this.style.background='rgba(15,23,42,0.75)';this.style.boxShadow='0 0 0 3px rgba(59,130,246,0.25)'" onblur="this.style.borderColor='rgba(255,255,255,0.18)';this.style.background='rgba(15,23,42,0.55)';this.style.boxShadow='none'">
       </div>
-      <button type="button" id="btn-recuperar" onclick="executarRecuperarSenha()" style="width:100%;padding:13px;border:0;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-size:0.95rem;font-weight:600;cursor:pointer;font-family:inherit;">Enviar link de recuperação</button>
-      <p id="recuperar-msg" style="margin:14px 0 0;font-size:0.85rem;text-align:center;min-height:1.2em;"></p>
+      <button type="button" id="btn-recuperar" onclick="executarRecuperarSenha()" style="width:100%;padding:14px 1rem;border:0;border-radius:12px;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(59,130,246,0.35);transition:transform .15s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 12px 30px rgba(59,130,246,0.5)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 24px rgba(59,130,246,0.35)'">Enviar link de recuperação</button>
+      <p id="recuperar-msg" style="margin:16px 0 0;font-size:0.875rem;text-align:center;min-height:1.2em;"></p>
     </div>
   </div>
 </div>
+<!-- /FASE_5_MODAL_DARK -->
 
 <div id="reset-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#0b1e3a 0%,#1e3a5f 40%,#312e81 100%);z-index:10001;align-items:center;justify-content:center;padding:16px;">
   <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:36px 28px;max-width:440px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.45);color:#f1f5f9;">
