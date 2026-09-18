@@ -5792,13 +5792,21 @@
         if (e.key === 'Escape') fecharModalUsuario();
       });
 
-      // Fechar modal clicando no overlay (fora do card)
-      const modal = document.getElementById('modal-usuario');
-      if (modal) {
-        modal.addEventListener('click', (e) => {
-          if (e.target === modal) fecharModalUsuario();
-        });
-      }
+      // FASE_5_FIX_MODAL_USER — desabilitado fechar ao clicar fora
+      // Motivo: o clique no input de e-mail (ou próximo às bordas do card)
+      //         estava sendo interpretado como clique no overlay, fechando
+      //         o modal e perdendo as edições em andamento.
+      // O modal continua fechando por: botão Cancelar, tecla ESC, ou
+      // após Salvar com sucesso.
+      //
+      // Para reativar o comportamento antigo, descomente as 6 linhas abaixo:
+      //
+      // const modal = document.getElementById('modal-usuario');
+      // if (modal) {
+      //   modal.addEventListener('click', (e) => {
+      //     if (e.target === modal) fecharModalUsuario();
+      //   });
+      // }
     });
 
     // =========================================================================
