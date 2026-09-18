@@ -1458,7 +1458,8 @@
     @media (max-width: 768px) { .filtros-bar { flex-direction:column; align-items:stretch; } .filtros-grid { grid-template-columns:1fr 1fr; } .filtros-acoes { justify-content:flex-end; } }
 </style>
 
-<script>
+<script type="text/javascript">
+// @ts-nocheck
   // Blindagem global contra erros de elementos nulos no carregamento
   window.addEventListener('error', function(e) {
     if (e.message && e.message.includes('textContent')) {
@@ -1502,6 +1503,116 @@
     }
 </script>
 
+
+<!-- FIX LAYOUT V4 - CORRECAO CIRURGICA -->
+<style id="fix-layout-v4">
+  /* ============================================================
+     FIX LAYOUT V4 - scrollbar horizontal + padding generoso
+     ============================================================ */
+
+  /* 1) ESCONDER SCROLLBAR DO SIDEBAR (vertical E horizontal) */
+  .app-sidebar,
+  .app-sidebar nav,
+  .sidebar-nav,
+  .sidebar-nav * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    overflow-x: hidden !important;
+  }
+  .app-sidebar::-webkit-scrollbar,
+  .app-sidebar nav::-webkit-scrollbar,
+  .sidebar-nav::-webkit-scrollbar,
+  .sidebar-nav *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+  }
+
+  /* 2) CONTEUDO NAO COLAR NO SIDEBAR */
+  .app-wrapper {
+    margin-left: 0 !important;
+    padding-left: 300px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .app-sidebar.collapsed ~ .app-wrapper {
+    padding-left: 84px !important;
+  }
+
+  /* 3) APP-MAIN */
+  .app-main,
+  main.app-main {
+    padding: 0 2.5rem 2rem 2.5rem !important;
+    margin: 1.5rem auto !important;
+    max-width: 1400px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 4) TABS */
+  .app-main > .tab-content,
+  .app-main > section.tab-content,
+  section.tab-content {
+    padding: 0 1rem !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 5) BAR-CONTROLS */
+  .bar-controls {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 6) AJUDA */
+  .ajuda-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+    gap: 1.25rem !important;
+    margin: 1.5rem 0 !important;
+    padding: 0 !important;
+  }
+  .ajuda-card {
+    background: #fff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 7) CONFIG */
+  .config-form {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)) !important;
+    gap: 1.5rem !important;
+    margin: 1.5rem 0 !important;
+    padding: 0 !important;
+  }
+  .config-group {
+    background: #fff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 1.5rem !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 8) MOBILE */
+  @media (max-width: 768px) {
+    .app-wrapper { padding-left: 84px !important; }
+    .app-main { padding: 0 1rem !important; }
+  }
+
+  /* 9) MODO ESCURO */
+  [data-theme="dark"] .ajuda-card,
+  [data-theme="dark"] .config-group {
+    background: #161b22 !important;
+    border-color: rgba(230,237,243,0.10) !important;
+  }
+</style>
 </head>
 <body>
 
@@ -3056,7 +3167,8 @@
     </footer>
   </div>
 
-  <script>
+  <script type="text/javascript">
+// @ts-nocheck
     const API_URL = '/api';
 
     function apiFetch(endpoint, options = {}) {
@@ -7894,7 +8006,8 @@
 </script>
 
   <!-- Gráficos nativos em SVG -->
-  <script>
+  <script type="text/javascript">
+// @ts-nocheck
   (function () {
     "use strict";
     
@@ -8307,7 +8420,8 @@
     @media print { .ds-pdf-fab { display: none !important; } }
 
 </style>
-<script>
+<script type="text/javascript">
+// @ts-nocheck
     // FASE_3A_MODO_ESCURO_JS
     (function() {
       var K = "theme";
@@ -8337,7 +8451,8 @@
       window.applyTheme = applyTheme;
     })();
 </script>
-<script>
+<script type="text/javascript">
+// @ts-nocheck
     // FASE_3D_SKELETON_JS
     function renderSkeletonTable(tbodyId, colunas, linhas) {
       colunas = colunas || 6;
@@ -8382,7 +8497,8 @@
     window.renderSkeletonTable = renderSkeletonTable;
     window.aplicarSkeletonsIniciais = aplicarSkeletonsIniciais;
 </script>
-<script>
+<script type="text/javascript">
+// @ts-nocheck
     // FASE_3D_FILTROS_JS
     (function() {
       var TABELAS = [
@@ -8563,10 +8679,8 @@
       window.dsFiltrarTabela = filtrarTabela;
     })();
 </script>
-<script>
-
-</script>
-<script>
+<script type="text/javascript">
+// @ts-nocheck
 // FASE_3D_PDF_JS_V2
 (function() {
   var TITULOS = {
@@ -8651,64 +8765,9 @@
 
     
 
-  <style id="fix-layout-v3">
-    /* ============================================================
-       FIX LAYOUT V3 - correcoes cirurgicas
-       ============================================================ */
+  
 
-    /* 1) Esconder scrollbar do sidebar */
-    .sidebar-nav::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; background: transparent !important; }
-    .sidebar-nav { scrollbar-width: none !important; -ms-overflow-style: none !important; }
-
-    /* 2) Conteudo NAO colar no sidebar */
-    .app-wrapper {
-      margin-left: 0 !important;
-      padding-left: 280px !important;
-      width: 100% !important;
-      box-sizing: border-box !important;
-    }
-    .app-sidebar.collapsed ~ .app-wrapper {
-      padding-left: 64px !important;
-    }
-
-    /* 3) Respiro dentro das telas */
-    .app-main {
-      padding: 0 2rem !important;
-      margin: 1.5rem auto !important;
-      max-width: 1320px !important;
-      box-sizing: border-box !important;
-    }
-
-    /* 4) Ajuda e Configuracoes */
-    .ajuda-grid, .config-form {
-      display: grid !important;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
-      gap: 1.25rem !important;
-      margin: 1.5rem 0 !important;
-    }
-    .ajuda-card, .config-group {
-      background: #fff !important;
-      border: 1px solid #e2e8f0 !important;
-      border-radius: 12px !important;
-      padding: 1.5rem !important;
-      box-sizing: border-box !important;
-    }
-
-    /* 5) Mobile */
-    @media (max-width: 768px) {
-      .app-wrapper { padding-left: 64px !important; }
-      .app-main { padding: 0 1rem !important; }
-    }
-
-    /* 6) Modo escuro */
-    [data-theme="dark"] .ajuda-card,
-    [data-theme="dark"] .config-group {
-      background: #161b22 !important;
-      border-color: rgba(230,237,243,0.10) !important;
-    }
-  </style>
-
-</head><body>");
+    p.push("</head><body>");
     p.push("<div class=\"pdf-header\">");
     p.push("<div class=\"pdf-logo\">C</div>");
     p.push("<div class=\"pdf-title-block\"><h1>Caderninho de Motorista</h1><p>Gestao Integrada de Frotas e Operacoes</p></div>");
@@ -9117,7 +9176,8 @@
 </style>
 
   <!-- FASE_3D_PWA_REGISTRO -->
-  <script>
+  <script type="text/javascript">
+// @ts-nocheck
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function() {
         navigator.serviceWorker.register("/sw.js")
@@ -9166,7 +9226,8 @@
     }
     @media print { .pwa-install-btn { display: none !important; } }
   </style>
-  <script>
+  <script type="text/javascript">
+// @ts-nocheck
     (function() {
       var deferredPrompt = null;
       var botao = document.getElementById("pwa-install-btn");
@@ -9446,7 +9507,8 @@
     [data-theme="dark"] .pwa-help-btn-close:hover { background: #1d4ed8; }
   </style>
 
-  <script>
+  <script type="text/javascript">
+// @ts-nocheck
     (function() {
       var modal = document.getElementById("pwa-help-modal");
       var btnHelp = document.getElementById("pwa-help-btn");
@@ -9476,7 +9538,8 @@
     })();
   </script>
 
-  <script>
+  <script type="text/javascript">
+// @ts-nocheck
     // FASE_4_AJUDA_LOGICA
     (function() {
       window.addEventListener("beforeinstallprompt", function(e) {
@@ -9509,7 +9572,8 @@
     })();
   </script>
 
-  <script>
+  <script type="text/javascript">
+// @ts-nocheck
     // FASE_4_CONFIG_LOGICA
     async function loadConfiguracoes() {
       try {
@@ -9548,7 +9612,8 @@
     setTimeout(loadConfiguracoes, 1500);
   </script>
 
-  <script>
+  <script type="text/javascript">
+// @ts-nocheck
     // FASE_4_EMAIL_SUPORTE
     window.abrirEmailSuporte = function() {
       var email = window.__emailSuporte || "contato@caderninho.com.br";
