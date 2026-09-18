@@ -8976,5 +8976,84 @@
     }
   </script>
 
+  <!-- FASE_4_BOTAO_INSTALAR -->
+  <button id="pwa-install-btn" class="pwa-install-btn no-print" style="display:none;" title="Instalar o Caderninho como aplicativo">
+    <span style="font-size:1.1rem;">&#128241;</span>
+    <span class="pwa-install-label">Instalar App</span>
+  </button>
+  <style>
+    .pwa-install-btn {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 9000;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .pwa-install-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.55);
+    }
+    @media (max-width: 640px) {
+      .pwa-install-btn { bottom: 16px; left: 16px; padding: 8px 14px; font-size: 13px; }
+    }
+    @media print { .pwa-install-btn { display: none !important; } }
+  </style>
+  <script>
+    (function() {
+      var deferredPrompt = null;
+      var botao = document.getElementById("pwa-install-btn");
+
+      window.addEventListener("beforeinstallprompt", function(e) {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (botao) botao.style.display = "inline-flex";
+        console.log("[PWA] Prompt de instalacao disponivel");
+      });
+
+      if (botao) {
+        botao.addEventListener("click", function() {
+          if (!deferredPrompt) {
+            var msg = "Como instalar o Caderninho:\n\n";
+            msg += "Android (Chrome):\n  Menu (3 pontinhos) > Adicionar a tela inicial\n\n";
+            msg += "iOS (Safari):\n  Compartilhar > Adicionar a Tela de Inicio\n\n";
+            msg += "Desktop (Chrome/Edge):\n  Menu (3 pontinhos) > Salvar e compartilhar > Instalar pagina como app";
+            alert(msg);
+            return;
+          }
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(function(escolha) {
+            console.log("[PWA] Escolha:", escolha.outcome);
+            if (escolha.outcome === "accepted") {
+              if (botao) botao.style.display = "none";
+            }
+            deferredPrompt = null;
+          });
+        });
+      }
+
+      if (window.matchMedia("(display-mode: standalone)").matches) {
+        if (botao) botao.style.display = "none";
+      }
+
+      window.addEventListener("appinstalled", function() {
+        if (botao) botao.style.display = "none";
+        deferredPrompt = null;
+      });
+    })();
+  </script>
+
 </body>
 </html>
