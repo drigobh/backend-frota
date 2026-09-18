@@ -200,6 +200,13 @@ fastify.register(require('@fastify/static'), {
   // NAO serve index.html pelo static — deixar a rota / cuidar disso
   index: false,
   setHeaders: function (res, filepath) {
+    // FASE_4_NO_CACHE_STATIC - X-STATIC-No-Cache
+    if (filepath.endsWith('.html')) {
+      res['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0';
+      res['Pragma'] = 'no-cache';
+      res['Expires'] = '0';
+    }
+
     // Fastify v5: res e um objeto plain de headers
     var ext = filepath.substring(filepath.lastIndexOf('.'));
     var tipos = {
@@ -306,6 +313,11 @@ fastify.put("/api/configuracoes", { preHandler: [fastify.autenticar] }, async (r
 // ROTA PRINCIPAL - Serve o index.html
 // =========================================================================
 fastify.get('/', (req, reply) => {
+    // FASE_4_NO_CACHE_HTML - X-HTML-No-Cache
+    reply.header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+    reply.header('Pragma', 'no-cache');
+    reply.header('Expires', '0');
+
   const filePath = path.join(__dirname, '../public/Cad Moto.html');
   if (fs.existsSync(filePath)) {
     return reply.type('text/html; charset=utf-8').header('Content-Type', 'text/html; charset=utf-8').send(fs.readFileSync(filePath));
@@ -424,6 +436,11 @@ fastify.setErrorHandler((error, request, reply) => {
 // NOT FOUND HANDLER
 // =========================================================================
 fastify.setNotFoundHandler((request, reply) => {
+  // FASE_4_NO_CACHE_404 - X-404-No-Cache
+  reply.header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+  reply.header('Pragma', 'no-cache');
+  reply.header('Expires', '0');
+
   if (request.url.startsWith('/api/')) {
     return reply.status(404).send({ erro: 'Rota de API não encontrada.' });
   }
