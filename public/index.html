@@ -8649,117 +8649,99 @@
     p.push(".pdf-footer{margin-top:16px;padding-top:8px;border-top:1px solid #cbd5e1;display:flex;justify-content:space-between;font-size:9px;color:#64748b}");
     p.push("@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}</style>  
 
-  <style>
-    /* FASE_4_AJUDA_CSS */
-    .ajuda-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.25rem;
-      margin-top: 1.5rem;
-    }
-    .ajuda-card {
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 1.5rem;
-      text-align: center;
-      transition: all 0.15s ease;
-    }
-    .ajuda-card:hover {
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-      transform: translateY(-2px);
-    }
-    .ajuda-card-icon {
-      font-size: 2.5rem;
-      margin-bottom: 0.75rem;
-    }
-    .ajuda-card h3 {
-      margin: 0 0 0.5rem;
-      font-size: 1.1rem;
-      color: #0f2a4a;
-    }
-    .ajuda-card p {
-      color: #64748b;
-      font-size: 0.875rem;
-      margin-bottom: 1rem;
-      line-height: 1.5;
-    }
-    [data-theme="dark"] .ajuda-card {
-      background: #161b22;
-      border-color: rgba(230,237,243,0.10);
-    }
-    [data-theme="dark"] .ajuda-card h3 { color: #e6edf3; }
-    [data-theme="dark"] .ajuda-card p { color: #8b949e; }
-  </style>
+    <style id="fase4-ultra-final">
+    /* ========================================================
+       FASE 4 - ULTRA FINAL (padding-left DIRETO no wrapper)
+       ======================================================== */
 
-    <style>
-    /* FASE_4_FIX_SCROLLBAR_PADDING */
-    /* 1) Esconder scrollbar do sidebar */
-    html body .app-sidebar .sidebar-nav,
-    html body .app-sidebar nav.sidebar-nav {
+    /* SCROLLBAR DO SIDEBAR - todos os browsers */
+    aside.app-sidebar nav.sidebar-nav,
+    .app-sidebar .sidebar-nav,
+    .sidebar-nav {
       scrollbar-width: none !important;
       -ms-overflow-style: none !important;
       overflow-y: auto !important;
     }
-    html body .app-sidebar .sidebar-nav::-webkit-scrollbar,
-    html body .app-sidebar nav.sidebar-nav::-webkit-scrollbar {
+    aside.app-sidebar nav.sidebar-nav::-webkit-scrollbar,
+    .app-sidebar .sidebar-nav::-webkit-scrollbar,
+    .sidebar-nav::-webkit-scrollbar {
       display: none !important;
       width: 0 !important;
       height: 0 !important;
       background: transparent !important;
     }
-    html body .app-sidebar {
-      overflow: hidden !important;
-    }
 
-    /* 2) Corrigir padding das telas */
-    html body .app-wrapper {
-      margin-left: 280px !important;
-      width: calc(100% - 280px) !important;
-    }
-    html body .app-sidebar.collapsed ~ .app-wrapper {
-      margin-left: 64px !important;
-      width: calc(100% - 64px) !important;
-    }
-    html body .app-main {
-      max-width: 1320px !important;
-      margin: 1.5rem auto !important;
-      padding: 0 1.5rem !important;
+    /* PADDING-LEFT DIRETO NO WRAPPER (solucao infalivel) */
+    .app-wrapper {
+      margin-left: 0 !important;
+      padding-left: 280px !important;
       width: 100% !important;
       box-sizing: border-box !important;
     }
-    @media (max-width: 768px) {
-      html body .app-wrapper {
-        margin-left: 64px !important;
-        width: calc(100% - 64px) !important;
-      }
-      html body .app-main {
-        padding: 0 1rem !important;
-      }
+    .app-sidebar.collapsed ~ .app-wrapper {
+      padding-left: 64px !important;
     }
-    .ajuda-grid {
-      padding: 0 0.5rem !important;
-    }
-    .tab-content {
-      padding: 0 0.25rem !important;
-    }
-  </style>
 
-  <style>
-    /* FASE_4_CONFIG_CSS */
-    .config-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
-    .config-group { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; }
-    .config-group h3 { margin: 0 0 1.25rem; font-size: 1.05rem; color: #0f2a4a; padding-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0; }
-    .config-field { margin-bottom: 1rem; }
-    .config-field label { display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 4px; }
-    .config-field input { width: 100%; padding: 0.6rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; font-family: inherit; box-sizing: border-box; }
-    .config-field input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
-    .config-field small { display: block; font-size: 0.75rem; color: #64748b; margin-top: 4px; }
-    [data-theme="dark"] .config-group { background: #161b22; border-color: rgba(230,237,243,0.10); }
-    [data-theme="dark"] .config-group h3 { color: #e6edf3; border-bottom-color: rgba(230,237,243,0.10); }
-    [data-theme="dark"] .config-field label { color: #cbd5e1; }
-    [data-theme="dark"] .config-field input { background: #1c2330; color: #e6edf3; border-color: rgba(230,237,243,0.20); }
-    [data-theme="dark"] .config-field small { color: #8b949e; }
+    /* APP-MAIN: padding lateral generoso */
+    .app-main {
+      max-width: 1320px !important;
+      margin: 1.5rem auto !important;
+      padding: 0 2rem !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .app-main > .tab-content,
+    .app-main > section.tab-content {
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* AJUDA: cards */
+    .ajuda-grid {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+      gap: 1.25rem !important;
+      margin: 1.5rem 0 !important;
+      padding: 0 !important;
+    }
+    .ajuda-card {
+      background: #fff !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 12px !important;
+      padding: 1.5rem !important;
+      text-align: center !important;
+      box-sizing: border-box !important;
+    }
+
+    /* CONFIG: form */
+    .config-form {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)) !important;
+      gap: 1.5rem !important;
+      margin: 1.5rem 0 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .config-group {
+      background: #fff !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 12px !important;
+      padding: 1.5rem !important;
+      box-sizing: border-box !important;
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      .app-wrapper { padding-left: 64px !important; }
+      .app-main { padding: 0 1rem !important; }
+    }
+
+    /* MODO ESCURO */
+    [data-theme="dark"] .ajuda-card,
+    [data-theme="dark"] .config-group {
+      background: #161b22 !important;
+      border-color: rgba(230,237,243,0.10) !important;
+    }
   </style>
 
 </head><body>");
