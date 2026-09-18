@@ -10062,10 +10062,14 @@
 
       // Aviso temporário enquanto SMTP não está configurado
       window.abrirRecuperarSenhaEmBreve = function() {
-        alert(
-          "Recuperação de senha em breve.\n\n" +
-          "Entre em contato com o administrador do sistema para redefinir sua senha."
-        );
+        var modal = document.getElementById("modal-recuperar-senha");
+        if (modal) modal.style.display = "flex";
+        var inp = document.getElementById("input-email-recuperar");
+        if (inp) {
+          var emailLogin = document.getElementById("login-email");
+          if (emailLogin && emailLogin.value) inp.value = emailLogin.value;
+          setTimeout(function(){ inp.focus(); }, 100);
+        }
       };
 
       // Loading state no botão (compatível com a função executarLoginNaNuvem existente)
@@ -10096,6 +10100,172 @@
     })();
   </script>
   <!-- /FASE_4_LOGIN_V2_SCRIPT -->
+
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FASE_5_RESET_SENHA — Modal de recuperar senha + tela /reset -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+
+<div id="modal-recuperar-senha" style="display:none;position:fixed;inset:0;background:rgba(11,30,58,0.85);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#ffffff;border-radius:16px;padding:32px 28px;max-width:440px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.4);position:relative;">
+    <button onclick="document.getElementById('modal-recuperar-senha').style.display='none'" style="position:absolute;top:14px;right:14px;background:transparent;border:0;font-size:22px;color:#94a3b8;cursor:pointer;line-height:1;">&times;</button>
+
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="display:inline-block;width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);line-height:56px;font-size:26px;">&#128273;</div>
+      <h2 style="margin:14px 0 6px;font-size:1.3rem;color:#0f2a4a;">Recuperar senha</h2>
+      <p style="margin:0;font-size:0.85rem;color:#64748b;">Digite o e-mail cadastrado e enviaremos um link para criar uma nova senha.</p>
+    </div>
+
+    <div id="recuperar-form">
+      <div style="margin-bottom:14px;text-align:left;">
+        <label for="input-email-recuperar" style="display:block;font-size:0.8rem;color:#475569;margin-bottom:6px;font-weight:600;">E-mail cadastrado</label>
+        <input type="email" id="input-email-recuperar" placeholder="seu@email.com" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #cbd5e1;border-radius:10px;font-size:0.95rem;outline:none;font-family:inherit;" autocomplete="email">
+      </div>
+      <button type="button" id="btn-recuperar" onclick="executarRecuperarSenha()" style="width:100%;padding:13px;border:0;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-size:0.95rem;font-weight:600;cursor:pointer;font-family:inherit;">Enviar link de recuperação</button>
+      <p id="recuperar-msg" style="margin:14px 0 0;font-size:0.85rem;text-align:center;min-height:1.2em;"></p>
+    </div>
+  </div>
+</div>
+
+<div id="reset-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#0b1e3a 0%,#1e3a5f 40%,#312e81 100%);z-index:10001;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:rgba(255,255,255,0.08);backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:36px 28px;max-width:440px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,0.45);color:#f1f5f9;">
+    <div style="text-align:center;margin-bottom:22px;">
+      <div style="display:inline-block;width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);line-height:64px;font-size:30px;box-shadow:0 8px 24px rgba(59,130,246,0.45);">&#128273;</div>
+      <h2 style="margin:16px 0 6px;font-size:1.4rem;color:#fff;font-weight:700;">Criar nova senha</h2>
+      <p style="margin:0;font-size:0.875rem;color:#cbd5e1;">Defina uma nova senha para sua conta.</p>
+    </div>
+
+    <div id="reset-form">
+      <div style="margin-bottom:14px;text-align:left;">
+        <label for="input-nova-senha" style="display:block;font-size:0.8rem;color:#cbd5e1;margin-bottom:6px;font-weight:600;">Nova senha</label>
+        <input type="password" id="input-nova-senha" placeholder="Mínimo 6 caracteres" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid rgba(255,255,255,0.18);border-radius:10px;background:rgba(15,23,42,0.55);color:#f1f5f9;font-size:0.95rem;outline:none;font-family:inherit;" autocomplete="new-password">
+      </div>
+      <div style="margin-bottom:20px;text-align:left;">
+        <label for="input-confirma-senha" style="display:block;font-size:0.8rem;color:#cbd5e1;margin-bottom:6px;font-weight:600;">Confirmar nova senha</label>
+        <input type="password" id="input-confirma-senha" placeholder="Repita a senha" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid rgba(255,255,255,0.18);border-radius:10px;background:rgba(15,23,42,0.55);color:#f1f5f9;font-size:0.95rem;outline:none;font-family:inherit;" autocomplete="new-password">
+      </div>
+      <button type="button" id="btn-reset" onclick="executarResetSenha()" style="width:100%;padding:13px;border:0;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-size:0.95rem;font-weight:600;cursor:pointer;font-family:inherit;">Redefinir senha</button>
+      <p id="reset-msg" style="margin:14px 0 0;font-size:0.85rem;text-align:center;min-height:1.2em;"></p>
+      <a onclick="window.location.href='/'" style="display:block;text-align:center;margin-top:18px;color:#93c5fd;font-size:0.85rem;cursor:pointer;text-decoration:none;">&larr; Voltar ao login</a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  window.executarRecuperarSenha = async function() {
+    var inp = document.getElementById("input-email-recuperar");
+    var btn = document.getElementById("btn-recuperar");
+    var msg = document.getElementById("recuperar-msg");
+    if (!inp || !btn || !msg) return;
+
+    var email = (inp.value || "").trim();
+    if (!email) {
+      msg.style.color = "#dc2626";
+      msg.textContent = "Digite seu e-mail.";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Enviando...";
+    msg.textContent = "";
+
+    try {
+      var res = await fetch("/api/recuperar-senha", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email })
+      });
+      var data = await res.json();
+      if (res.ok && data.ok) {
+        msg.style.color = "#16a34a";
+        msg.textContent = data.mensagem || "Link enviado! Verifique seu e-mail.";
+        inp.value = "";
+      } else {
+        msg.style.color = "#dc2626";
+        msg.textContent = data.erro || "Erro ao enviar. Tente novamente.";
+      }
+    } catch (e) {
+      msg.style.color = "#dc2626";
+      msg.textContent = "Erro de rede. Tente novamente.";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Enviar link de recuperação";
+    }
+  };
+
+  window.executarResetSenha = async function() {
+    var s1 = document.getElementById("input-nova-senha");
+    var s2 = document.getElementById("input-confirma-senha");
+    var btn = document.getElementById("btn-reset");
+    var msg = document.getElementById("reset-msg");
+    if (!s1 || !s2 || !btn || !msg) return;
+
+    var senha = s1.value || "";
+    var confirma = s2.value || "";
+
+    if (senha.length < 6) {
+      msg.style.color = "#fca5a5";
+      msg.textContent = "A senha deve ter pelo menos 6 caracteres.";
+      return;
+    }
+    if (senha !== confirma) {
+      msg.style.color = "#fca5a5";
+      msg.textContent = "As senhas não coincidem.";
+      return;
+    }
+
+    var params = new URLSearchParams(window.location.search);
+    var token = params.get("token");
+    if (!token) {
+      msg.style.color = "#fca5a5";
+      msg.textContent = "Token ausente na URL.";
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Redefinindo...";
+    msg.textContent = "";
+
+    try {
+      var res = await fetch("/api/reset-senha", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: token, senha: senha })
+      });
+      var data = await res.json();
+      if (res.ok && data.ok) {
+        msg.style.color = "#86efac";
+        msg.textContent = data.mensagem || "Senha alterada! Redirecionando...";
+        setTimeout(function() { window.location.href = "/"; }, 2500);
+      } else {
+        msg.style.color = "#fca5a5";
+        msg.textContent = data.erro || "Erro ao redefinir.";
+      }
+    } catch (e) {
+      msg.style.color = "#fca5a5";
+      msg.textContent = "Erro de rede.";
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Redefinir senha";
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", function() {
+    var params = new URLSearchParams(window.location.search);
+    var token = params.get("token");
+    var path = window.location.pathname;
+
+    if (path === "/reset" || (token && path !== "/")) {
+      var tela = document.getElementById("reset-screen");
+      var login = document.getElementById("login-screen");
+      if (tela) tela.style.display = "flex";
+      if (login) login.style.display = "none";
+    }
+  });
+})();
+</script>
+<!-- /FASE_5_RESET_SENHA -->
 
 </body>
 </html>

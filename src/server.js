@@ -558,6 +558,126 @@ fastify.addHook('onSend', async (request, reply, payload) => {
 // =========================================================================
 const start = async () => {
   try {
+
+// ═══════════════════════════════════════════════════════════
+// FASE_5_RESET_SENHA — Rotas de recuperação de senha
+// ═══════════════════════════════════════════════════════════
+const crypto = require("crypto");
+const bcryptLib = require("bcrypt");
+const { enviarEmailRecuperacaoSenha } = require("./email");
+
+// POST /api/recuperar-senha — recebe { email }
+fastify.post("/api/recuperar-senha", async (req, reply) => {
+  try {
+    const { email } = req.body || {};
+    if (!email || typeof email !== "string") {
+      return reply.status(400).send({ erro: "E-mail obrigatório" });
+    }
+
+    const emailNorm = email.trim().toLowerCase();
+
+    // Busca usuário (não revela se existe — sempre responde ok)
+    const r = await db.query(
+      "SELECT id, nome, email FROM usuarios WHERE LOWER(email) = $1 AND ativo = true LIMIT 1",
+      [emailNorm]
+    );
+
+    if (r.rows.length === 0) {
+      // Silencioso: responde ok para não vazar quais e-mails existem
+      return reply.send({ ok: true, mensagem: "Se este e-mail estiver cadastrado, você receberá o link em instantes." });
+    }
+
+    const usuario = r.rows[0];
+
+    // Gera token (32 bytes = 64 chars hex)
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiraEm = new Date(Date.now() + 15 * 60 * 1000); // 15 min
+
+    // Invalida tokens antigos do usuário
+    await db.query(
+      "UPDATE senha_reset_tokens SET usado = true WHERE usuario_id = $1 AND usado = false",
+      [usuario.id]
+    );
+
+    // Insere novo token
+    await db.query(
+      "INSERT INTO senha_reset_tokens (usuario_id, token, expira_em) VALUES ($1, $2, $3)",
+      [usuario.id, token, expiraEm]
+    );
+
+    // Envia e-mail
+    const envio = await enviarEmailRecuperacaoSenha(usuario.email, usuario.nome, token);
+
+    if (!envio.ok) {
+      req.log.error({ erro: envio.erro }, "Falha ao enviar e-mail de recuperação");
+      // Não revela o erro pro cliente (segurança)
+    } else {
+      req.log.info({ usuario_id: usuario.id, email_id: envio.id }, "E-mail de recuperação enviado");
+    }
+
+    return reply.send({ ok: true, mensagem: "Se este e-mail estiver cadastrado, você receberá o link em instantes." });
+  } catch (err) {
+    req.log.error({ err }, "Erro em /api/recuperar-senha");
+    return reply.status(500).send({ erro: "Erro ao processar solicitação" });
+  }
+});
+
+// POST /api/reset-senha — recebe { token, senha }
+fastify.post("/api/reset-senha", async (req, reply) => {
+  try {
+    const { token, senha } = req.body || {};
+
+    if (!token || !senha) {
+      return reply.status(400).send({ erro: "Token e senha são obrigatórios" });
+    }
+    if (typeof senha !== "string" || senha.length < 6) {
+      return reply.status(400).send({ erro: "Senha deve ter pelo menos 6 caracteres" });
+    }
+
+    const r = await db.query(
+      "SELECT id, usuario_id, expira_em, usado FROM senha_reset_tokens WHERE token = $1 LIMIT 1",
+      [token]
+    );
+
+    if (r.rows.length === 0) {
+      return reply.status(400).send({ erro: "Token inválido ou expirado" });
+    }
+
+    const row = r.rows[0];
+
+    if (row.usado) {
+      return reply.status(400).send({ erro: "Este link já foi utilizado" });
+    }
+    if (new Date(row.expira_em) < new Date()) {
+      return reply.status(400).send({ erro: "Este link expirou. Solicite um novo." });
+    }
+
+    // Gera hash da nova senha
+    const senhaHash = await bcryptLib.hash(senha, 10);
+
+    // Atualiza senha do usuário
+    await db.query(
+      "UPDATE usuarios SET senha_hash = $1 WHERE id = $2",
+      [senhaHash, row.usuario_id]
+    );
+
+    // Marca token como usado
+    await db.query(
+      "UPDATE senha_reset_tokens SET usado = true WHERE id = $1",
+      [row.id]
+    );
+
+    req.log.info({ usuario_id: row.usuario_id }, "Senha redefinida com sucesso");
+
+    return reply.send({ ok: true, mensagem: "Senha alterada com sucesso. Faça login com a nova senha." });
+  } catch (err) {
+    req.log.error({ err }, "Erro em /api/reset-senha");
+    return reply.status(500).send({ erro: "Erro ao redefinir senha" });
+  }
+});
+// ═══════════════════════════════════════════════════════════
+// /FASE_5_RESET_SENHA
+
     console.log('[BOOT] Chamando fastify.listen...');
     await fastify.listen({ port: Number(PORT), host: HOST });
     clearTimeout(watchdog);
