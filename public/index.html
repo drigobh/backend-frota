@@ -10129,6 +10129,7 @@
       <div style="margin-bottom:16px;text-align:left;">
         <label for="input-email-recuperar" style="display:block;font-size:0.8rem;color:#cbd5e1;margin-bottom:8px;font-weight:600;">E-mail cadastrado</label>
         <input type="email" id="input-email-recuperar" placeholder="seu@email.com" style="width:100%;box-sizing:border-box;padding:13px 14px;border:1px solid rgba(255,255,255,0.18);border-radius:10px;background:rgba(15,23,42,0.55);color:#f1f5f9;font-size:0.95rem;outline:none;font-family:inherit;transition:border-color .2s,box-shadow .2s,background .2s;" autocomplete="email" onfocus="this.style.borderColor='#3b82f6';this.style.background='rgba(15,23,42,0.75)';this.style.boxShadow='0 0 0 3px rgba(59,130,246,0.25)'" onblur="this.style.borderColor='rgba(255,255,255,0.18)';this.style.background='rgba(15,23,42,0.55)';this.style.boxShadow='none'">
+        <p id="recuperar-email-status" style="margin:8px 0 0;font-size:0.78rem;color:#94a3b8;min-height:1.1em;"></p>
       </div>
       <button type="button" id="btn-recuperar" onclick="executarRecuperarSenha()" style="width:100%;padding:14px 1rem;border:0;border-radius:12px;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit;box-shadow:0 8px 24px rgba(59,130,246,0.35);transition:transform .15s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 12px 30px rgba(59,130,246,0.5)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 8px 24px rgba(59,130,246,0.35)'">Enviar link de recuperação</button>
       <p id="recuperar-msg" style="margin:16px 0 0;font-size:0.875rem;text-align:center;min-height:1.2em;"></p>
@@ -10276,6 +10277,78 @@
 })();
 </script>
 <!-- /FASE_5_RESET_SENHA -->
+
+
+
+<!-- FASE_5_VALIDADOR_EMAIL -->
+<script>
+(function() {
+  var _timer = null;
+
+  function setStatus(msg, cor) {
+    var el = document.getElementById("recuperar-email-status");
+    if (!el) return;
+    el.style.color = cor || "#94a3b8";
+    el.textContent = msg || "";
+  }
+
+  function habilitarBotao(habilitar) {
+    var btn = document.getElementById("btn-recuperar");
+    if (!btn) return;
+    btn.disabled = !habilitar;
+    btn.style.opacity = habilitar ? "1" : "0.55";
+    btn.style.cursor = habilitar ? "pointer" : "not-allowed";
+  }
+
+  async function verificarEmail(email) {
+    setStatus("Verificando...", "#94a3b8");
+    habilitarBotao(false);
+    try {
+      var res = await fetch("/api/verificar-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email })
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      var data = await res.json();
+      if (data.existe) {
+        setStatus("E-mail cadastrado", "#16a34a");
+        habilitarBotao(true);
+      } else {
+        setStatus("E-mail nao encontrado no sistema", "#dc2626");
+        habilitarBotao(false);
+      }
+    } catch (e) {
+      setStatus("Erro ao verificar. Tente novamente.", "#dc2626");
+      habilitarBotao(true);
+    }
+  }
+
+  document.addEventListener("input", function(e) {
+    if (!e.target || e.target.id !== "input-email-recuperar") return;
+    var email = (e.target.value || "").trim();
+    if (_timer) clearTimeout(_timer);
+    if (!email || email.indexOf("@") === -1 || email.length < 5) {
+      setStatus("", "#94a3b8");
+      habilitarBotao(true);
+      return;
+    }
+    _timer = setTimeout(function() { verificarEmail(email); }, 600);
+  });
+
+  var observer = new MutationObserver(function() {
+    var modal = document.getElementById("modal-recuperar-senha");
+    if (modal && modal.style.display === "flex") {
+      var status = document.getElementById("recuperar-email-status");
+      if (status) status.textContent = "";
+      habilitarBotao(true);
+    }
+  });
+  var modal = document.getElementById("modal-recuperar-senha");
+  if (modal) observer.observe(modal, { attributes: true, attributeFilter: ["style"] });
+})();
+</script>
+<!-- /FASE_5_VALIDADOR_EMAIL -->
 
 </body>
 </html>

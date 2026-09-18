@@ -623,6 +623,36 @@ fastify.post("/api/recuperar-senha", async (req, reply) => {
 });
 
 // POST /api/reset-senha — recebe { token, senha }
+
+// =============================================================
+// FASE_5_VERIFICAR_EMAIL - Verifica se email existe
+// =============================================================
+fastify.post("/api/verificar-email", async (req, reply) => {
+  try {
+    const { email } = req.body || {};
+    if (!email || typeof email !== "string") {
+      return reply.status(400).send({ erro: "E-mail obrigatorio" });
+    }
+
+    const emailNorm = email.trim().toLowerCase();
+    if (emailNorm.indexOf("@") === -1) {
+      return reply.send({ existe: false });
+    }
+
+    const r = await db.query(
+      "SELECT 1 FROM usuarios WHERE LOWER(email) = $1 AND ativo = true LIMIT 1",
+      [emailNorm]
+    );
+
+    return reply.send({ existe: r.rows.length > 0 });
+  } catch (err) {
+    req.log.error({ err }, "Erro em /api/verificar-email");
+    return reply.status(500).send({ erro: "Erro ao verificar e-mail" });
+  }
+});
+// =============================================================
+// /FASE_5_VERIFICAR_EMAIL
+
 fastify.post("/api/reset-senha", async (req, reply) => {
   try {
     const { token, senha } = req.body || {};
