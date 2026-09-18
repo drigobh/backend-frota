@@ -17,21 +17,21 @@
   ],
   "icons": [
     {
-      "src": "/icon-192.svg",
+      "src": "/icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.svg",
+      "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon-512.svg",
+      "src": "/icon-maskable-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ],
@@ -40,37 +40,19 @@
       "name": "Lancamentos",
       "short_name": "Lancamentos",
       "description": "Ver lancamentos financeiros",
-      "url": "/?tab=tab-lancamentos",
-      "icons": [
-        {
-          "src": "/icon-192.svg",
-          "sizes": "192x192"
-        }
-      ]
+      "url": "/?tab=tab-lancamentos"
     },
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
       "description": "Ver dashboard geral",
-      "url": "/?tab=tab-dashboard",
-      "icons": [
-        {
-          "src": "/icon-192.svg",
-          "sizes": "192x192"
-        }
-      ]
+      "url": "/?tab=tab-dashboard"
     },
     {
       "name": "DRE",
       "short_name": "DRE",
       "description": "Ver DRE consolidada",
-      "url": "/?tab=tab-dre-consolidada",
-      "icons": [
-        {
-          "src": "/icon-192.svg",
-          "sizes": "192x192"
-        }
-      ]
+      "url": "/?tab=tab-dre-consolidada"
     }
   ]
 }
