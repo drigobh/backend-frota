@@ -8651,6 +8651,63 @@
 
     
 
+  <style id="fix-layout-v3">
+    /* ============================================================
+       FIX LAYOUT V3 - correcoes cirurgicas
+       ============================================================ */
+
+    /* 1) Esconder scrollbar do sidebar */
+    .sidebar-nav::-webkit-scrollbar { display: none !important; width: 0 !important; height: 0 !important; background: transparent !important; }
+    .sidebar-nav { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+
+    /* 2) Conteudo NAO colar no sidebar */
+    .app-wrapper {
+      margin-left: 0 !important;
+      padding-left: 280px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    .app-sidebar.collapsed ~ .app-wrapper {
+      padding-left: 64px !important;
+    }
+
+    /* 3) Respiro dentro das telas */
+    .app-main {
+      padding: 0 2rem !important;
+      margin: 1.5rem auto !important;
+      max-width: 1320px !important;
+      box-sizing: border-box !important;
+    }
+
+    /* 4) Ajuda e Configuracoes */
+    .ajuda-grid, .config-form {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+      gap: 1.25rem !important;
+      margin: 1.5rem 0 !important;
+    }
+    .ajuda-card, .config-group {
+      background: #fff !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 12px !important;
+      padding: 1.5rem !important;
+      box-sizing: border-box !important;
+    }
+
+    /* 5) Mobile */
+    @media (max-width: 768px) {
+      .app-wrapper { padding-left: 64px !important; }
+      .app-main { padding: 0 1rem !important; }
+    }
+
+    /* 6) Modo escuro */
+    [data-theme="dark"] .ajuda-card,
+    [data-theme="dark"] .config-group {
+      background: #161b22 !important;
+      border-color: rgba(230,237,243,0.10) !important;
+    }
+  </style>
+
 </head><body>");
     p.push("<div class=\"pdf-header\">");
     p.push("<div class=\"pdf-logo\">C</div>");
@@ -9498,100 +9555,7 @@
       window.location.href = "mailto:" + email;
     };
   </script>
-  <style id="fase4-ultra-final">
-    /* ========================================================
-       FASE 4 - ULTRA FINAL (padding-left DIRETO no wrapper)
-       ======================================================== */
-
-    /* 1) SCROLLBAR DO SIDEBAR - esconder em todos os browsers */
-    aside.app-sidebar nav.sidebar-nav,
-    .app-sidebar .sidebar-nav,
-    .sidebar-nav {
-      scrollbar-width: none !important;
-      -ms-overflow-style: none !important;
-      overflow-y: auto !important;
-    }
-    aside.app-sidebar nav.sidebar-nav::-webkit-scrollbar,
-    .app-sidebar .sidebar-nav::-webkit-scrollbar,
-    .sidebar-nav::-webkit-scrollbar {
-      display: none !important;
-      width: 0 !important;
-      height: 0 !important;
-      background: transparent !important;
-    }
-
-    /* 2) PADDING-LEFT DIRETO NO WRAPPER (solucao infalivel) */
-    .app-wrapper {
-      margin-left: 0 !important;
-      padding-left: 280px !important;
-      width: 100% !important;
-      box-sizing: border-box !important;
-    }
-    .app-sidebar.collapsed ~ .app-wrapper {
-      padding-left: 64px !important;
-    }
-
-    /* 3) APP-MAIN: padding lateral generoso */
-    .app-main {
-      max-width: 1320px !important;
-      margin: 1.5rem auto !important;
-      padding: 0 2rem !important;
-      width: 100% !important;
-      box-sizing: border-box !important;
-    }
-    .app-main > .tab-content,
-    .app-main > section.tab-content {
-      padding: 0 !important;
-      margin: 0 !important;
-    }
-
-    /* 4) AJUDA: cards */
-    .ajuda-grid {
-      display: grid !important;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
-      gap: 1.25rem !important;
-      margin: 1.5rem 0 !important;
-      padding: 0 !important;
-    }
-    .ajuda-card {
-      background: #fff !important;
-      border: 1px solid #e2e8f0 !important;
-      border-radius: 12px !important;
-      padding: 1.5rem !important;
-      text-align: center !important;
-      box-sizing: border-box !important;
-    }
-
-    /* 5) CONFIG: form */
-    .config-form {
-      display: grid !important;
-      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)) !important;
-      gap: 1.5rem !important;
-      margin: 1.5rem 0 !important;
-      width: 100% !important;
-      box-sizing: border-box !important;
-    }
-    .config-group {
-      background: #fff !important;
-      border: 1px solid #e2e8f0 !important;
-      border-radius: 12px !important;
-      padding: 1.5rem !important;
-      box-sizing: border-box !important;
-    }
-
-    /* 6) MOBILE */
-    @media (max-width: 768px) {
-      .app-wrapper { padding-left: 64px !important; }
-      .app-main { padding: 0 1rem !important; }
-    }
-
-    /* 7) MODO ESCURO */
-    [data-theme="dark"] .ajuda-card,
-    [data-theme="dark"] .config-group {
-      background: #161b22 !important;
-      border-color: rgba(230,237,243,0.10) !important;
-    }
-  </style>
+  
 
 
 </body>
