@@ -1676,6 +1676,7 @@
         <button class="nav-tab-btn" data-tab="tab-usuarios" id="nav-tab-usuarios" onclick="setTimeout(loadUsuariosDaAPI, 100)"><span>&#128101;</span><span class="nav-label">Usuários</span></button>
         <button class="nav-tab-btn" data-tab="tab-perfis" id="nav-tab-perfis" onclick="setTimeout(loadPerfisDaAPI, 100)"><span>&#128737;</span><span class="nav-label">Perfis</span></button>
         <button class="nav-tab-btn" data-tab="tab-auditoria" id="nav-tab-auditoria" onclick="setTimeout(loadAuditoriaDaAPI, 100)"><span>&#128373;</span><span class="nav-label">Auditoria</span></button>
+        <button class="nav-tab-btn" id="nav-btn-atualizar" onclick="abrirModalAtualizar()"><span>&#128260;</span><span class="nav-label">Atualizar App</span></button>
         <button class="nav-tab-btn" data-tab="tab-configuracoes" id="nav-tab-configuracoes"><span>&#9881;&#65039;</span><span class="nav-label">Configura&ccedil;&otilde;es</span></button>
         <button class="nav-tab-btn" data-tab="tab-ajuda" id="nav-tab-ajuda"><span>&#10067;</span><span class="nav-label">Ajuda</span></button>
       </div>
@@ -9622,6 +9623,125 @@
   </script>
   
 
+
+
+  <!-- FASE_4_MENU_ATUALIZAR -->
+  <div class="modal-overlay no-print" id="modal-atualizar">
+    <div class="modal-card" style="max-width:520px;">
+      <div class="modal-header">
+        <h2>&#128260; Atualizar App</h2>
+        <button class="modal-close" onclick="fecharModalAtualizar()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin:0 0 1rem; color:#475569; line-height:1.6;">
+          Esta op&ccedil;&atilde;o força uma <strong>atualiza&ccedil;&atilde;o completa</strong> do aplicativo, 
+          removendo o cache antigo e baixando a vers&atilde;o mais recente do servidor.
+        </p>
+        <p style="margin:0 0 1.25rem; color:#475569; line-height:1.6;">
+          Use quando voc&ecirc; n&atilde;o estiver vendo as &uacute;ltimas mudan&ccedil;as do sistema.
+        </p>
+        <div style="background:#f1f5f9; border-radius:8px; padding:1rem; margin-bottom:1.25rem;">
+          <div style="font-size:0.85rem; color:#64748b; margin-bottom:0.35rem;">Vers&atilde;o atual:</div>
+          <div style="font-family:monospace; font-size:0.9rem; color:#0f2a4a;" id="modal-atualizar-versao">--</div>
+        </div>
+        <div id="modal-atualizar-status" style="display:none; background:#dbeafe; border-radius:8px; padding:1rem; margin-bottom:1.25rem; color:#1e40af; font-size:0.9rem;">
+          Atualizando...
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-action btn-action-secondary" onclick="fecharModalAtualizar()">Cancelar</button>
+        <button class="btn-action btn-action-primary" id="btn-atualizar-agora" onclick="executarAtualizacao()">&#128260; Atualizar agora</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // FASE_4_MENU_ATUALIZAR_JS
+    (function() {
+      window.abrirModalAtualizar = function() {
+        var modal = document.getElementById("modal-atualizar");
+        if (modal) modal.classList.add("open");
+
+        // Atualiza a versao exibida (lê do SW se disponivel)
+        var versaoEl = document.getElementById("modal-atualizar-versao");
+        if (versaoEl) {
+          if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+            versaoEl.textContent = "Service Worker ativo";
+          } else {
+            versaoEl.textContent = "Service Worker inativo";
+          }
+        }
+
+        var statusEl = document.getElementById("modal-atualizar-status");
+        if (statusEl) statusEl.style.display = "none";
+        var btn = document.getElementById("btn-atualizar-agora");
+        if (btn) { btn.disabled = false; btn.textContent = "\uD83D\uDD04 Atualizar agora"; }
+      };
+
+      window.fecharModalAtualizar = function() {
+        var modal = document.getElementById("modal-atualizar");
+        if (modal) modal.classList.remove("open");
+      };
+
+      window.executarAtualizacao = async function() {
+        var btn = document.getElementById("btn-atualizar-agora");
+        var statusEl = document.getElementById("modal-atualizar-status");
+        if (btn) { btn.disabled = true; btn.textContent = "Atualizando..."; }
+        if (statusEl) { statusEl.style.display = "block"; statusEl.textContent = "Removendo Service Worker..."; }
+
+        try {
+          // 1) Desregistra todos os Service Workers
+          if ("serviceWorker" in navigator) {
+            var regs = await navigator.serviceWorker.getRegistrations();
+            for (var i = 0; i < regs.length; i++) {
+              await regs[i].unregister();
+            }
+          }
+
+          if (statusEl) statusEl.textContent = "Limpando cache...";
+
+          // 2) Limpa todos os caches
+          if ("caches" in window) {
+            var keys = await caches.keys();
+            for (var j = 0; j < keys.length; j++) {
+              await caches.delete(keys[j]);
+            }
+          }
+
+          if (statusEl) statusEl.textContent = "Recarregando aplicativo...";
+
+          // 3) Recarrega com cache-buster
+          setTimeout(function() {
+            var url = new URL(window.location.href);
+            url.searchParams.set("_v", Date.now());
+            window.location.href = url.toString();
+          }, 600);
+        } catch (err) {
+          console.error("[FASE_4] Erro ao atualizar:", err);
+          if (statusEl) {
+            statusEl.style.background = "#fee2e2";
+            statusEl.style.color = "#991b1b";
+            statusEl.textContent = "Erro: " + err.message;
+          }
+          if (btn) { btn.disabled = false; btn.textContent = "Tentar novamente"; }
+        }
+      };
+
+      // Fechar com ESC
+      document.addEventListener("keydown", function(e) {
+        if (e.key === "Escape") {
+          var modal = document.getElementById("modal-atualizar");
+          if (modal && modal.classList.contains("open")) window.fecharModalAtualizar();
+        }
+      });
+
+      // Fechar clicando fora
+      document.addEventListener("click", function(e) {
+        var modal = document.getElementById("modal-atualizar");
+        if (e.target === modal) window.fecharModalAtualizar();
+      });
+    })();
+  </script>
 
 </body>
 </html>
