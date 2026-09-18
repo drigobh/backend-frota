@@ -318,7 +318,208 @@
       background: #dcfce7;
       color: #166534;
     }
-  </style>
+  
+    /* ============================================ */
+    /* FASE_4_LOGIN_V2 — Novo layout da tela login  */
+    /* ============================================ */
+    #login-screen {
+      background: linear-gradient(135deg, #0b1e3a 0%, #1e3a5f 40%, #312e81 100%) !important;
+      animation: loginBgPulse 18s ease-in-out infinite alternate;
+    }
+    @keyframes loginBgPulse {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    #login-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(59,130,246,0.25) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(139,92,246,0.22) 0%, transparent 45%);
+      pointer-events: none;
+    }
+
+    .login-screen-card {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(22px) saturate(160%);
+      -webkit-backdrop-filter: blur(22px) saturate(160%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 20px;
+      padding: 2.5rem 2rem 1.75rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.45),
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+      text-align: center;
+      color: #f1f5f9;
+      animation: loginCardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @keyframes loginCardIn {
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .login-logo-badge {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 1rem;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      box-shadow: 0 8px 24px rgba(59,130,246,0.45);
+    }
+
+    .login-screen-card h2 {
+      margin: 0 0 0.35rem;
+      color: #ffffff !important;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .login-screen-card .login-subtitle {
+      color: #cbd5e1 !important;
+      font-size: 0.875rem;
+      margin: 0 0 1.75rem;
+      opacity: 0.85;
+    }
+
+    .login-new-input-wrap {
+      position: relative;
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+    .login-new-input-wrap .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+    .login-new-input-wrap .input-toggle-senha {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      color: #94a3b8;
+      padding: 6px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s, background 0.2s;
+    }
+    .login-new-input-wrap .input-toggle-senha:hover {
+      color: #e2e8f0;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .login-new-input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.85rem 2.6rem 0.85rem 2.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.55);
+      color: #f1f5f9;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      font-family: inherit;
+    }
+    .login-new-input::placeholder { color: #94a3b8; }
+    .login-new-input:focus {
+      border-color: #3b82f6;
+      background: rgba(15, 23, 42, 0.75);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.25);
+    }
+
+    .login-btn-new {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      margin-top: 0.35rem;
+      border: 0;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s, opacity 0.2s;
+      box-shadow: 0 8px 24px rgba(59,130,246,0.35);
+      font-family: inherit;
+      position: relative;
+    }
+    .login-btn-new:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 30px rgba(59,130,246,0.5);
+    }
+    .login-btn-new:active:not(:disabled) { transform: translateY(0); }
+    .login-btn-new:disabled { opacity: 0.7; cursor: wait; }
+
+    .login-link-esqueci {
+      display: inline-block;
+      margin-top: 1rem;
+      color: #93c5fd;
+      font-size: 0.85rem;
+      text-decoration: none;
+      cursor: pointer;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+    .login-link-esqueci:hover { opacity: 1; text-decoration: underline; }
+
+    .login-divider {
+      margin: 1.5rem 0 0.75rem;
+      border: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .login-footer-info {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+    .login-footer-info strong {
+      color: #93c5fd;
+      font-family: monospace;
+      font-weight: 600;
+    }
+
+    /* Modo claro: mantém o glassmorphism mas ajusta contraste */
+    [data-theme="light"] #login-screen {
+      background: linear-gradient(135deg, #1e3a8a 0%, #4338ca 50%, #7c3aed 100%) !important;
+    }
+
+    /* Responsivo — celular vira tela cheia */
+    @media (max-width: 640px) {
+      .login-screen-card {
+        max-width: 100%;
+        height: 100vh;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 2rem 1.5rem;
+      }
+    }
+    /* ============================================ */
+    /* /FASE_4_LOGIN_V2                             */
+    /* ============================================ */
+
+</style>
   
   <style>
     :root {
@@ -1617,14 +1818,40 @@
 <body>
 
   <!-- Tela de Login Inicial -->
-  <div id="login-screen">
-    <div class="login-card">
-      <h2>🚛 Caderninho de Frota</h2>
-      <p>Faça login com sua conta para acessar o sistema</p>
+    <div id="login-screen">
+    <div class="login-screen-card" data-fase4-login="v2">
+      <div class="login-logo-badge">&#128667;</div>
+      <h2>Caderninho de Frota</h2>
+      <p class="login-subtitle">Fa&ccedil;a login com sua conta para acessar o sistema</p>
+
       <div id="login-form">
-        <input type="email" id="login-email" name="email" class="login-input" placeholder="E-mail" required autocomplete="username">
-        <input type="password" id="login-senha" name="senha" class="login-input" placeholder="Senha" required autocomplete="current-password">
-        <button type="button" class="login-btn" onclick="executarLoginNaNuvem()">Entrar no Sistema</button>
+        <div class="login-new-input-wrap">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </span>
+          <input type="email" id="login-email" name="email" class="login-new-input" placeholder="E-mail" required autocomplete="username" autofocus>
+        </div>
+
+        <div class="login-new-input-wrap">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input type="password" id="login-senha" name="senha" class="login-new-input" placeholder="Senha" required autocomplete="current-password">
+          <button type="button" class="input-toggle-senha" onclick="toggleSenhaLogin()" title="Mostrar/ocultar senha" aria-label="Mostrar ou ocultar senha">
+            <svg id="icon-olho" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+
+        <button type="button" class="login-btn-new" id="btn-login-novo" onclick="executarLoginNaNuvem()">
+          <span id="btn-login-txt">Entrar no Sistema</span>
+        </button>
+
+        <a class="login-link-esqueci" onclick="abrirRecuperarSenhaEmBreve()">Esqueci minha senha</a>
+      </div>
+
+      <hr class="login-divider">
+      <div class="login-footer-info">
+        Caderninho de Frota &middot; <strong id="login-versao">v1977-34</strong>
       </div>
     </div>
   </div>
@@ -9804,5 +10031,64 @@
     })();
   </script>
   <!-- /FASE_4_CARD_VERSAO_SCRIPT -->
+
+  <!-- FASE_4_LOGIN_V2_SCRIPT -->
+  <script>
+    (function() {
+      // Toggle mostrar/ocultar senha
+      window.toggleSenhaLogin = function() {
+        var inp = document.getElementById("login-senha");
+        var ico = document.getElementById("icon-olho");
+        if (!inp || !ico) return;
+        if (inp.type === "password") {
+          inp.type = "text";
+          ico.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+        } else {
+          inp.type = "password";
+          ico.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+        }
+      };
+
+      // Aviso temporário enquanto SMTP não está configurado
+      window.abrirRecuperarSenhaEmBreve = function() {
+        alert(
+          "Recuperação de senha em breve.\n\n" +
+          "Entre em contato com o administrador do sistema para redefinir sua senha."
+        );
+      };
+
+      // Loading state no botão (compatível com a função executarLoginNaNuvem existente)
+      var _origBtn = document.getElementById("btn-login-novo");
+      if (_origBtn) {
+        // Adiciona feedback visual imediato no clique
+        _origBtn.addEventListener("click", function() {
+          var txt = document.getElementById("btn-login-txt");
+          if (txt) txt.textContent = "Entrando...";
+          _origBtn.disabled = true;
+          // Restaura após 8s (fallback, caso executarLoginNaNuvem não restaure)
+          setTimeout(function(){
+            if (txt) txt.textContent = "Entrar no Sistema";
+            _origBtn.disabled = false;
+          }, 8000);
+        });
+      }
+
+      // Puxar versão do sistema para o rodapé do card
+      async function carregarVersaoLogin() {
+        try {
+          var res = await fetch("/configuracoes");
+          if (!res.ok) return;
+          var cfg = await res.json();
+          var v = cfg.versao_sistema;
+          var valor = (v && typeof v === "object") ? v.valor : v;
+          var el = document.getElementById("login-versao");
+          if (el && valor) el.textContent = valor;
+        } catch (e) { /* silencioso */ }
+      }
+      setTimeout(carregarVersaoLogin, 800);
+    })();
+  </script>
+  <!-- /FASE_4_LOGIN_V2_SCRIPT -->
+
 </body>
 </html>
