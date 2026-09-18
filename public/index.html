@@ -9063,5 +9063,309 @@
     })();
   </script>
 
+  <!-- FASE_4_AJUDA_INSTALAR -->
+  <button id="pwa-help-btn" class="pwa-help-btn no-print" title="Como instalar o Caderninho" style="display:none;">
+    <span style="font-size:1.1rem;">&#10067;</span>
+    <span class="pwa-help-label">Como instalar</span>
+  </button>
+
+  <div id="pwa-help-modal" class="pwa-help-modal" role="dialog" aria-modal="true" aria-labelledby="pwa-help-title">
+    <div class="pwa-help-card">
+      <div class="pwa-help-header">
+        <h2 id="pwa-help-title">&#128241; Como instalar o Caderninho</h2>
+        <button class="pwa-help-close" onclick="fecharAjudaInstalar()" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="pwa-help-body">
+
+        <section class="pwa-help-section">
+          <h3>&#128241; Android (Chrome)</h3>
+          <ol>
+            <li>Abra o <strong>Chrome</strong> no seu celular Android</li>
+            <li>Acesse <code>backend-frota-72ni.onrender.com</code></li>
+            <li>Aguarde 3 segundos at&eacute; aparecer o bot&atilde;o azul <strong>"Instalar App"</strong></li>
+            <li>Toque no bot&atilde;o &rarr; confirme <strong>"Adicionar"</strong></li>
+            <li>O &iacute;cone <strong>Caderninho</strong> aparece na sua tela inicial</li>
+          </ol>
+          <p class="pwa-help-tip"><strong>Alternativa:</strong> menu (&#8942;) &rarr; <strong>Instalar app</strong> ou <strong>Adicionar &agrave; tela inicial</strong></p>
+        </section>
+
+        <section class="pwa-help-section">
+          <h3>&#127822; iPhone / iPad (Safari)</h3>
+          <ol>
+            <li>Abra o <strong>Safari</strong> (n&atilde;o funciona no Chrome do iOS)</li>
+            <li>Acesse <code>backend-frota-72ni.onrender.com</code></li>
+            <li>Toque no bot&atilde;o <strong>Compartilhar</strong> (quadrado com seta para cima)</li>
+            <li>Escolha <strong>"Adicionar &agrave; Tela de In&iacute;cio"</strong></li>
+            <li>Confirme em <strong>"Adicionar"</strong></li>
+            <li>O &iacute;cone <strong>Caderninho</strong> aparece na home</li>
+          </ol>
+          <p class="pwa-help-tip"><strong>Dica:</strong> o iOS n&atilde;o mostra o bot&atilde;o azul automaticamente. Use o menu Compartilhar.</p>
+        </section>
+
+        <section class="pwa-help-section">
+          <h3>&#128187; Desktop (Chrome/Edge)</h3>
+          <ol>
+            <li>Abra <strong>Chrome</strong> ou <strong>Edge</strong> no computador</li>
+            <li>Acesse <code>backend-frota-72ni.onrender.com</code></li>
+            <li>Toque no bot&atilde;o azul <strong>"Instalar App"</strong> no canto inferior esquerdo</li>
+            <li>Ou clique no &iacute;cone <strong>&#128241;</strong> na barra de endere&ccedil;os</li>
+            <li>Confirme em <strong>"Instalar"</strong></li>
+            <li>O app abre em <strong>janela pr&oacute;pria</strong> (sem barra do navegador)</li>
+          </ol>
+        </section>
+
+        <section class="pwa-help-section pwa-help-section-warn">
+          <h3>&#128465;&#65039; Como desinstalar</h3>
+          <ul>
+            <li><strong>Android:</strong> toque e segure o &iacute;cone <strong>Caderninho</strong> na home &rarr; arraste para <strong>"Remover"</strong></li>
+            <li><strong>iPhone:</strong> toque e segure o &iacute;cone &rarr; <strong>"Remover App"</strong> &rarr; <strong>"Excluir da Tela de In&iacute;cio"</strong></li>
+            <li><strong>Desktop:</strong> abra o app &rarr; menu (&#8942;) &rarr; <strong>"Desinstalar Caderninho..."</strong></li>
+            <li><strong>Chrome:</strong> <code>chrome://apps</code> &rarr; bot&atilde;o direito no &iacute;cone &rarr; <strong>"Remover do Chrome"</strong></li>
+          </ul>
+        </section>
+
+        <section class="pwa-help-section pwa-help-section-info">
+          <h3>&#128260; Como reinstalar (se o atalho sumir)</h3>
+          <ol>
+            <li>Abra o Chrome/Safari</li>
+            <li>Acesse <code>backend-frota-72ni.onrender.com</code></li>
+            <li>Clique em <strong>"Instalar App"</strong> (Android/Desktop) ou use o menu Compartilhar (iOS)</li>
+            <li>O &iacute;cone volta para a tela inicial</li>
+          </ol>
+          <p class="pwa-help-tip"><strong>Importante:</strong> ao desinstalar, os dados em cache s&atilde;o apagados. Ao reinstalar, o app volta do zero (mais r&aacute;pido na pr&oacute;xima vez).</p>
+        </section>
+
+        <section class="pwa-help-section pwa-help-section-success">
+          <h3>&#10004;&#65039; Como saber se instalou</h3>
+          <ul>
+            <li>O <strong>&iacute;cone Caderninho</strong> aparece na tela inicial do celular</li>
+            <li>Ao abrir, <strong>n&atilde;o tem barra do Chrome</strong> (tela cheia)</li>
+            <li>Aparece em <strong>"Apps recentes"</strong> do Android</li>
+            <li>No desktop, aparece no <strong>Menu Iniciar</strong> como <strong>"Caderninho de Motorista"</strong></li>
+            <li>O bot&atilde;o azul <strong>"Instalar App"</strong> desaparece (j&aacute; instalado)</li>
+          </ul>
+        </section>
+
+      </div>
+      <div class="pwa-help-footer">
+        <button class="pwa-help-btn-close" onclick="fecharAjudaInstalar()">Entendi</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .pwa-help-btn {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      z-index: 9001;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      background: #1c2330;
+      color: #e6edf3;
+      border: 1px solid rgba(230,237,243,0.20);
+      border-radius: 50px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.20);
+      transition: transform 0.15s ease;
+    }
+    .pwa-help-btn:hover { transform: translateY(-2px); }
+    .pwa-help-btn + .pwa-install-btn { left: 180px; }
+    @media (max-width: 640px) {
+      .pwa-help-btn { bottom: 80px; left: 16px; padding: 8px 14px; font-size: 13px; }
+      .pwa-help-btn + .pwa-install-btn { left: 16px; bottom: 130px; }
+    }
+    @media print { .pwa-help-btn { display: none !important; } }
+
+    .pwa-help-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(9,27,48,0.75);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+    .pwa-help-modal.open { display: flex; }
+    .pwa-help-card {
+      background: #fff;
+      color: #14171f;
+      border-radius: 14px;
+      max-width: 720px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.40);
+      overflow: hidden;
+    }
+    .pwa-help-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(135deg, #0f2a4a 0%, #1e3d64 100%);
+      color: #fff;
+    }
+    .pwa-help-header h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .pwa-help-close {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      line-height: 1;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pwa-help-close:hover { background: rgba(255,255,255,0.25); }
+    .pwa-help-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+      line-height: 1.6;
+    }
+    .pwa-help-section {
+      margin-bottom: 1.5rem;
+      padding: 1rem 1.15rem;
+      background: #f8fafc;
+      border-left: 4px solid #2563eb;
+      border-radius: 8px;
+    }
+    .pwa-help-section-warn { border-left-color: #dc2626; background: #fef2f2; }
+    .pwa-help-section-info { border-left-color: #0891b2; background: #ecfeff; }
+    .pwa-help-section-success { border-left-color: #15803d; background: #f0fdf4; }
+    .pwa-help-section h3 {
+      margin: 0 0 0.75rem;
+      font-size: 1rem;
+      color: #0f2a4a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .pwa-help-section ol,
+    .pwa-help-section ul {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+    .pwa-help-section li {
+      margin-bottom: 0.4rem;
+      color: #334155;
+      font-size: 0.9rem;
+    }
+    .pwa-help-section code {
+      background: #1c2330;
+      color: #58a6ff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+    .pwa-help-tip {
+      margin: 0.75rem 0 0;
+      padding: 0.5rem 0.75rem;
+      background: rgba(37,99,235,0.08);
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: #1e40af;
+    }
+    .pwa-help-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      background: #f8fafc;
+    }
+    .pwa-help-btn-close {
+      padding: 0.6rem 1.5rem;
+      background: #0f2a4a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .pwa-help-btn-close:hover { background: #1e3d64; }
+
+    /* Modo escuro */
+    [data-theme="dark"] .pwa-help-card { background: #161b22; color: #e6edf3; }
+    [data-theme="dark"] .pwa-help-body { background: #161b22; }
+    [data-theme="dark"] .pwa-help-section { background: #1c2330; color: #e6edf3; }
+    [data-theme="dark"] .pwa-help-section-warn { background: #2d1618; }
+    [data-theme="dark"] .pwa-help-section-info { background: #0d2428; }
+    [data-theme="dark"] .pwa-help-section-success { background: #0d2417; }
+    [data-theme="dark"] .pwa-help-section h3 { color: #e6edf3; }
+    [data-theme="dark"] .pwa-help-section li { color: #cbd5e1; }
+    [data-theme="dark"] .pwa-help-section code { background: #0d1117; color: #58a6ff; }
+    [data-theme="dark"] .pwa-help-tip { background: rgba(37,99,235,0.15); color: #93c5fd; }
+    [data-theme="dark"] .pwa-help-footer { background: #1c2330; border-top-color: rgba(230,237,243,0.10); }
+    [data-theme="dark"] .pwa-help-btn-close { background: #2563eb; }
+    [data-theme="dark"] .pwa-help-btn-close:hover { background: #1d4ed8; }
+  </style>
+
+  <script>
+    (function() {
+      var modal = document.getElementById("pwa-help-modal");
+      var btnHelp = document.getElementById("pwa-help-btn");
+
+      window.abrirAjudaInstalar = function() {
+        if (modal) modal.classList.add("open");
+      };
+      window.fecharAjudaInstalar = function() {
+        if (modal) modal.classList.remove("open");
+      };
+
+      if (btnHelp) {
+        btnHelp.style.display = "inline-flex";
+        btnHelp.addEventListener("click", window.abrirAjudaInstalar);
+      }
+
+      if (modal) {
+        modal.addEventListener("click", function(e) {
+          if (e.target === modal) window.fecharAjudaInstalar();
+        });
+      }
+
+      document.addEventListener("keydown", function(e) {
+        if (e.key === "Escape" && modal && modal.classList.contains("open")) {
+          window.fecharAjudaInstalar();
+        }
+      });
+
+      // Abre automaticamente na primeira visita (se nao instalado)
+      var jaViu = false;
+      try { jaViu = localStorage.getItem("pwa_ajuda_vista") === "1"; } catch (e) {}
+      var instalado = window.matchMedia("(display-mode: standalone)").matches;
+      if (!jaViu && !instalado) {
+        setTimeout(function() {
+          if (!instalado) {
+            window.abrirAjudaInstalar();
+            try { localStorage.setItem("pwa_ajuda_vista", "1"); } catch (e) {}
+          }
+        }, 4000);
+      }
+    })();
+  </script>
+
 </body>
 </html>
