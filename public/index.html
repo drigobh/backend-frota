@@ -1565,6 +1565,7 @@
         <button class="nav-tab-btn" data-tab="tab-usuarios" id="nav-tab-usuarios" onclick="setTimeout(loadUsuariosDaAPI, 100)"><span>&#128101;</span><span class="nav-label">Usuários</span></button>
         <button class="nav-tab-btn" data-tab="tab-perfis" id="nav-tab-perfis" onclick="setTimeout(loadPerfisDaAPI, 100)"><span>&#128737;</span><span class="nav-label">Perfis</span></button>
         <button class="nav-tab-btn" data-tab="tab-auditoria" id="nav-tab-auditoria" onclick="setTimeout(loadAuditoriaDaAPI, 100)"><span>&#128373;</span><span class="nav-label">Auditoria</span></button>
+        <button class="nav-tab-btn" data-tab="tab-configuracoes" id="nav-tab-configuracoes"><span>&#9881;&#65039;</span><span class="nav-label">Configura&ccedil;&otilde;es</span></button>
         <button class="nav-tab-btn" data-tab="tab-ajuda" id="nav-tab-ajuda"><span>&#10067;</span><span class="nav-label">Ajuda</span></button>
       </div>
     <!-- FASE_3A_THEME_SIDEBAR --><button class="theme-toggle-btn theme-toggle-btn-sidebar" data-theme-toggle type="button" title="Alternar tema"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-label">Escuro</span></button>
@@ -2991,13 +2992,58 @@
             <div class="ajuda-card-icon">&#128172;</div>
             <h3>Suporte</h3>
             <p>D&uacute;vidas, problemas ou sugest&otilde;es? Entre em contato com o suporte t&eacute;cnico.</p>
-            <button class="btn-action btn-action-secondary" onclick="alert('Suporte: contato@caderninho.com.br')">Enviar e-mail</button>
+            <button class="btn-action btn-action-secondary" onclick="abrirEmailSuporte()">Enviar e-mail</button>
           </div>
           <div class="ajuda-card">
             <div class="ajuda-card-icon">&#128203;</div>
             <h3>Documenta&ccedil;&atilde;o</h3>
             <p>Consulte o manual completo do sistema com todas as funcionalidades.</p>
             <button class="btn-action btn-action-secondary" onclick="alert('Em breve: manual completo em PDF')">Acessar manual</button>
+          </div>
+        </div>
+      </section>
+
+    
+      <!-- TAB: CONFIGURACOES -->
+      <section id="tab-configuracoes" class="tab-content">
+        <div class="bar-controls">
+          <div class="bar-controls-left">
+            <span class="label-month-select">CONFIGURACOES DO SISTEMA:</span>
+          </div>
+          <div class="bar-controls-right">
+            <button class="btn-action btn-action-primary" onclick="salvarConfiguracoes()">Salvar</button>
+          </div>
+        </div>
+        <div class="section-title-wrap">
+          <h2 class="section-title"><span>&#9881;&#65039;</span> Configuracoes do Sistema</h2>
+        </div>
+        <div id="config-form" class="config-form">
+          <div class="config-group">
+            <h3>Contato e Suporte</h3>
+            <div class="config-field">
+              <label>E-mail de suporte</label>
+              <input type="email" id="config-email_suporte" placeholder="contato@empresa.com">
+              <small>Usado no botao Enviar e-mail da tela Ajuda</small>
+            </div>
+            <div class="config-field">
+              <label>Telefone de suporte</label>
+              <input type="text" id="config-telefone_suporte" placeholder="(00) 0000-0000">
+            </div>
+            <div class="config-field">
+              <label>WhatsApp</label>
+              <input type="text" id="config-whatsapp_suporte" placeholder="(00) 90000-0000">
+            </div>
+          </div>
+          <div class="config-group">
+            <h3>Empresa</h3>
+            <div class="config-field">
+              <label>Nome da empresa</label>
+              <input type="text" id="config-nome_empresa" placeholder="Minha Empresa LTDA">
+            </div>
+            <div class="config-field">
+              <label>Site</label>
+              <input type="url" id="config-site_empresa" placeholder="https://minhaempresa.com">
+            </div>
           </div>
         </div>
       </section>
@@ -8601,13 +8647,7 @@
     p.push("tbody tr:nth-child(even){background:#f8fafc}");
     p.push("tfoot td{padding:6px 8px;background:#e2e8f0;font-weight:700;border:1px solid #94a3b8;font-size:10px}");
     p.push(".pdf-footer{margin-top:16px;padding-top:8px;border-top:1px solid #cbd5e1;display:flex;justify-content:space-between;font-size:9px;color:#64748b}");
-    p.push("@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}</style>  <style>
-    /* FASE_4_SCROLLBAR_HIDE */
-    .sidebar-nav { scrollbar-width: none; -ms-overflow-style: none; }
-    .sidebar-nav::-webkit-scrollbar { display: none; width: 0; height: 0; }
-    .app-sidebar { overflow: hidden; }
-    .app-sidebar .sidebar-nav { overflow-y: auto; }
-  </style>
+    p.push("@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}</style>  
 
   <style>
     /* FASE_4_AJUDA_CSS */
@@ -8650,6 +8690,76 @@
     }
     [data-theme="dark"] .ajuda-card h3 { color: #e6edf3; }
     [data-theme="dark"] .ajuda-card p { color: #8b949e; }
+  </style>
+
+    <style>
+    /* FASE_4_FIX_SCROLLBAR_PADDING */
+    /* 1) Esconder scrollbar do sidebar */
+    html body .app-sidebar .sidebar-nav,
+    html body .app-sidebar nav.sidebar-nav {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+      overflow-y: auto !important;
+    }
+    html body .app-sidebar .sidebar-nav::-webkit-scrollbar,
+    html body .app-sidebar nav.sidebar-nav::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      background: transparent !important;
+    }
+    html body .app-sidebar {
+      overflow: hidden !important;
+    }
+
+    /* 2) Corrigir padding das telas */
+    html body .app-wrapper {
+      margin-left: 280px !important;
+      width: calc(100% - 280px) !important;
+    }
+    html body .app-sidebar.collapsed ~ .app-wrapper {
+      margin-left: 64px !important;
+      width: calc(100% - 64px) !important;
+    }
+    html body .app-main {
+      max-width: 1320px !important;
+      margin: 1.5rem auto !important;
+      padding: 0 1.5rem !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+    @media (max-width: 768px) {
+      html body .app-wrapper {
+        margin-left: 64px !important;
+        width: calc(100% - 64px) !important;
+      }
+      html body .app-main {
+        padding: 0 1rem !important;
+      }
+    }
+    .ajuda-grid {
+      padding: 0 0.5rem !important;
+    }
+    .tab-content {
+      padding: 0 0.25rem !important;
+    }
+  </style>
+
+  <style>
+    /* FASE_4_CONFIG_CSS */
+    .config-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+    .config-group { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; }
+    .config-group h3 { margin: 0 0 1.25rem; font-size: 1.05rem; color: #0f2a4a; padding-bottom: 0.75rem; border-bottom: 1px solid #e2e8f0; }
+    .config-field { margin-bottom: 1rem; }
+    .config-field label { display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 4px; }
+    .config-field input { width: 100%; padding: 0.6rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; font-family: inherit; box-sizing: border-box; }
+    .config-field input:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+    .config-field small { display: block; font-size: 0.75rem; color: #64748b; margin-top: 4px; }
+    [data-theme="dark"] .config-group { background: #161b22; border-color: rgba(230,237,243,0.10); }
+    [data-theme="dark"] .config-group h3 { color: #e6edf3; border-bottom-color: rgba(230,237,243,0.10); }
+    [data-theme="dark"] .config-field label { color: #cbd5e1; }
+    [data-theme="dark"] .config-field input { background: #1c2330; color: #e6edf3; border-color: rgba(230,237,243,0.20); }
+    [data-theme="dark"] .config-field small { color: #8b949e; }
   </style>
 
 </head><body>");
@@ -9451,6 +9561,53 @@
         if (card) card.style.display = "none";
       });
     })();
+  </script>
+
+  <script>
+    // FASE_4_CONFIG_LOGICA
+    async function loadConfiguracoes() {
+      try {
+        const res = await apiFetch("/configuracoes");
+        if (!res.ok) return;
+        const config = await res.json();
+        Object.keys(config).forEach(function(chave) {
+          var el = document.getElementById("config-" + chave);
+          if (el) el.value = config[chave].valor || "";
+        });
+        var email = config.email_suporte && config.email_suporte.valor;
+        if (email) window.__emailSuporte = email;
+      } catch (err) { console.error("Erro config:", err); }
+    }
+    window.salvarConfiguracoes = async function() {
+      var dados = {};
+      var campos = ["email_suporte", "telefone_suporte", "whatsapp_suporte", "nome_empresa", "site_empresa"];
+      campos.forEach(function(c) {
+        var el = document.getElementById("config-" + c);
+        if (el) dados[c] = el.value;
+      });
+      try {
+        var res = await apiFetch("/configuracoes", { method: "PUT", body: JSON.stringify(dados) });
+        if (res.ok) {
+          if (typeof mostrarToast === "function") mostrarToast("Configuracoes salvas!", "success", "Sucesso");
+          window.__emailSuporte = dados.email_suporte;
+        } else {
+          if (typeof mostrarToast === "function") mostrarToast("Erro ao salvar", "error", "Erro");
+        }
+      } catch (err) { console.error(err); }
+    };
+    document.addEventListener("click", function(e) {
+      var btn = e.target.closest ? e.target.closest("[data-tab=\"tab-configuracoes\"]") : null;
+      if (btn) setTimeout(loadConfiguracoes, 200);
+    });
+    setTimeout(loadConfiguracoes, 1500);
+  </script>
+
+  <script>
+    // FASE_4_EMAIL_SUPORTE
+    window.abrirEmailSuporte = function() {
+      var email = window.__emailSuporte || "contato@caderninho.com.br";
+      window.location.href = "mailto:" + email;
+    };
   </script>
 
 </body>

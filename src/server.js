@@ -267,7 +267,44 @@ fastify.get('/sw.js', (req, reply) => {
     .send(fs.readFileSync(swPath, 'utf8'));
 });
 
-// ROTA PRINCIPAL - Serve o index.html — Serve o index.html
+
+// =========================================================================
+// ROTAS DE CONFIGURACOES
+// =========================================================================
+fastify.get("/api/configuracoes", { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  try {
+    const result = await db.query("SELECT chave, valor, descricao, tipo FROM configuracoes ORDER BY chave");
+    const config = {};
+    result.rows.forEach(r => { config[r.chave] = { valor: r.valor, descricao: r.descricao, tipo: r.tipo }; });
+    return reply.send(config);
+  } catch (err) {
+    req.log.error({ err }, "Erro ao buscar configuracoes");
+    return reply.status(500).send({ erro: "Erro ao buscar configuracoes" });
+  }
+});
+
+fastify.put("/api/configuracoes", { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  try {
+    const dados = req.body || {};
+    const chaves = Object.keys(dados);
+    if (chaves.length === 0) {
+      return reply.status(400).send({ erro: "Nenhuma configuracao enviada" });
+    }
+    for (const chave of chaves) {
+      await db.query(
+        "INSERT INTO configuracoes (chave, valor) VALUES ($1, $2) ON CONFLICT (chave) DO UPDATE SET valor = EXCLUDED.valor, updated_at = NOW()",
+        [chave, dados[chave]]
+      );
+    }
+    return reply.send({ ok: true, atualizadas: chaves.length });
+  } catch (err) {
+    req.log.error({ err }, "Erro ao salvar configuracoes");
+    return reply.status(500).send({ erro: "Erro ao salvar configuracoes" });
+  }
+});
+
+// ROTA PRINCIPAL
+ - Serve o index.html — Serve o index.html
 // =========================================================================
 fastify.get('/', (req, reply) => {
   const filePath = path.join(__dirname, '../public/Cad Moto.html');
