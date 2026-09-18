@@ -11,6 +11,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Caderninho">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="versao-sistema" content="v1977-35">
   <title>Caderninho de Motorista — Gestão de Frota</title>
   <!-- Basecoat CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@1.0.2/dist/basecoat.cdn.min.css">
@@ -9990,31 +9991,41 @@
 
       async function carregarVersaoSistema(force) {
         if (_versaoCarregada && !force) return;
+
+        var metaEl = document.querySelector('meta[name="versao-sistema"]');
+        var valorMeta = metaEl ? metaEl.getAttribute("content") : null;
+
+        var valorApi = null;
+        var dataApi = null;
         try {
-          var res = await apiFetch("/configuracoes");
-          if (!res || !res.ok) return;
-          var config = await res.json();
+          if (localStorage.getItem("token")) {
+            var res = await apiFetch("/configuracoes");
+            if (res && res.ok) {
+              var cfg = await res.json();
+              var v = cfg.versao_sistema;
+              valorApi = (v && typeof v === "object") ? v.valor : v;
+              dataApi  = (v && typeof v === "object") ? v.updated_at : null;
+            }
+          }
+        } catch (e) { /* silencioso */ }
 
-          // /configuracoes pode retornar { versao_sistema: "v1977-34" }
-          // ou { versao_sistema: { valor: "v1977-34", updated_at: "..." } }
-          var v = config.versao_sistema;
-          var valor = (v && typeof v === "object") ? v.valor : v;
-          var data  = (v && typeof v === "object") ? v.updated_at : null;
+        var valor = valorApi || valorMeta || "desconhecida";
 
-          var elValor = document.getElementById("ajuda-versao-valor");
-          var elData  = document.getElementById("ajuda-versao-data");
-
-          if (elValor) elValor.textContent = valor || "desconhecida";
-          if (elData && data) {
-            elData.textContent = "Atualizada em: " + new Date(data).toLocaleString("pt-BR");
-          } else if (elData) {
+        var elValor = document.getElementById("ajuda-versao-valor");
+        var elData  = document.getElementById("ajuda-versao-data");
+        if (elValor) elValor.textContent = valor;
+        if (elData) {
+          if (dataApi) {
+            elData.textContent = "Atualizada em: " + new Date(dataApi).toLocaleString("pt-BR");
+          } else {
             elData.textContent = "Sistema Caderninho de Frota";
           }
-
-          _versaoCarregada = true;
-        } catch (err) {
-          console.error("[FASE_4] Erro ao carregar versão:", err);
         }
+
+        var elLogin = document.getElementById("login-versao");
+        if (elLogin) elLogin.textContent = valor;
+
+        _versaoCarregada = true;
       }
 
       // Carrega quando o usuário clica em Ajuda
@@ -10074,18 +10085,14 @@
       }
 
       // Puxar versão do sistema para o rodapé do card
-      async function carregarVersaoLogin() {
-        try {
-          var res = await fetch("/configuracoes");
-          if (!res.ok) return;
-          var cfg = await res.json();
-          var v = cfg.versao_sistema;
-          var valor = (v && typeof v === "object") ? v.valor : v;
-          var el = document.getElementById("login-versao");
-          if (el && valor) el.textContent = valor;
-        } catch (e) { /* silencioso */ }
+      function carregarVersaoLogin() {
+        var metaEl = document.querySelector('meta[name="versao-sistema"]');
+        var valor = metaEl ? metaEl.getAttribute("content") : null;
+        if (!valor) return;
+        var el = document.getElementById("login-versao");
+        if (el) el.textContent = valor;
       }
-      setTimeout(carregarVersaoLogin, 800);
+      setTimeout(carregarVersaoLogin, 200);
     })();
   </script>
   <!-- /FASE_4_LOGIN_V2_SCRIPT -->
