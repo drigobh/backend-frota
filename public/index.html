@@ -3112,6 +3112,17 @@
             <p>Consulte o manual completo do sistema com todas as funcionalidades.</p>
             <button class="btn-action btn-action-secondary" onclick="alert('Em breve: manual completo em PDF')">Acessar manual</button>
           </div>
+
+          <!-- FASE_4_CARD_VERSAO -->
+          <div class="ajuda-card" id="ajuda-versao-card">
+            <div class="ajuda-card-icon">&#127991;&#65039;</div>
+            <h3>Vers&atilde;o do Sistema</h3>
+            <p>Vers&atilde;o atual instalada:
+              <strong id="ajuda-versao-valor" style="color:#2563eb;font-family:monospace;font-size:1.05rem;">--</strong>
+            </p>
+            <p id="ajuda-versao-data" style="font-size:0.78rem;color:#94a3b8;margin-top:0.4rem;">--</p>
+          </div>
+          <!-- /FASE_4_CARD_VERSAO -->
         </div>
       </section>
 
@@ -9743,5 +9754,55 @@
     })();
   </script>
 
+
+
+  <!-- FASE_4_CARD_VERSAO_SCRIPT -->
+  <script>
+    (function() {
+      var _versaoCarregada = false;
+
+      async function carregarVersaoSistema(force) {
+        if (_versaoCarregada && !force) return;
+        try {
+          var res = await apiFetch("/configuracoes");
+          if (!res || !res.ok) return;
+          var config = await res.json();
+
+          // /configuracoes pode retornar { versao_sistema: "v1977-34" }
+          // ou { versao_sistema: { valor: "v1977-34", updated_at: "..." } }
+          var v = config.versao_sistema;
+          var valor = (v && typeof v === "object") ? v.valor : v;
+          var data  = (v && typeof v === "object") ? v.updated_at : null;
+
+          var elValor = document.getElementById("ajuda-versao-valor");
+          var elData  = document.getElementById("ajuda-versao-data");
+
+          if (elValor) elValor.textContent = valor || "desconhecida";
+          if (elData && data) {
+            elData.textContent = "Atualizada em: " + new Date(data).toLocaleString("pt-BR");
+          } else if (elData) {
+            elData.textContent = "Sistema Caderninho de Frota";
+          }
+
+          _versaoCarregada = true;
+        } catch (err) {
+          console.error("[FASE_4] Erro ao carregar versão:", err);
+        }
+      }
+
+      // Carrega quando o usuário clica em Ajuda
+      document.addEventListener("click", function(e) {
+        var btn = e.target && e.target.closest ? e.target.closest('[data-tab="tab-ajuda"]') : null;
+        if (btn) setTimeout(function(){ carregarVersaoSistema(true); }, 250);
+      });
+
+      // Carrega também no boot (após 2s)
+      setTimeout(function(){ carregarVersaoSistema(false); }, 2000);
+
+      // Expõe global para debug
+      window.__carregarVersaoSistema = carregarVersaoSistema;
+    })();
+  </script>
+  <!-- /FASE_4_CARD_VERSAO_SCRIPT -->
 </body>
 </html>
