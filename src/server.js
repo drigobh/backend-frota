@@ -303,8 +303,7 @@ fastify.put("/api/configuracoes", { preHandler: [fastify.autenticar] }, async (r
   }
 });
 
-// ROTA PRINCIPAL
- - Serve o index.html — Serve o index.html
+// ROTA PRINCIPAL - Serve o index.html
 // =========================================================================
 fastify.get('/', (req, reply) => {
   const filePath = path.join(__dirname, '../public/Cad Moto.html');
