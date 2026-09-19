@@ -32,6 +32,7 @@
     "dotenv": "^17.4.2",
     "fastify": "^5.12.4",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^10.0.10",
     "pg": "^8.23.0",
     "resend": "^6.28.1"
   },
