@@ -613,16 +613,13 @@
     /* ==== /FASE_7_DARK_HISTORICO ==== */
 
     /* ==== FASE_7_PRINT_HISTORICO ==== */
+    /* FASE_7_PRINT_CONDICIONAL: so ativa quando body.print-historico */
     @media print {
-      /* Esconde TUDO por padrao */
-      body * { visibility: hidden !important; }
+      body.print-historico * { visibility: hidden !important; }
+      body.print-historico #tab-historico,
+      body.print-historico #tab-historico * { visibility: visible !important; }
 
-      /* Mostra apenas o conteudo do historico */
-      #tab-historico,
-      #tab-historico * { visibility: visible !important; }
-
-      /* Posiciona a secao no topo da pagina */
-      #tab-historico {
+      body.print-historico #tab-historico {
         position: absolute !important;
         left: 0 !important;
         top: 0 !important;
@@ -633,8 +630,7 @@
         color: #000 !important;
       }
 
-      /* Cabecalho de impressao */
-      #hist-print-header {
+      body.print-historico #hist-print-header {
         display: block !important;
         visibility: visible !important;
         text-align: center;
@@ -642,26 +638,24 @@
         border-bottom: 2px solid #0f2a4a;
         margin-bottom: 16px;
       }
-      #hist-print-header h2 { margin: 0 0 6px; color: #0f2a4a !important; font-size: 16pt; }
-      #hist-print-header p  { margin: 0; color: #475569 !important; font-size: 10pt; }
+      body.print-historico #hist-print-header h2 { margin: 0 0 6px; color: #0f2a4a !important; font-size: 16pt; }
+      body.print-historico #hist-print-header p  { margin: 0; color: #475569 !important; font-size: 10pt; }
 
-      /* Esconde elementos que nao fazem sentido no PDF */
-      #tab-historico .bar-controls,
-      #tab-historico .hist-toolbar,
-      #tab-historico .hist-paginacao,
-      #tab-historico .btn-action { display: none !important; }
+      body.print-historico #tab-historico .bar-controls,
+      body.print-historico #tab-historico .hist-toolbar,
+      body.print-historico #tab-historico .hist-paginacao,
+      body.print-historico #tab-historico .btn-action { display: none !important; }
 
-      /* Timeline em preto e branco para impressao */
-      #tab-historico .timeline::before { display: none !important; }
-      #tab-historico .timeline { padding-left: 0 !important; }
+      body.print-historico #tab-historico .timeline::before { display: none !important; }
+      body.print-historico #tab-historico .timeline { padding-left: 0 !important; }
 
-      #tab-historico .timeline-dia {
+      body.print-historico #tab-historico .timeline-dia {
         color: #0f2a4a !important;
         font-weight: 700 !important;
         margin-top: 12px !important;
         page-break-after: avoid;
       }
-      #tab-historico .timeline-item {
+      body.print-historico #tab-historico .timeline-item {
         background: #fff !important;
         border: 1px solid #cbd5e1 !important;
         box-shadow: none !important;
@@ -671,24 +665,23 @@
         page-break-inside: avoid;
         transform: none !important;
       }
-      #tab-historico .timeline-item::before { display: none !important; }
-      #tab-historico .timeline-hora { color: #475569 !important; }
-      #tab-historico .timeline-acao { color: #0f2a4a !important; font-weight: 700 !important; }
-      #tab-historico .timeline-meta { color: #475569 !important; }
-      #tab-historico .timeline-detalhe { color: #334155 !important; border-top-color: #cbd5e1 !important; }
-      #tab-historico .timeline-badge {
+      body.print-historico #tab-historico .timeline-item::before { display: none !important; }
+      body.print-historico #tab-historico .timeline-hora { color: #475569 !important; }
+      body.print-historico #tab-historico .timeline-acao { color: #0f2a4a !important; font-weight: 700 !important; }
+      body.print-historico #tab-historico .timeline-meta { color: #475569 !important; }
+      body.print-historico #tab-historico .timeline-detalhe { color: #334155 !important; border-top-color: #cbd5e1 !important; }
+      body.print-historico #tab-historico .timeline-badge {
         background: #f1f5f9 !important;
         color: #334155 !important;
         border: 1px solid #cbd5e1 !important;
       }
-      #tab-historico .timeline-resumo {
+      body.print-historico #tab-historico .timeline-resumo {
         background: #f8fafc !important;
         color: #334155 !important;
         border: 1px solid #e2e8f0 !important;
       }
-      #tab-historico .timeline-resumo-item strong { color: #0f2a4a !important; }
+      body.print-historico #tab-historico .timeline-resumo-item strong { color: #0f2a4a !important; }
 
-      /* Pagina em paisagem para caber mais */
       @page { size: A4 landscape; margin: 10mm; }
     }
     /* ==== /FASE_7_PRINT_HISTORICO ==== */
@@ -8453,7 +8446,12 @@
       cab.innerHTML = '<h2 style="margin:0 0 0.5rem;color:#0f2a4a;">Caderninho de Frota &mdash; Hist\u00f3rico de Atividades</h2>' +
         '<p style="margin:0;font-size:0.9rem;color:#64748b;">Gerado em ' + agora + ' &middot; Total de ' + __historicoCache.length + ' evento(s)' + linhaFiltros + '</p>';
 
-      // Executa o print
+      // FASE_7_PRINT_CONDICIONAL: ativa classe so durante o print
+      document.body.classList.add("print-historico");
+      window.addEventListener("afterprint", function _rm() {
+        document.body.classList.remove("print-historico");
+        window.removeEventListener("afterprint", _rm);
+      });
       setTimeout(function() { window.print(); }, 150);
     }
 
@@ -9260,6 +9258,56 @@
     p.push("thead th{background:#0f2a4a;color:#fff;padding:6px 8px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;border:1px solid #0f2a4a}");
     p.push("tbody td{padding:5px 8px;border:1px solid #e2e8f0;font-size:10px}");
     p.push("tbody tr:nth-child(even){background:#f8fafc}");
+    // FASE_7_META_CARDS_FIX: colunas de tabela
+    p.push("td.col-num{text-align:right;font-variant-numeric:tabular-nums}");
+    p.push("td.col-center, th.col-center{text-align:center}");
+    p.push(".vehicle-tag{font-family:monospace;font-weight:700;color:#0f2a4a}");
+    p.push("table{page-break-inside:auto}");
+    p.push("thead{display:table-header-group}");
+    p.push("tr{page-break-inside:avoid}");
+    // FASE_7_PDF_DADOS: cards, KPIs, timeline
+    p.push(".kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px}");
+    p.push(".kpi-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 12px}");
+    p.push(".kpi-card-title{font-size:9px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.03em}");
+    p.push(".kpi-card-val{font-size:16px;font-weight:700;color:#0f2a4a;margin-top:4px}");
+    p.push(".kpi-card-sub{font-size:9px;color:#94a3b8;margin-top:2px}");
+    p.push(".kpi-card.kpi-pos .kpi-card-val{color:#059669}.kpi-card.kpi-neg .kpi-card-val{color:#dc2626}");
+    p.push(".timeline{padding-left:0;border-left:none}");
+    p.push(".timeline-dia{font-weight:700;color:#0f2a4a;margin:10px 0 6px;font-size:11px}");
+    p.push(".timeline-item{border:1px solid #cbd5e1;border-radius:6px;padding:6px 8px;margin-bottom:5px;page-break-inside:avoid}");
+    p.push(".timeline-hora{font-family:monospace;font-size:9px;color:#475569}");
+    p.push(".timeline-acao{font-weight:700;color:#0f2a4a;font-size:10px;margin-left:6px}");
+    p.push(".timeline-meta{font-size:9px;color:#475569;margin-top:3px}");
+    p.push(".timeline-detalhe{font-size:9px;color:#334155;margin-top:3px;padding-top:3px;border-top:1px dashed #e2e8f0}");
+    p.push(".timeline-badge{display:inline-block;padding:1px 6px;border-radius:8px;font-size:8px;font-weight:700;text-transform:uppercase;background:#f1f5f9;color:#334155;border:1px solid #cbd5e1}");
+    p.push(".timeline-resumo{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:6px 8px;margin-bottom:10px;font-size:10px;display:flex;gap:10px;flex-wrap:wrap}");
+    p.push("svg{max-width:100%;height:auto}");
+    // FASE_7_PDF_METAS_GRAFICOS: charts + charts-grid
+    p.push(".charts-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}");
+    p.push(".chart-card{border:1px solid #cbd5e1;border-radius:6px;padding:8px;page-break-inside:avoid;background:#fff}");
+    p.push(".chart-card-title{font-size:10px;font-weight:700;color:#0f2a4a;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.02em}");
+    p.push(".chart-card-body{width:100%;overflow:hidden}");
+    p.push(".chart-box{width:100%}");
+    p.push(".chart-box svg{width:100% !important;height:auto !important;max-width:100% !important;display:block}");
+    // FASE_7_META_CARDS_FIX
+    p.push(".meta-card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}");
+    p.push(".meta-card{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;page-break-inside:avoid}");
+    p.push(".meta-card.atingida{border-left:4px solid #15803d}");
+    p.push(".meta-card.proxima{border-left:4px solid #eab308}");
+    p.push(".meta-card.abaixo{border-left:4px solid #dc2626}");
+    p.push(".meta-circle{position:relative;width:52px;height:52px;flex-shrink:0}");
+    p.push(".meta-circle svg{width:52px !important;height:52px !important;display:block}");
+    p.push(".meta-circle .bg{fill:#e2e8f0;stroke:none}");
+    p.push(".meta-circle .fg{fill:none;stroke-width:6;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center}");
+    p.push(".meta-circle .label{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;font-weight:700;color:#0f2a4a}");
+    p.push(".meta-card-info{flex:1;min-width:0}");
+    p.push(".meta-card-placa{font-family:monospace;font-weight:700;font-size:11px;color:#0f2a4a}");
+    p.push(".meta-card-tipo{font-size:8px;color:#64748b;text-transform:uppercase;letter-spacing:0.04em;font-weight:600;margin-top:2px}");
+    p.push(".meta-card-valores{font-size:9px;color:#475569;margin-top:4px;line-height:1.4}");
+    p.push(".meta-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:8px;font-weight:700;text-transform:uppercase;margin-top:4px}");
+    p.push(".meta-badge.atingida{background:#dcfce7;color:#166534}");
+    p.push(".meta-badge.proxima{background:#fef3c7;color:#92400e}");
+    p.push(".meta-badge.abaixo{background:#fee2e2;color:#991b1b}");
     p.push("tfoot td{padding:6px 8px;background:#e2e8f0;font-weight:700;border:1px solid #94a3b8;font-size:10px}");
     p.push(".pdf-footer{margin-top:16px;padding-top:8px;border-top:1px solid #cbd5e1;display:flex;justify-content:space-between;font-size:9px;color:#64748b}");
     p.push("@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}</style>");
@@ -9282,15 +9330,116 @@
     p.push("<div class=\"pdf-footer\"><div>Caderninho de Motorista - v2.0.0</div><div>Relatorio gerado automaticamente pelo sistema</div></div></body></html>");
     return p.join("\n");
   }
-  function exportarTelaAtualPDF() {
+  async function exportarTelaAtualPDF() {
     var s = getSecaoAtiva();
-    if (!s) { if (typeof mostrarToast === "function") mostrarToast("Nenhuma tela ativa.", "warning", "Aviso"); return; }
-    var t = getTabelaPrincipal(s.elemento);
-    var h = gerarHTML(s, clonarTabelaVisivel(t));
-    var w = window.open("", "_blank");
-    w.document.write(h); w.document.close(); w.focus();
-    setTimeout(function() { w.print(); }, 400);
-    if (typeof mostrarToast === "function") mostrarToast("PDF gerado.", "success", "Exportacao");
+    if (!s) {
+      if (typeof mostrarToast === 'function') mostrarToast('Nenhuma tela ativa.', 'warning', 'Aviso');
+      return;
+    }
+    // FASE_7_PDF_METAS_GRAFICOS - aguarda tabelas carregarem
+    var precisaEsperar = false;
+    var seletorSkeleton = '.ds-skeleton-row, .ds-no-results';
+    if (s.elemento.querySelector(seletorSkeleton)) precisaEsperar = true;
+    // Se tem tbody vazio em tabela visivel, tambem espera
+    s.elemento.querySelectorAll('table.data-table tbody').forEach(function(tb) {
+      if (tb.children.length === 0 && tb.closest('.tab-content.active')) precisaEsperar = true;
+    });
+    if (precisaEsperar) {
+      if (typeof mostrarToast === 'function') mostrarToast('Aguardando dados...', 'info', 'PDF');
+      await new Promise(function(r) { setTimeout(r, 800); });
+    }
+    // Clona a secao
+    var clone = s.elemento.cloneNode(true);
+    // Converte inputs em texto (preserva dados)
+    clone.querySelectorAll('input').forEach(function(inp) {
+      var tipo = (inp.getAttribute('type') || 'text').toLowerCase();
+      if (tipo === 'checkbox') {
+        var sp = document.createElement('span');
+        sp.textContent = inp.checked ? 'Sim' : 'Nao';
+        inp.parentNode.replaceChild(sp, inp);
+        return;
+      }
+      var valor = inp.value || inp.getAttribute('value') || '';
+      var span = document.createElement('span');
+      span.textContent = String(valor);
+      inp.parentNode.replaceChild(span, inp);
+    });
+    // Converte selects em texto
+    clone.querySelectorAll('select').forEach(function(sel) {
+      var opt = sel.options[sel.selectedIndex];
+      var txt = opt ? opt.textContent : '';
+      var sp = document.createElement('span');
+      sp.textContent = String(txt);
+      sel.parentNode.replaceChild(sp, sel);
+    });
+    // Remove elementos que nao fazem sentido
+    var remover = ['.no-print', '.btn-action', '.action-btn', '.bar-controls', '.hist-toolbar', '.hist-paginacao', '.historico-filtros', '.section-title-wrap', 'button', 'textarea', '.ds-pdf-fab', 'nav', 'header', '.subtab-btn', '.ds-sort-icon', '.ds-skeleton-row', '.ds-no-results'];
+    remover.forEach(function(sel) {
+      try { clone.querySelectorAll(sel).forEach(function(el) { el.remove(); }); } catch (e) {}
+    });
+    // Remove linhas escondidas
+    clone.querySelectorAll('tbody tr').forEach(function(tr) {
+      if (tr.style.display === 'none') tr.remove();
+    });
+    // Remove coluna de Acoes
+    clone.querySelectorAll('table').forEach(function(tbl) {
+      var idx = -1;
+      tbl.querySelectorAll('thead th').forEach(function(th, i) {
+        if (/acoes/i.test(th.textContent)) idx = i;
+      });
+      if (idx >= 0) {
+        tbl.querySelectorAll('tr').forEach(function(tr) {
+          if (tr.children[idx]) tr.children[idx].remove();
+        });
+      }
+    });
+    // FASE_7_META_CARDS_FIX: ajusta SVGs
+    clone.querySelectorAll('svg').forEach(function(svg) {
+      var vb = svg.getAttribute('viewBox') || '';
+      // SVG de donut (meta-circle) tem viewBox '0 0 80 80'
+      if (vb === '0 0 80 80') {
+        // Mantém tamanho fixo pequeno
+        svg.setAttribute('width', '52');
+        svg.setAttribute('height', '52');
+        svg.style.width = '52px';
+        svg.style.height = '52px';
+        svg.style.maxWidth = '52px';
+        svg.style.flexShrink = '0';
+        // Corrige fill/stroke dos circulos
+        svg.querySelectorAll('circle').forEach(function(c) {
+          var cls = (c.getAttribute('class') || '');
+          if (cls.indexOf('bg') !== -1) {
+            c.setAttribute('fill', '#e2e8f0');
+            c.setAttribute('stroke', 'none');
+          } else if (cls.indexOf('fg') !== -1) {
+            c.setAttribute('fill', 'none');
+            c.setAttribute('stroke-width', '6');
+            c.setAttribute('stroke-linecap', 'round');
+          }
+        });
+        return;
+      }
+      // Outros SVGs (graficos): responsivos
+      svg.removeAttribute('width');
+      svg.removeAttribute('height');
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+      svg.style.maxWidth = '100%';
+      svg.style.height = 'auto';
+      svg.style.display = 'block';
+    });
+    var conteudo = clone.innerHTML || '';
+    var textoPlano = (clone.textContent || '').trim();
+    if (textoPlano.length < 20) {
+      if (typeof mostrarToast === 'function') mostrarToast('Esta tela nao tem conteudo para imprimir.', 'warning', 'Aviso');
+      conteudo = '<p style="color:#64748b;font-style:italic;padding:20px;text-align:center">Nenhum conteudo nesta tela.</p>';
+    }
+    var h = gerarHTML(s, conteudo);
+    var w = window.open('', '_blank');
+    w.document.write(h);
+    w.document.close();
+    w.focus();
+    setTimeout(function() { w.print(); }, 600);
+    if (typeof mostrarToast === 'function') mostrarToast('PDF gerado.', 'success', 'Exportacao');
   }
 
   // --------------------- BOTAO ARRASTAVEL ---------------------
