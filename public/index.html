@@ -817,6 +817,154 @@
       color: #e6edf3 !important;
     }
     /* ===== /FASE_8_FIX_23 ===== */
+
+    /* FASE_11_CSS_RESTORE_INPUTS - legibilidade dos inputs do modal restore nos 2 temas */
+    #modal-restore input[type="text"],
+    #modal-restore input[type="password"],
+    #modal-restore input[type="file"] {
+      color: #0f172a !important;
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+    #modal-restore input[type="text"]::placeholder,
+    #modal-restore input[type="password"]::placeholder {
+      color: #94a3b8 !important;
+      opacity: 1;
+    }
+    [data-theme="dark"] #modal-restore input[type="text"],
+    [data-theme="dark"] #modal-restore input[type="password"],
+    [data-theme="dark"] #modal-restore input[type="file"] {
+      color: #f1f5f9 !important;
+      background: #1e293b !important;
+      border: 1px solid #475569 !important;
+    }
+    [data-theme="dark"] #modal-restore input[type="text"]::placeholder,
+    [data-theme="dark"] #modal-restore input[type="password"]::placeholder {
+      color: #94a3b8 !important;
+      opacity: 1;
+    }
+    #modal-restore label,
+    #modal-restore .restore-label { color: #0f172a !important; }
+    [data-theme="dark"] #modal-restore label,
+    [data-theme="dark"] #modal-restore .restore-label { color: #e2e8f0 !important; }
+  
+    /* FASE_11_CSS_MODAL_RESTORE_FULL - texto legivel em ambos os temas */
+    #modal-restore > div,
+    #modal-restore label,
+    #modal-restore h2,
+    #modal-restore h3,
+    #modal-restore p,
+    #modal-restore span,
+    #modal-restore strong,
+    #modal-restore div {
+      color: #0f172a;
+    }
+    #modal-restore .restore-sub,
+    #modal-restore label,
+    #modal-restore small {
+      color: #475569 !important;
+      font-weight: 600;
+    }
+    #modal-restore input[type="text"],
+    #modal-restore input[type="password"],
+    #modal-restore input[type="file"] {
+      color: #0f172a !important;
+      background: #f8fafc !important;
+      border: 1px solid #cbd5e1 !important;
+    }
+    #modal-restore input[type="text"]::placeholder,
+    #modal-restore input[type="password"]::placeholder {
+      color: #94a3b8 !important;
+      opacity: 1;
+    }
+    /* Alertas de resultado */
+    #restore-resultado .alerta-erro {
+      background: #fee2e2;
+      border: 1px solid #fca5a5;
+      color: #991b1b;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    #restore-resultado .alerta-sucesso {
+      background: #d1fae5;
+      border: 1px solid #6ee7b7;
+      color: #065f46;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1.6;
+    }
+    /* Dark mode */
+    [data-theme="dark"] #modal-restore > div,
+    [data-theme="dark"] #modal-restore label,
+    [data-theme="dark"] #modal-restore h2,
+    [data-theme="dark"] #modal-restore h3,
+    [data-theme="dark"] #modal-restore p,
+    [data-theme="dark"] #modal-restore span,
+    [data-theme="dark"] #modal-restore strong,
+    [data-theme="dark"] #modal-restore div {
+      color: #e2e8f0;
+    }
+    [data-theme="dark"] #modal-restore label,
+    [data-theme="dark"] #modal-restore small,
+    [data-theme="dark"] #modal-restore .restore-sub {
+      color: #94a3b8 !important;
+    }
+    [data-theme="dark"] #modal-restore input[type="text"],
+    [data-theme="dark"] #modal-restore input[type="password"],
+    [data-theme="dark"] #modal-restore input[type="file"] {
+      color: #f1f5f9 !important;
+      background: #1e293b !important;
+      border: 1px solid #475569 !important;
+    }
+    [data-theme="dark"] #modal-restore input[type="text"]::placeholder,
+    [data-theme="dark"] #modal-restore input[type="password"]::placeholder {
+      color: #94a3b8 !important;
+      opacity: 1;
+    }
+    [data-theme="dark"] #restore-resultado .alerta-erro {
+      background: rgba(220, 38, 38, 0.15);
+      border-color: #dc2626;
+      color: #fca5a5;
+    }
+    [data-theme="dark"] #restore-resultado .alerta-sucesso {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: #10b981;
+      color: #6ee7b7;
+    }
+    /* Botoes premium da tabela */
+    .btn-row-acao {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(248, 250, 252, 0.6);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      padding: 0;
+    }
+    .btn-row-acao:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+    .btn-row-acao svg { width: 16px; height: 16px; display: block; }
+    .btn-row-testar { color: #16a34a; }
+    .btn-row-testar:hover { background: rgba(22, 163, 74, 0.12); border-color: #16a34a; }
+    .btn-row-baixar { color: #2563eb; }
+    .btn-row-baixar:hover { background: rgba(37, 99, 235, 0.12); border-color: #2563eb; }
+    .btn-row-apagar { color: #dc2626; }
+    .btn-row-apagar:hover { background: rgba(220, 38, 38, 0.12); border-color: #dc2626; }
+    [data-theme="dark"] .btn-row-acao {
+      background: rgba(30, 41, 59, 0.6);
+      border-color: rgba(148, 163, 184, 0.35);
+    }
+  
 </style>
   
   <style>
@@ -3590,69 +3738,100 @@
     
       <!-- TAB: AJUDA -->
       <!-- FASE_9_BACKUP_UI -->
+      <!-- FASE_10_FRONTEND_BACKUP -->
       <section id="tab-backup" class="tab-content">
         <div class="bar-controls">
           <div class="bar-controls-left">
             <span class="label-month-select">BACKUP DO SISTEMA:</span>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-primary" onclick="gerarBackupAgora()">&#128190; Gerar Backup Agora</button>
+            <button class="btn-action btn-action-primary" onclick="gerarBackupAgora()">&#128190; Backup de Dados (JSON)</button>
             <button class="btn-action" style="background:#8b5cf6;color:#fff;" onclick="gerarBackupCompleto()">&#128230; Backup Completo (ZIP)</button>
-            <button class="btn-action btn-action-secondary" onclick="baixarUltimoCompleto()">&#11015;&#65039; Baixar Ultimo ZIP</button>
-            <button class="btn-action btn-action-secondary" onclick="baixarBackupDireto()">&#11015;&#65039; Baixar JSON Agora</button>
             <button class="btn-action btn-action-secondary" onclick="loadBackupsDaAPI(true)">&#128260; Atualizar</button>
             <button class="btn-action" style="background:#dc2626;color:#fff;" onclick="abrirModalRestore()">&#9888;&#65039; Importar Backup</button>
           </div>
         </div>
+
         <div class="section-title-wrap">
           <h2 class="section-title"><span>&#128190;</span> Backups do Sistema</h2>
         </div>
 
-        <!-- FASE_9_CARDS_BACKUP -->
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;margin-bottom:1rem;">
-          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;">
-            <div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Total de Backups</div>
-            <div id="card-bkp-total" style="font-size:1.6rem;font-weight:800;color:#0f2a4a;margin-top:4px;">0</div>
-            <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">Dados + Completos</div>
+        <!-- Cards compactos -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.6rem;margin-bottom:0.75rem;">
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:0.6rem 0.75rem;">
+            <div style="font-size:0.65rem;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Total</div>
+            <div id="card-bkp-total" style="font-size:1.3rem;font-weight:800;color:#0f2a4a;line-height:1.2;">0</div>
+            <div style="font-size:0.68rem;color:#94a3b8;">Dados + Completos</div>
           </div>
-          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;">
-            <div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Ultimo Backup</div>
-            <div id="card-bkp-ultimo" style="font-size:1rem;font-weight:700;color:#2563eb;margin-top:6px;">--</div>
-            <div id="card-bkp-ultimo-info" style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">--</div>
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:0.6rem 0.75rem;">
+            <div style="font-size:0.65rem;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Ultimo</div>
+            <div id="card-bkp-ultimo" style="font-size:0.85rem;font-weight:700;color:#2563eb;line-height:1.4;">--</div>
+            <div id="card-bkp-ultimo-info" style="font-size:0.68rem;color:#94a3b8;">--</div>
           </div>
-          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;">
-            <div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Ultimo Completo</div>
-            <div id="card-bkp-completo" style="font-size:1rem;font-weight:700;color:#8b5cf6;margin-top:6px;">--</div>
-            <div id="card-bkp-completo-info" style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">--</div>
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:0.6rem 0.75rem;">
+            <div style="font-size:0.65rem;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Ultimo Completo</div>
+            <div id="card-bkp-completo" style="font-size:0.85rem;font-weight:700;color:#8b5cf6;line-height:1.4;">--</div>
+            <div id="card-bkp-completo-info" style="font-size:0.68rem;color:#94a3b8;">--</div>
           </div>
-          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;">
-            <div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Ultima Restauracao</div>
-            <div id="card-bkp-restore" style="font-size:1rem;font-weight:700;color:#dc2626;margin-top:6px;">--</div>
-            <div id="card-bkp-restore-info" style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">--</div>
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:0.6rem 0.75rem;">
+            <div style="font-size:0.65rem;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Ultima Restauracao</div>
+            <div id="card-bkp-restore" style="font-size:0.85rem;font-weight:700;color:#dc2626;line-height:1.4;">--</div>
+            <div id="card-bkp-restore-info" style="font-size:0.68rem;color:#94a3b8;">--</div>
           </div>
         </div>
-        <!-- /FASE_9_CARDS_BACKUP -->
-        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
-          Backup automatico diario ativado. Mantemos os ultimos 7 backups (mais antigos sao removidos automaticamente).
+
+        <!-- Grafico de tipos -->
+        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:1rem;">
+          <svg id="chart-backup-tipos" width="120" height="120" viewBox="0 0 120 120" style="flex-shrink:0;">
+            <circle cx="60" cy="60" r="45" fill="none" stroke="#e2e8f0" stroke-width="20"/>
+            <circle id="donut-dados" cx="60" cy="60" r="45" fill="none" stroke="#2563eb" stroke-width="20" stroke-dasharray="0 283" transform="rotate(-90 60 60)" stroke-linecap="butt"/>
+            <circle id="donut-completo" cx="60" cy="60" r="45" fill="none" stroke="#8b5cf6" stroke-width="20" stroke-dasharray="0 283" transform="rotate(-90 60 60)" stroke-linecap="butt"/>
+            <text x="60" y="58" text-anchor="middle" font-size="18" font-weight="800" fill="#0f2a4a" id="donut-total">0</text>
+            <text x="60" y="72" text-anchor="middle" font-size="9" fill="#64748b">backups</text>
+          </svg>
+          <div style="flex:1;">
+            <div style="font-size:0.75rem;font-weight:700;color:#0f2a4a;margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.04em;">Distribuicao por Tipo</div>
+            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;margin-bottom:0.3rem;">
+              <span style="width:12px;height:12px;background:#2563eb;border-radius:3px;"></span>
+              <span style="color:#475569;">Dados (JSON):</span>
+              <strong id="donut-qtd-dados" style="color:#2563eb;">0</strong>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;margin-bottom:0.3rem;">
+              <span style="width:12px;height:12px;background:#8b5cf6;border-radius:3px;"></span>
+              <span style="color:#475569;">Completos (ZIP):</span>
+              <strong id="donut-qtd-completo" style="color:#8b5cf6;">0</strong>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;font-size:0.85rem;">
+              <span style="width:12px;height:12px;background:#f59e0b;border-radius:3px;"></span>
+              <span style="color:#475569;">Pre-Restore:</span>
+              <strong id="donut-qtd-prerestore" style="color:#f59e0b;">0</strong>
+            </div>
+          </div>
+        </div>
+
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.75rem;">
+          Backups salvos persistentemente no Neon. Mantemos os ultimos 7 de cada tipo automaticamente.
         </p>
+
         <div class="table-container">
           <table class="data-table" id="table-backups">
             <thead>
               <tr>
-                <th style="width:60px;">#</th>
+                <th style="width:50px;">#</th>
+                <th style="width:110px;">Tipo</th>
                 <th>Arquivo</th>
-                <th style="width:140px;">Tamanho</th>
-                <th style="width:200px;">Data</th>
+                <th style="width:100px;">Tamanho</th>
+                <th style="width:170px;">Data</th>
                 <th style="width:200px;" class="col-center">Acoes</th>
               </tr>
             </thead>
             <tbody id="tbody-backups">
-              <tr><td colspan="5" style="text-align:center;padding:1.5rem;color:#64748b;">Carregando...</td></tr>
+              <tr><td colspan="6" style="text-align:center;padding:1.5rem;color:#64748b;">Carregando...</td></tr>
             </tbody>
           </table>
         </div>
-
       </section>
+      <!-- /FASE_10_FRONTEND_BACKUP -->
       <!-- FASE_9_RESTORE_UI -->
 
       <!-- Modal de Restore -->
@@ -3668,9 +3847,31 @@
             <strong>Atencao:</strong> Verifique se o arquivo eh o correto antes de continuar.
           </div>
 
+          <!-- FASE_10_SELETOR_47 - Seletor de tipo de restore -->
+          <div style="margin-bottom:16px;">
+            <label style="display:block;font-size:0.8rem;font-weight:700;color:#475569;margin-bottom:8px;">O que voce vai restaurar?</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <label id="lbl-rest-tipo-json" style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:2px solid #2563eb;border-radius:8px;cursor:pointer;background:#eff6ff;">
+                <input type="radio" name="restore-tipo" value="json" checked style="cursor:pointer;">
+                <div>
+                  <div style="font-weight:700;color:#1e40af;font-size:0.85rem;">&#128190; Dados (JSON)</div>
+                  <div style="font-size:0.72rem;color:#475569;">Apenas o banco de dados</div>
+                </div>
+              </label>
+              <label id="lbl-rest-tipo-completo" style="display:flex;align-items:center;gap:8px;padding:10px 12px;border:2px solid #cbd5e1;border-radius:8px;cursor:pointer;background:#fff;">
+                <input type="radio" name="restore-tipo" value="completo" style="cursor:pointer;">
+                <div>
+                  <div style="font-weight:700;color:#6d28d9;font-size:0.85rem;">&#128230; Completo (ZIP)</div>
+                  <div style="font-size:0.72rem;color:#475569;">Banco + codigo</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          <!-- /FASE_10_SELETOR_47 -->
+
           <div style="margin-bottom:14px;">
             <label style="display:block;font-size:0.8rem;font-weight:700;color:#475569;margin-bottom:5px;">Arquivo de backup (.json)</label>
-            <input type="file" id="restore-file" accept=".json" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;font-size:0.85rem;">
+            <input type="file" id="restore-file" accept=".json,.zip" onchange="window.__lerArquivoRestore(this)" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;font-size:0.85rem;">
             <div id="restore-info" style="margin-top:6px;font-size:0.78rem;color:#64748b;"></div>
           </div>
 
@@ -3893,6 +4094,7 @@
 
   <script type="text/javascript">
 // @ts-nocheck
+    // FASE_10_FIX_LOGIN
     const API_URL = '/api';
 
     function apiFetch(endpoint, options = {}) {
@@ -3908,11 +4110,13 @@
       if (token) {
         headers["Authorization"] = "Bearer " + token;
       }
+      // FASE_10_FIX_401 - so limpa token se a requisicao tinha token
+      var tinhaToken = !!token;
       return fetch(API_URL + endpoint, {
         ...options,
         headers,
       }).then((res) => {
-        if (res.status === 401) {
+        if (res.status === 401 && tinhaToken) {
           localStorage.removeItem("token");
           const loginScreen = document.getElementById("login-screen");
           if (loginScreen) loginScreen.style.display = "flex";
@@ -4179,7 +4383,14 @@
     // Lí“GICA DE LOGIN
     // =========================================================================
     async function executarLoginNaNuvem() {
-      const email = document.getElementById('login-email').value;
+  // FASE_10_FIX_LOGIN - evita duplo clique
+  if (window.__loginEmAndamento) {
+    console.log('[FASE_10] Login ja em andamento, ignorando clique duplicado');
+    return;
+  }
+  window.__loginEmAndamento = true;
+  try {
+const email = document.getElementById('login-email').value;
       const senha = document.getElementById('login-senha').value;
       
       try {
@@ -4203,7 +4414,10 @@
       } catch (err) {
         alert('Erro: ' + err.message);
       }
-    }
+    } finally {
+    window.__loginEmAndamento = false;
+  }
+}
     function fazerLogout() {
       localStorage.removeItem('token');
       state.user = null;
@@ -4236,7 +4450,7 @@
       loadDashboardData(); renderAlertasDashboard();
       loadAcoplamentosDaAPI();
       loadKmDaAPI();
-      loadLancamentosDaAPI();
+      /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) loadLancamentosDaAPI(); })();
       loadAbastecimentosDaAPI();
     }
 
@@ -4989,7 +5203,7 @@
         if (typeof popularAnosLancamentos === "function") {
           var selAno = document.getElementById("lanc-filtro-ano");
           if (selAno && selAno.options.length <= 1) {
-            await popularAnosLancamentos();
+            await /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) popularAnosLancamentos(); })();
           }
         }
         if (typeof popularMesesLancamentos === "function") {
@@ -5226,7 +5440,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(item)
         });
-        loadLancamentosDaAPI();
+        /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) loadLancamentosDaAPI(); })();
         loadDashboardData();
       } catch (error) {
         console.error(error);
@@ -5238,7 +5452,7 @@
       
       try {
         await apiFetch(`/financeiro/${id}`, { method: 'DELETE' });
-        loadLancamentosDaAPI();
+        /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) loadLancamentosDaAPI(); })();
         loadDashboardData();
       } catch (error) {
         console.error(error);
@@ -5272,7 +5486,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
-        loadLancamentosDaAPI();
+        /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) loadLancamentosDaAPI(); })();
         loadDashboardData();
       } catch (err) {
         console.error(err);
@@ -5887,7 +6101,7 @@
         loadDashboardData();
         loadAcoplamentosDaAPI();
         loadKmDaAPI();
-        loadLancamentosDaAPI();
+        /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) loadLancamentosDaAPI(); })();
         loadAbastecimentosDaAPI();
         loadManutencoesDaAPI();
         loadDocumentosDaAPI();
@@ -5899,6 +6113,8 @@
     // LISTENERS & BOOTSTRAP
     // =========================================================================
     document.addEventListener('DOMContentLoaded', () => {
+      // FASE_10_FIX_401 - guard: so carrega se estiver logado
+      var __logado = !!localStorage.getItem("token");
       document.querySelectorAll('.nav-tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
@@ -5949,20 +6165,22 @@
       bindClick('btn-add-documento', addDocumentoRow);
 
       // ==== INICIALIZACAO DRE POR VEICULO ====
-      if (typeof carregarPlacasDre === 'function') {
-        carregarPlacasDre().then(function() {
-          // Se houver placa no cache, seleciona a primeira automaticamente
-          if (__drePlacasCache && __drePlacasCache.length > 0) {
-            var sel = document.getElementById('dre-filtro-placa');
-            if (sel && !sel.value) {
-              sel.value = __drePlacasCache[0].placa;
-              loadDreDaAPI();
+      // FASE_10_FIX_43 - so carrega se estiver logado
+      if (localStorage.getItem("token")) {
+        if (typeof carregarPlacasDre === 'function') {
+          carregarPlacasDre().then(function() {
+            if (__drePlacasCache && __drePlacasCache.length > 0) {
+              var sel = document.getElementById('dre-filtro-placa');
+              if (sel && !sel.value) {
+                sel.value = __drePlacasCache[0].placa;
+                loadDreDaAPI();
+              }
             }
-          }
-        }).catch(function(e) { console.error('Erro ao carregar placas DRE:', e); });
-      }
-      if (typeof carregarCategoriasDre === 'function') {
-        carregarCategoriasDre().catch(function(e) { console.error('Erro categorias DRE:', e); });
+          }).catch(function(e) { console.error('Erro ao carregar placas DRE:', e); });
+        }
+        if (typeof carregarCategoriasDre === 'function') {
+          carregarCategoriasDre().catch(function(e) { console.error('Erro categorias DRE:', e); });
+        }
       }
       window.__dreInicializado = true;
       
@@ -7505,10 +7723,10 @@
       if (btn) {
         setTimeout(function() {
           if (typeof carregarPlacasDre === 'function' && (!__drePlacasCache || __drePlacasCache.length === 0)) {
-            carregarPlacasDre();
+            /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) carregarPlacasDre(); })();
           }
           if (typeof carregarCategoriasDre === 'function' && (!__dreCategoriasCache || __dreCategoriasCache.length === 0)) {
-            carregarCategoriasDre();
+            /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) carregarCategoriasDre(); })();
           }
         }, 150);
       }
@@ -7805,7 +8023,7 @@
         }
 
         // Recarrega todas as telas afetadas
-        if (typeof loadLancamentosDaAPI === "function") loadLancamentosDaAPI();
+        if (typeof loadLancamentosDaAPI === "function") /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) loadLancamentosDaAPI(); })();
         if (typeof loadDreDaAPI === "function") loadDreDaAPI();
         if (typeof loadDreConsolidadaDaAPI === "function") loadDreConsolidadaDaAPI(true);
         if (typeof loadDashboardData === "function") loadDashboardData();
@@ -7827,7 +8045,7 @@
           return;
         }
         alert('Lancamento excluido.');
-        loadLancamentosDaAPI();
+        /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) loadLancamentosDaAPI(); })();
       } catch (e) { alert('Erro: ' + e.message); }
     }
 
@@ -7836,7 +8054,7 @@
         var el = document.getElementById(id);
         if (el) el.value = "";
       });
-      loadLancamentosDaAPI();
+      /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) loadLancamentosDaAPI(); })();
     }
 
     function exportarLancamentosCSV() {
@@ -7867,7 +8085,7 @@
       if (!e.target) return;
       var ids = ['lanc-filtro-periodo','lanc-filtro-ano','lanc-filtro-mes','lanc-filtro-tipo','lanc-filtro-categoria','lanc-filtro-veiculo'];
       if (ids.indexOf(e.target.id) !== -1) {
-        loadLancamentosDaAPI();
+        /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) loadLancamentosDaAPI(); })();
       }
     });
 
@@ -7876,12 +8094,12 @@
     // ==== AUTO-INIT DOS FILTROS DE LANCAMENTOS (FASE 3A / 20) ====
     async function inicializarFiltrosLancamentos() {
       try {
-        await popularAnosLancamentos();
+        await /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) popularAnosLancamentos(); })();
         if (typeof popularMesesLancamentos === "function") popularMesesLancamentos();
         if (typeof carregarFiltrosLancamentos === "function") await carregarFiltrosLancamentos();
         // Recarrega os lancamentos com filtros vazios
         if (typeof loadLancamentosDaAPI === "function") {
-          setTimeout(function() { loadLancamentosDaAPI(); }, 100);
+          setTimeout(function() { /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) loadLancamentosDaAPI(); })(); }, 100);
         }
       } catch (e) {
         console.error("[INIT] Erro ao carregar filtros:", e);
@@ -7890,6 +8108,8 @@
 
     // Registra no boot
     document.addEventListener("DOMContentLoaded", function() {
+      // FASE_10_FIX_401 - guard
+      if (!localStorage.getItem("token")) return;
       setTimeout(inicializarFiltrosLancamentos, 1500);
     });
 
@@ -10686,7 +10906,8 @@ function renderHistorico(data) {
       var btn = e.target.closest ? e.target.closest("[data-tab=\"tab-configuracoes\"]") : null;
       if (btn) setTimeout(loadConfiguracoes, 200);
     });
-    setTimeout(loadConfiguracoes, 1500);
+    // FASE_10_FIX_401
+    if (localStorage.getItem("token")) setTimeout(loadConfiguracoes, 1500);
   </script>
 
   <script type="text/javascript">
@@ -10872,7 +11093,8 @@ function renderHistorico(data) {
       });
 
       // Carrega também no boot (após 2s)
-      setTimeout(function(){ carregarVersaoSistema(false); }, 2000);
+      // FASE_10_FIX_401
+      if (localStorage.getItem("token")) setTimeout(function(){ carregarVersaoSistema(false); }, 2000);
 
       // Expõe global para debug
       window.__carregarVersaoSistema = carregarVersaoSistema;
@@ -11483,7 +11705,7 @@ function renderHistorico(data) {
         if (typeof state !== 'undefined') state.currentMonth = this.value;
         if (typeof mostrarToast === 'function') mostrarToast('Carregando ' + this.value + '...', 'info', 'Resumo');
         try {
-          if (typeof loadLancamentosDaAPI === 'function') await loadLancamentosDaAPI();
+          if (typeof loadLancamentosDaAPI === 'function') await /* FASE_10_FIX_401 */ (function(){ if(localStorage.getItem('token')) loadLancamentosDaAPI(); })();
           if (typeof loadKmDaAPI === 'function') await loadKmDaAPI();
           if (typeof renderResumo === 'function') renderResumo();
           if (typeof mostrarToast === 'function') mostrarToast('Resumo atualizado!', 'success', 'Resumo');
@@ -11565,75 +11787,91 @@ function renderHistorico(data) {
     return '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:700;background:#dbeafe;color:#1e40af;margin-right:6px;">&#128190; DADOS</span>';
   }
   function renderBackups(lista) {
+    // FASE_10_SEMAFORO_46B
     var tbody = document.getElementById('tbody-backups');
     if (!tbody) return;
-    // FASE_9_CARDS_BACKUP - atualiza os cards
+
+    function semaforo(status) {
+      // FASE_11_DIAG
+      console.log('[SEMAFORO] status recebido:', JSON.stringify(status), '| tipo:', typeof status);
+      if (status === 'verde' || status === 'green' || status === 'ok' || status === 'OK') return '<span title="OK" style="font-size:1.1rem;">&#128994;</span>';
+      if (status === 'amarelo' || status === 'yellow' || status === 'warn' || status === 'aviso') return '<span title="Com avisos" style="font-size:1.1rem;">&#128993;</span>';
+      if (status === 'vermelho' || status === 'red' || status === 'erro' || status === 'error') return '<span title="Falha" style="font-size:1.1rem;">&#128308;</span>';
+      return '<span title="Nao testado (' + (status || 'vazio') + ')" style="font-size:1.1rem;opacity:0.4;">&#9899;</span>';
+    }
+
     try {
       var total = (lista || []).length;
       var ultimo = (lista || [])[0];
-      var ultimoCompleto = (lista || []).find(function(b){ return b.nome.indexOf('completo_') === 0; });
-
-      var elTotal = document.getElementById('card-bkp-total');
-      if (elTotal) elTotal.textContent = total;
-
+      var ultimoCompleto = (lista || []).find(function(b){ return b.tipo === 'completo'; });
+      var preRestore = (lista || []).find(function(b){ return b.tipo === 'pre-restore'; });
+      var elTotal = document.getElementById('card-bkp-total'); if (elTotal) elTotal.textContent = total;
       var elUlt = document.getElementById('card-bkp-ultimo');
       var elUltInfo = document.getElementById('card-bkp-ultimo-info');
-      if (elUlt) {
-        if (ultimo) {
-          elUlt.textContent = new Date(ultimo.criado_em).toLocaleDateString('pt-BR');
-          if (elUltInfo) elUltInfo.textContent = new Date(ultimo.criado_em).toLocaleTimeString('pt-BR') + ' · ' + formatBytes(ultimo.tamanho);
-        } else {
-          elUlt.textContent = '--';
-          if (elUltInfo) elUltInfo.textContent = 'Nenhum backup ainda';
-        }
-      }
-
+      if (elUlt && ultimo) {
+        elUlt.textContent = new Date(ultimo.criado_em).toLocaleDateString('pt-BR');
+        if (elUltInfo) elUltInfo.textContent = new Date(ultimo.criado_em).toLocaleTimeString('pt-BR') + ' - ' + formatBytes(ultimo.tamanho);
+      } else if (elUlt) { elUlt.textContent = '--'; if (elUltInfo) elUltInfo.textContent = 'Nenhum'; }
       var elComp = document.getElementById('card-bkp-completo');
       var elCompInfo = document.getElementById('card-bkp-completo-info');
-      if (elComp) {
-        if (ultimoCompleto) {
-          elComp.textContent = new Date(ultimoCompleto.criado_em).toLocaleDateString('pt-BR');
-          if (elCompInfo) elCompInfo.textContent = formatBytes(ultimoCompleto.tamanho);
-        } else {
-          elComp.textContent = '--';
-          if (elCompInfo) elCompInfo.textContent = 'Nenhum completo ainda';
-        }
-      }
-
-      // Ultima restauracao (pega da config salva ou localStorage)
+      if (elComp && ultimoCompleto) {
+        elComp.textContent = new Date(ultimoCompleto.criado_em).toLocaleDateString('pt-BR');
+        if (elCompInfo) elCompInfo.textContent = formatBytes(ultimoCompleto.tamanho);
+      } else if (elComp) { elComp.textContent = '--'; if (elCompInfo) elCompInfo.textContent = 'Nenhum'; }
       var elRes = document.getElementById('card-bkp-restore');
       var elResInfo = document.getElementById('card-bkp-restore-info');
-      if (elRes) {
-        var ultRestore = localStorage.getItem('__ultimoRestore');
-        if (ultRestore) {
-          var d = new Date(ultRestore);
-          elRes.textContent = d.toLocaleDateString('pt-BR');
-          if (elResInfo) elResInfo.textContent = d.toLocaleTimeString('pt-BR');
-        } else {
-          elRes.textContent = '--';
-          if (elResInfo) elResInfo.textContent = 'Nunca restaurado';
-        }
-      }
-    } catch (e) { console.error('Erro cards backup:', e); }
+      if (elRes && preRestore) {
+        elRes.textContent = new Date(preRestore.criado_em).toLocaleDateString('pt-BR');
+        if (elResInfo) elResInfo.textContent = new Date(preRestore.criado_em).toLocaleTimeString('pt-BR');
+      } else if (elRes) { elRes.textContent = '--'; if (elResInfo) elResInfo.textContent = 'Nunca'; }
+    } catch (e) { console.error('Erro cards:', e); }
+
+    // FASE_10_DONUT_46C - atualiza o grafico donut
+    try {
+      var dados = (lista || []).filter(function(b){ return b.tipo === 'json'; }).length;
+      var completos = (lista || []).filter(function(b){ return b.tipo === 'completo'; }).length;
+      var pres = (lista || []).filter(function(b){ return b.tipo === 'pre-restore'; }).length;
+      var soma = dados + completos + pres || 1;
+      var C = 2 * Math.PI * 45;
+      var elD = document.getElementById('donut-dados');
+      var elC = document.getElementById('donut-completo');
+      if (elD) elD.setAttribute('stroke-dasharray', (dados / soma * C) + ' ' + C);
+      if (elC) elC.setAttribute('stroke-dasharray', (completos / soma * C) + ' ' + C);
+      if (elC) elC.setAttribute('transform', 'rotate(' + ((dados / soma * 360) - 90) + ' 60 60)');
+      var elT = document.getElementById('donut-total'); if (elT) elT.textContent = dados + completos + pres;
+      var qd = document.getElementById('donut-qtd-dados'); if (qd) qd.textContent = dados;
+      var qc = document.getElementById('donut-qtd-completo'); if (qc) qc.textContent = completos;
+      var qp = document.getElementById('donut-qtd-prerestore'); if (qp) qp.textContent = pres;
+    } catch (e) { console.error('Erro donut:', e); }
 
     if (!lista || lista.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:#64748b;">Nenhum backup ainda. Clique em "Gerar Backup Agora" ou "Backup Completo".</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:#64748b;">Nenhum backup ainda.</td></tr>';
       return;
     }
     tbody.innerHTML = '';
     lista.forEach(function(b, idx) {
       var data = b.criado_em ? new Date(b.criado_em).toLocaleString('pt-BR') : '-';
-      var isZip = b.nome.endsWith('.zip');
-      var iconArquivo = isZip ? '&#128230;' : '&#128190;';
+      var badge = '';
+      if (b.tipo === 'completo') {
+        badge = '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:700;background:#ede9fe;color:#6d28d9;">&#128230; COMPLETO</span>';
+      } else if (b.tipo === 'pre-restore') {
+        badge = '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:700;background:#fef3c7;color:#78350f;">&#9888;&#65039; PRE-RESTORE</span>';
+      } else {
+        badge = '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:700;background:#dbeafe;color:#1e40af;">&#128190; DADOS</span>';
+      }
       var tr = document.createElement('tr');
       tr.innerHTML =
         '<td>' + (idx + 1) + '</td>' +
-        '<td>' + getBadgeTipo(b.nome) + '<span style="font-family:monospace;font-size:0.82rem;">' + iconArquivo + ' ' + b.nome + '</span></td>' +
+        '<td>' + badge + '</td>' +
+        '<td class="col-center">' + semaforo(b.status) + '</td>' +
+        '<td><span style="font-family:monospace;font-size:0.82rem;">' + b.nome + '</span></td>' +
         '<td>' + formatBytes(b.tamanho) + '</td>' +
         '<td>' + data + '</td>' +
         '<td class="col-center">' +
-          '<button class="btn-action btn-action-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="baixarBackupSalvo(\'' + b.nome + '\')">Baixar</button> ' +
-          '<button class="btn-action" style="padding:4px 10px;font-size:0.78rem;background:#dc2626;color:#fff;" onclick="excluirBackup(\'' + b.nome + '\')">Excluir</button>' +
+/* FASE_11_BOTOES_SVG */
+          '<button class="btn-row-acao btn-row-testar" onclick="testarBackup(' + b.id + ')" title="Testar integridade">' + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>' + '</button> ' +
+          '<button class="btn-row-acao btn-row-baixar" onclick="baixarBackup(' + b.id + ')" title="Baixar arquivo">' + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' + '</button> ' +
+          '<button class="btn-row-acao btn-row-apagar" onclick="excluirBackup(' + b.id + ')" title="Excluir backup">' + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>' + '</button>' +
         '</td>';
       tbody.appendChild(tr);
     });
@@ -11659,20 +11897,26 @@ function renderHistorico(data) {
 
 
   // FASE_9_CARDS_BACKUP
-  window.baixarUltimoCompleto = function() {
-    var url = '/api/backup/listar?tipo=completo';
-    var token = localStorage.getItem('token') || '';
-    apiFetch('/backup/listar').then(function(r){ return r.json(); }).then(function(data){
-      var completos = (data.backups || []).filter(function(b){ return b.nome.indexOf('completo_') === 0; });
-      if (completos.length === 0) {
-        if (typeof mostrarToast === 'function') mostrarToast('Nenhum backup completo ainda.', 'warning', 'Backup');
-        return;
+  // baixarUltimoCompleto removido (agora e por linha)
+
+  // FASE_10_TESTAR_46C
+  window.testarBackup = async function(id) {
+    if (typeof mostrarToast === 'function') mostrarToast('Testando backup...', 'info', 'Backup');
+    try {
+      var res = await apiFetch('/backup/testar/' + id, { method: 'POST' });
+      var data = await res.json();
+      if (data.ok) {
+        var cor = data.status === 'verde' ? 'success' : data.status === 'amarelo' ? 'warning' : 'error';
+        var emoji = data.status === 'verde' ? '\uD83D\uDFE2' : data.status === 'amarelo' ? '\uD83D\uDFE1' : '\uD83D\uDD34';
+        if (typeof mostrarToast === 'function') mostrarToast(emoji + ' ' + data.status.toUpperCase(), cor, 'Backup');
+        console.log('[TESTE BACKUP]', data.detalhes);
+        loadBackupsDaAPI(true);
+      } else {
+        if (typeof mostrarToast === 'function') mostrarToast('Erro: ' + (data.erro || '?'), 'error', 'Backup');
       }
-      var ultimo = completos[0].nome;
-      window.location.href = '/api/backup/baixar/' + encodeURIComponent(ultimo) + '?token=' + encodeURIComponent(token);
-    }).catch(function(e){
+    } catch (e) {
       if (typeof mostrarToast === 'function') mostrarToast('Erro: ' + e.message, 'error', 'Backup');
-    });
+    }
   };
 
   window.loadBackupsDaAPI = loadBackupsDaAPI;
@@ -11693,20 +11937,58 @@ function renderHistorico(data) {
     }
   };
 
-  window.baixarBackupDireto = function() {
-    var token = localStorage.getItem('token') || '';
-    window.location.href = '/api/backup/exportar?token=' + encodeURIComponent(token);
-  };
-
-  window.baixarBackupSalvo = function(nome) {
-    var token = localStorage.getItem('token') || '';
-    window.location.href = '/api/backup/baixar/' + encodeURIComponent(nome) + '?token=' + encodeURIComponent(token);
-  };
-
-  window.excluirBackup = async function(nome) {
-    if (!confirm('Excluir backup ' + nome + '?')) return;
+  // FASE_10_FIX_DOWNLOAD_45A - baixa JSON via fetch + blob
+  window.baixarBackupDireto = async function() {
     try {
-      var res = await apiFetch('/backup/' + encodeURIComponent(nome), { method: 'DELETE' });
+      if (typeof mostrarToast === 'function') mostrarToast('Gerando JSON...', 'info', 'Backup');
+      var res = await apiFetch('/backup/exportar');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      var blob = await res.blob();
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'backup-caderninho-' + new Date().toISOString().substring(0, 10) + '.json';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() { a.remove(); URL.revokeObjectURL(url); }, 1000);
+
+      if (typeof mostrarToast === 'function') mostrarToast('JSON baixado!', 'success', 'Backup');
+    } catch (e) {
+      if (typeof mostrarToast === 'function') mostrarToast('Erro: ' + e.message, 'error', 'Backup');
+    }
+  };
+
+  // FASE_10_FIX_DOWNLOAD_45A - baixa via fetch + blob (envia Authorization header)
+  window.baixarBackup = async function(id) {
+    try {
+      if (typeof mostrarToast === 'function') mostrarToast('Baixando...', 'info', 'Backup');
+      var res = await apiFetch('/backup/baixar/' + id);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      var nome = 'backup-' + id;
+      var cd = res.headers.get('Content-Disposition');
+      if (cd) { var m = cd.match(/filename="([^"]+)"/); if (m) nome = m[1]; }
+
+      var blob = await res.blob();
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = nome;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() { a.remove(); URL.revokeObjectURL(url); }, 1000);
+
+      if (typeof mostrarToast === 'function') mostrarToast('Baixado: ' + nome, 'success', 'Backup');
+    } catch (e) {
+      if (typeof mostrarToast === 'function') mostrarToast('Erro: ' + e.message, 'error', 'Backup');
+    }
+  };
+
+  window.excluirBackup = async function(id) {
+    if (!confirm('Excluir este backup?')) return;
+    try {
+      var res = await apiFetch('/backup/' + id, { method: 'DELETE' });
       var data = await res.json();
       if (data.ok) {
         if (typeof mostrarToast === 'function') mostrarToast('Backup excluido.', 'success', 'Backup');
@@ -11738,31 +12020,95 @@ function renderHistorico(data) {
 
   document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
+      // FASE_10_FIX_HANDLER_45B - handler com deteccao de tipo (ZIP vs JSON)
+      document.querySelectorAll('input[name="restore-tipo"]').forEach(function(r) {
+        r.addEventListener('change', function() {
+          var lj = document.getElementById('lbl-rest-tipo-json');
+          var lc = document.getElementById('lbl-rest-tipo-completo');
+          if (!lj || !lc) return;
+          if (this.value === 'json') {
+            lj.style.borderColor = '#2563eb'; lj.style.background = '#eff6ff';
+            lc.style.borderColor = '#cbd5e1'; lc.style.background = '#fff';
+          } else {
+            lc.style.borderColor = '#8b5cf6'; lc.style.background = '#f5f3ff';
+            lj.style.borderColor = '#cbd5e1'; lj.style.background = '#fff';
+          }
+        });
+      });
+
       var inp = document.getElementById('restore-file');
       if (!inp) return;
       inp.addEventListener('change', function(e) {
         var f = e.target.files && e.target.files[0];
         if (!f) return;
-        var reader = new FileReader();
-        reader.onload = function(ev) {
-          try {
-            var json = JSON.parse(ev.target.result);
-            var dados = json.dados || {};
-            var tabelas = Object.keys(dados);
-            var total = tabelas.reduce(function(acc, t){ return acc + (Array.isArray(dados[t]) ? dados[t].length : 0); }, 0);
-            document.getElementById('restore-info').innerHTML = '<strong>Arquivo:</strong> ' + f.name + ' (' + (f.size/1024).toFixed(1) + ' KB)<br>' +
-              '<strong>Gerado em:</strong> ' + (json.gerado_em || '-') + '<br>' +
-              '<strong>Tabelas:</strong> ' + tabelas.length + ' | <strong>Registros:</strong> ' + total;
-            window.__restoreConteudo = ev.target.result;
-          } catch (err) {
-            document.getElementById('restore-info').innerHTML = '<span style="color:#dc2626;">Erro ao ler JSON: ' + err.message + '</span>';
-            window.__restoreConteudo = null;
-          }
-        };
-        reader.readAsText(f);
+        var infoEl = document.getElementById('restore-info');
+        var radioSel = document.querySelector('input[name="restore-tipo"]:checked');
+        var tipo = radioSel ? radioSel.value : 'json';
+        var ext = f.name.split('.').pop().toLowerCase();
+        var isZip = ext === 'zip' || tipo === 'completo';
+
+        if (isZip) {
+          infoEl.innerHTML = '<strong>Arquivo:</strong> ' + f.name + ' (' + (f.size/1024).toFixed(1) + ' KB)<br>' +
+            '<strong>Tipo detectado:</strong> <span style="color:#6d28d9;font-weight:700;">ZIP Completo</span><br>' +
+            '<em>O ZIP sera processado no servidor.</em>';
+          window.__restoreConteudo = null;
+          window.__restoreTipo = 'completo';
+          window.__restoreFile = f;
+        } else {
+          window.__restoreTipo = 'json';
+          window.__restoreFile = f;
+          var reader = new FileReader();
+          reader.onload = function(ev) {
+            try {
+              var json = JSON.parse(ev.target.result);
+              var dados = json.dados || {};
+              var tabelas = Object.keys(dados);
+              var total = tabelas.reduce(function(acc, t){ return acc + (Array.isArray(dados[t]) ? dados[t].length : 0); }, 0);
+              infoEl.innerHTML = '<strong>Arquivo:</strong> ' + f.name + ' (' + (f.size/1024).toFixed(1) + ' KB)<br>' +
+                '<strong>Tipo detectado:</strong> <span style="color:#1e40af;font-weight:700;">JSON</span><br>' +
+                '<strong>Gerado em:</strong> ' + (json.gerado_em || '-') + '<br>' +
+                '<strong>Tabelas:</strong> ' + tabelas.length + ' | <strong>Registros:</strong> ' + total;
+              window.__restoreConteudo = ev.target.result;
+            } catch (err) {
+              infoEl.innerHTML = '<span style="color:#dc2626;">Erro ao ler JSON: ' + err.message + '</span>';
+              window.__restoreConteudo = null;
+            }
+          };
+          reader.readAsText(f);
+        }
       });
     }, 800);
   });
+
+  // FASE_11_FIX_LEITOR_ARQUIVO
+  window.__lerArquivoRestore = function(input) {
+    var info = document.getElementById('restore-info');
+    if (!input || !input.files || !input.files[0]) {
+      window.__restoreConteudo = null;
+      if (info) { info.textContent = ''; info.style.color = '#64748b'; }
+      return;
+    }
+    var file = input.files[0];
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      window.__restoreConteudo = e.target.result;
+      if (info) {
+        info.textContent = '\u2705 ' + file.name + ' (' + Math.round(file.size / 1024) + ' KB)';
+        info.style.color = '#059669';
+      }
+      console.log('[RESTORE] arquivo lido:', file.name, file.size, 'bytes');
+    };
+    reader.onerror = function(err) {
+      window.__restoreConteudo = null;
+      if (info) { info.textContent = '\u274C Erro ao ler arquivo.'; info.style.color = '#dc2626'; }
+      console.error('[RESTORE] erro ao ler:', err);
+    };
+    if (file.name.toLowerCase().endsWith('.zip')) {
+      reader.readAsDataURL(file);
+    } else {
+      reader.readAsText(file, 'utf-8');
+    }
+  };
 
   window.executarRestore = async function() {
     var btn = document.getElementById('btn-confirmar-restore');
@@ -11771,15 +12117,15 @@ function renderHistorico(data) {
     var conf = document.getElementById('restore-confirm').value;
 
     if (!window.__restoreConteudo) {
-      res.innerHTML = '<div style="color:#dc2626;">Selecione um arquivo primeiro.</div>';
+      res.innerHTML = '<div class="alerta-erro">⚠️ Selecione um arquivo primeiro.</div>'; /* FASE_11_ALERTA_ERRO */
       return;
     }
     if (!senha) {
-      res.innerHTML = '<div style="color:#dc2626;">Digite sua senha.</div>';
+      res.innerHTML = '<div class="alerta-erro">⚠️ Digite sua senha.</div>';
       return;
     }
-    if (conf !== 'RESTAURAR') {
-      res.innerHTML = '<div style="color:#dc2626;">Digite RESTAURAR no campo de confirmacao.</div>';
+    if (!conf || conf.trim().toUpperCase() !== 'RESTAURAR') {
+      res.innerHTML = '<div class="alerta-erro">⚠️ Digite RESTAURAR no campo de confirmação.</div>';
       return;
     }
 
@@ -11803,7 +12149,7 @@ function renderHistorico(data) {
       var data = await resp.json();
       if (resp.ok && data.ok) {
         var rel = data.relatorio || {};
-        var html = '<div style="color:#059669;font-weight:700;margin-bottom:8px;">&#10004; Restore concluido!</div>';
+        var html = '<div class="alerta-sucesso" style="margin-bottom:10px;">✅ Restore concluído com sucesso!</div>';
         html += '<div>Pre-backup: <code>' + (data.pre_backup || '-') + '</code></div>';
         html += '<div>Tabelas restauradas: <strong>' + (rel.truncadas || []).length + '</strong></div>';
         html += '<div>Erros: <strong style="color:' + ((rel.erros || []).length > 0 ? '#dc2626' : '#059669') + ';">' + (rel.erros || []).length + '</strong></div>';
@@ -11816,10 +12162,10 @@ function renderHistorico(data) {
           if (confirm('Restore concluido. Recarregar a pagina agora?')) location.reload();
         }, 1500);
       } else {
-        res.innerHTML = '<div style="color:#dc2626;">Erro: ' + (data.erro || 'desconhecido') + '</div>';
+        res.innerHTML = '<div class="alerta-erro">❌ ' + (data.erro || 'Erro desconhecido') + '</div>';
       }
     } catch (e) {
-      res.innerHTML = '<div style="color:#dc2626;">Erro: ' + e.message + '</div>';
+      res.innerHTML = '<div class="alerta-erro">❌ Erro: ' + e.message + '</div>';
     } finally {
       btn.disabled = false;
       btn.textContent = 'Restaurar agora';
