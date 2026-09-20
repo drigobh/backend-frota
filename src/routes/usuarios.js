@@ -137,7 +137,9 @@ async function routes(fastify, options) {
         if (pRes.rows.length > 0) perfilNome = pRes.rows[0].nome;
       }
 
-      const res = await db.query(`
+      // FASE_6_AUDITORIA - envolve em runAsUser para triggers capturarem quem fez
+      const res = await db.runAsUser(req.user, async () => {
+        return await db.query(`
         UPDATE usuarios
         SET nome = COALESCE($1, nome),
             email = COALESCE($2, email),
@@ -147,6 +149,7 @@ async function routes(fastify, options) {
         WHERE id::text = $6::text
         RETURNING id, nome, email, perfil_id, perfil, ativo, ultimo_login, created_at
       `, [nome, email ? email.toLowerCase().trim() : null, perfil_id ? String(perfil_id) : null, perfilNome, ativo, id]);
+      });
 
       if (res.rows.length === 0) return reply.code(404).send({ erro: 'Usuário não encontrado' });
       return reply.send(res.rows[0]);
