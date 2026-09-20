@@ -1,3 +1,4 @@
+// FASE_6_METAS_ENVELOPADO
 const db = require('../database');
 
 // FASE_3B_VALIDACAO_FINANCEIRO
@@ -167,7 +168,7 @@ module.exports = async function (fastify, options) {
                 }
             }
         }
-    }, preHandler: [fastify.autenticar] }, async (req, reply) => {
+    }, preHandler: [fastify.autenticar] }, fastify.comAuditoria(async (req, reply) => {
     const { veiculo_id, mes_referencia, tipo_meta, valor_meta, observacao } = req.body || {};
     if (!veiculo_id || !mes_referencia || !tipo_meta || !valor_meta) {
       return reply.code(400).send({ erro: 'Campos obrigatorios: veiculo_id, mes_referencia, tipo_meta, valor_meta.' });
@@ -191,7 +192,7 @@ module.exports = async function (fastify, options) {
       }
       return reply.code(500).send({ erro: err.message });
     }
-  });
+  }));
 
   // ATUALIZAR
   fastify.put('/api/metas/:id', {
@@ -213,7 +214,7 @@ module.exports = async function (fastify, options) {
                 }
             }
         }
-    }, preHandler: [fastify.autenticar] }, async (req, reply) => {
+    }, preHandler: [fastify.autenticar] }, fastify.comAuditoria(async (req, reply) => {
     const { id } = req.params;
     const { valor_meta, observacao } = req.body || {};
     if (parseFloat(valor_meta) <= 0) {
@@ -229,16 +230,16 @@ module.exports = async function (fastify, options) {
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
     }
-  });
+  }));
 
   // EXCLUIR
-  fastify.delete('/api/metas/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.delete('/api/metas/:id', { preHandler: [fastify.autenticar] }, fastify.comAuditoria(async (req, reply) => {
     try {
       await db.query('DELETE FROM metas WHERE id = $1', [req.params.id]);
       return reply.send({ sucesso: true });
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
     }
-  });
+  }));
 
 };

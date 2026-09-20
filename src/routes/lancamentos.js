@@ -267,7 +267,7 @@ module.exports = async function (fastify, options) {
                 }
             }
         }
-    }, preHandler: [fastify.autenticar] }, async (req, reply) => {
+    }, preHandler: [fastify.autenticar] }, fastify.comAuditoria(async (req, reply) => {
     const { placa, data, tipo, categoria, descricao, valor, centro_custo_id } = req.body || {};
 
     if (!data || !tipo || !categoria || !descricao || !valor) {
@@ -315,7 +315,7 @@ module.exports = async function (fastify, options) {
       fastify.log.error(err);
       return reply.code(500).send({ erro: err.message });
     }
-  });
+  }));
 
   // ==========================================================================
   // ATUALIZAR LANCAMENTO
@@ -370,7 +370,7 @@ module.exports = async function (fastify, options) {
                 }
             }
         }
-    }, preHandler: [fastify.autenticar] }, async (req, reply) => {
+    }, preHandler: [fastify.autenticar] }, fastify.comAuditoria(async (req, reply) => {
     const { id } = req.params;
     const { placa, data, tipo, categoria, descricao, valor, centro_custo_id } = req.body || {};
 
@@ -427,12 +427,13 @@ module.exports = async function (fastify, options) {
       fastify.log.error(err);
       return reply.code(500).send({ erro: err.message });
     }
-  });
+  }));
 
   // ==========================================================================
   // EXCLUIR LANCAMENTO (soft delete)
   // ==========================================================================
-  fastify.delete('/api/lancamentos/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  // FASE_6_DELETE_LANC_ENVELOPADO
+  fastify.delete('/api/lancamentos/:id', { preHandler: [fastify.autenticar] }, fastify.comAuditoria(async (req, reply) => {
     const { id } = req.params;
     try {
       const result = await db.query(`
@@ -451,7 +452,7 @@ module.exports = async function (fastify, options) {
       fastify.log.error(err);
       return reply.code(500).send({ erro: err.message });
     }
-  });
+  }));
 
   // ==========================================================================
   // LISTA DE ANOS DISPONIVEIS (dos lancamentos cadastrados)

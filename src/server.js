@@ -192,6 +192,22 @@ fastify.decorate('autenticar', async (request, reply) => {
 });
 
 // =========================================================================
+// FASE_6_COM_AUDITORIA - Envolve handler no contexto do usuario logado
+// para que os triggers de auditoria do PostgreSQL capturem "quem fez".
+// Uso: fastify.post('/rota', opts, fastify.comAuditoria(async (req, reply) => { ... }))
+// =========================================================================
+const { runAsUser: _runAsUser } = require('./database');
+
+fastify.decorate('comAuditoria', function(handler) {
+  return function(request, reply) {
+    if (request.user && request.user.email) {
+      return _runAsUser(request.user, () => handler(request, reply));
+    }
+    return handler(request, reply);
+  };
+});
+
+// =========================================================================
 // ARQUIVOS ESTÃTICOS (Frontend)
 // =========================================================================
 fastify.register(require('@fastify/static'), {
@@ -290,7 +306,8 @@ fastify.get("/api/configuracoes", { preHandler: [fastify.autenticar] }, async (r
   }
 });
 
-fastify.put("/api/configuracoes", { preHandler: [fastify.autenticar] }, async (req, reply) => {
+// FASE_6_CONFIG_ENVELOPADO - envelopa no contexto do usuario para auditoria
+fastify.put("/api/configuracoes", { preHandler: [fastify.autenticar] }, fastify.comAuditoria(async (req, reply) => {
   try {
     const dados = req.body || {};
     const chaves = Object.keys(dados);
@@ -308,7 +325,7 @@ fastify.put("/api/configuracoes", { preHandler: [fastify.autenticar] }, async (r
     req.log.error({ err }, "Erro ao salvar configuracoes");
     return reply.status(500).send({ erro: "Erro ao salvar configuracoes" });
   }
-});
+}));
 
 // ROTA PRINCIPAL - Serve o index.html
 // =========================================================================

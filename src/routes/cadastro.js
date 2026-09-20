@@ -1,3 +1,4 @@
+// FASE_6_CADASTRO_ENVELOPADO
 const db = require('../database');
 
 // FASE_3B_VALIDACAO_CADASTROS
@@ -63,7 +64,7 @@ module.exports = async function (fastify, options) {
         },
       },
     },
-  }, async (request, reply) => {
+  }, fastify.comAuditoria(async (request, reply) => {
     const { placa, modelo, ano, obs } = request.body;
     try {
       const { rows } = await db.query(
@@ -78,7 +79,7 @@ module.exports = async function (fastify, options) {
       fastify.log.error(error);
       return reply.status(500).send({ erro: 'Erro interno' });
     }
-  });
+  }));
 
   fastify.put('/api/veiculos/:id', {
     schema: {
@@ -110,7 +111,7 @@ module.exports = async function (fastify, options) {
         }
     },
     preHandler: [fastify.autenticar],
-  }, async (request, reply) => {
+  }, fastify.comAuditoria(async (request, reply) => {
     const { id } = request.params;
     const { placa, modelo, ano, obs } = request.body;
     await db.query(
@@ -119,11 +120,11 @@ module.exports = async function (fastify, options) {
       [placa.toUpperCase(), modelo, ano, obs, id]
     );
     return { sucesso: true };
-  });
+  }));
 
   fastify.delete('/api/veiculos/:id', {
     preHandler: [fastify.autenticar],
-  }, async (request, reply) => {
+  }, fastify.comAuditoria(async (request, reply) => {
     const { id } = request.params;
     await db.query(
       `UPDATE veiculos SET status = 'INATIVO', deleted_at = CURRENT_TIMESTAMP 
@@ -131,7 +132,7 @@ module.exports = async function (fastify, options) {
       [id]
     );
     return { sucesso: true };
-  });
+  }));
 
   // ==========================================================================
   // CARRETAS
@@ -304,7 +305,7 @@ module.exports = async function (fastify, options) {
         },
       },
     },
-  }, async (request, reply) => {
+  }, fastify.comAuditoria(async (request, reply) => {
     const { nome, cnh, telefone, obs } = request.body;
     try {
       const { rows } = await db.query(
@@ -318,7 +319,7 @@ module.exports = async function (fastify, options) {
       if (error.code === '23505') return reply.status(409).send({ erro: 'CNH já cadastrada.' });
       return reply.status(500).send({ erro: 'Erro interno' });
     }
-  });
+  }));
 
   fastify.put('/api/motoristas/:id', {
     schema: {
@@ -350,7 +351,7 @@ module.exports = async function (fastify, options) {
         }
     },
     preHandler: [fastify.autenticar],
-  }, async (request, reply) => {
+  }, fastify.comAuditoria(async (request, reply) => {
     const { id } = request.params;
     const { nome, cnh, telefone, obs } = request.body;
     await db.query(
@@ -359,17 +360,17 @@ module.exports = async function (fastify, options) {
       [nome, cnh, telefone, obs, id]
     );
     return { sucesso: true };
-  });
+  }));
 
   fastify.delete('/api/motoristas/:id', {
     preHandler: [fastify.autenticar],
-  }, async (request, reply) => {
+  }, fastify.comAuditoria(async (request, reply) => {
     await db.query(
       `UPDATE motoristas SET status = 'INATIVO', deleted_at = CURRENT_TIMESTAMP 
        WHERE id = $1`,
       [request.params.id]
     );
     return { sucesso: true };
-  });
+  }));
 
 };
