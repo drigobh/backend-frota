@@ -34,42 +34,10 @@ async function routes(fastify, options) {
     const hashInformado = await hashSenha(senhaStr);
 
     try {
-      // 1. DESBLOQUEIO MASTER PARA admin@frota.com
-      if (emailLimpo === 'admin@frota.com') {
-        let userRes = await db.query('SELECT * FROM usuarios WHERE LOWER(email) = $1', [emailLimpo]);
-        let user = userRes.rows[0];
-
-        if (!user) {
-          const createRes = await db.query(`
-            INSERT INTO usuarios (nome, email, senha_hash, perfil, ativo)
-            VALUES ('Administrador', 'admin@frota.com', $1, 'Administrador', true)
-            RETURNING *
-          `, [hashInformado]);
-          user = createRes.rows[0];
-        } else {
-          await db.query(
-            'UPDATE usuarios SET senha_hash = $1, ativo = true, ultimo_login = CURRENT_TIMESTAMP WHERE id = $2',
-            [hashInformado, user.id]
-          );
-        }
-
-        // Gera token JWT assinado se fastify.jwt existir, ou assina via jsonwebtoken
-        const payload = { id: user.id, email: user.email, nome: user.nome || 'Administrador', perfil: 'Administrador' };
-        let token;
-        if (fastify.jwt && typeof fastify.jwt.sign === 'function') {
-          token = fastify.jwt.sign(payload);
-        } else {
-          try {
-            const jwt = require('jsonwebtoken');
-            token = jwt.sign(payload, process.env.JWT_SECRET || 'secret');
-          } catch (e) {
-            token = crypto.randomBytes(32).toString('hex');
-          }
-        }
-
-        return reply.send({ token, usuario: payload });
-      }
-
+      // FASE_5_BYPASS_ADMIN_REMOVIDO
+      // O bypass master do admin@frota.com foi removido por seguranca.
+      // Agora o admin passa pelo fluxo normal (senha bcrypt validada).
+      //
       // 2. DEMAIS USUÁRIOS
       const res = await db.query('SELECT * FROM usuarios WHERE LOWER(email) = $1', [emailLimpo]);
       if (res.rows.length === 0) {
