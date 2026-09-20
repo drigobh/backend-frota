@@ -725,7 +725,43 @@ fastify.post("/api/reset-senha", async (req, reply) => {
 // ═══════════════════════════════════════════════════════════
 // /FASE_5_RESET_SENHA
 
-    console.log('[BOOT] Chamando fastify.listen...');
+    // =========================================================================
+// FASE_6_LIMPEZA_AUTOMATICA - Limpa auditoria com mais de 90 dias
+// Roda a cada 7 dias (verificado no boot)
+// =========================================================================
+async function limparAuditoriaSeNecessario() {
+  try {
+    const r = await db.query("SELECT valor FROM configuracoes WHERE chave = 'ultima_limpeza_auditoria'");
+    if (r.rows.length === 0) {
+      console.log("[LIMPEZA] Chave ausente. Pulando.");
+      return;
+    }
+    const ultima = new Date(r.rows[0].valor);
+    const agora = new Date();
+    const diasDesde = (agora - ultima) / (1000 * 60 * 60 * 24);
+
+    if (diasDesde < 7) {
+      console.log("[LIMPEZA] Ultima limpeza: " + Math.floor(diasDesde) + " dias atras. Pulando (min 7).");
+      return;
+    }
+
+    console.log("[LIMPEZA] Rodando limpeza de auditoria (>90 dias)...");
+    const resultado = await db.query("SELECT limpar_auditoria_antiga(90) AS removidos");
+    const removidos = resultado.rows[0].removidos || 0;
+    console.log("[LIMPEZA] OK " + removidos + " registros removidos.");
+
+    await db.query(
+      "UPDATE configuracoes SET valor = $1, updated_at = NOW() WHERE chave = 'ultima_limpeza_auditoria'",
+      [agora.toISOString()]
+    );
+  } catch (e) {
+    console.error("[LIMPEZA] Erro (nao fatal):", e.message);
+  }
+}
+
+await limparAuditoriaSeNecessario();
+
+console.log('[BOOT] Chamando fastify.listen...');
     await fastify.listen({ port: Number(PORT), host: HOST });
     clearTimeout(watchdog);
 
