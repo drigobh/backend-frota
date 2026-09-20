@@ -2179,6 +2179,7 @@
       <div class="nav-submenu" id="grupo-admin">
         <button class="nav-tab-btn" data-tab="tab-usuarios" id="nav-tab-usuarios" onclick="setTimeout(loadUsuariosDaAPI, 100)"><span>&#128101;</span><span class="nav-label">Usuários</span></button>
         <button class="nav-tab-btn" data-tab="tab-perfis" id="nav-tab-perfis" onclick="setTimeout(loadPerfisDaAPI, 100)"><span>&#128737;</span><span class="nav-label">Perfis</span></button>
+        <button class="nav-tab-btn" data-tab="tab-backup" id="nav-tab-backup" onclick="setTimeout(loadBackupsDaAPI, 200)"><span>&#128190;</span><span class="nav-label">Backup</span></button>
         <!-- FASE_7_AUDITORIA_REMOVIDA: botao removido -->
         <button class="nav-tab-btn" id="nav-btn-atualizar" onclick="abrirModalAtualizar()"><span>&#128260;</span><span class="nav-label">Atualizar App</span></button>
         <button class="nav-tab-btn" data-tab="tab-historico" onclick="setTimeout(loadHistoricoDaAPI, 150)"><span>&#128220;</span><span class="nav-label">Histórico</span></button>
@@ -3588,6 +3589,112 @@
 
     
       <!-- TAB: AJUDA -->
+      <!-- FASE_9_BACKUP_UI -->
+      <section id="tab-backup" class="tab-content">
+        <div class="bar-controls">
+          <div class="bar-controls-left">
+            <span class="label-month-select">BACKUP DO SISTEMA:</span>
+          </div>
+          <div class="bar-controls-right">
+            <button class="btn-action btn-action-primary" onclick="gerarBackupAgora()">&#128190; Gerar Backup Agora</button>
+            <button class="btn-action" style="background:#8b5cf6;color:#fff;" onclick="gerarBackupCompleto()">&#128230; Backup Completo (ZIP)</button>
+            <button class="btn-action btn-action-secondary" onclick="baixarUltimoCompleto()">&#11015;&#65039; Baixar Ultimo ZIP</button>
+            <button class="btn-action btn-action-secondary" onclick="baixarBackupDireto()">&#11015;&#65039; Baixar JSON Agora</button>
+            <button class="btn-action btn-action-secondary" onclick="loadBackupsDaAPI(true)">&#128260; Atualizar</button>
+            <button class="btn-action" style="background:#dc2626;color:#fff;" onclick="abrirModalRestore()">&#9888;&#65039; Importar Backup</button>
+          </div>
+        </div>
+        <div class="section-title-wrap">
+          <h2 class="section-title"><span>&#128190;</span> Backups do Sistema</h2>
+        </div>
+
+        <!-- FASE_9_CARDS_BACKUP -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;margin-bottom:1rem;">
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;">
+            <div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Total de Backups</div>
+            <div id="card-bkp-total" style="font-size:1.6rem;font-weight:800;color:#0f2a4a;margin-top:4px;">0</div>
+            <div style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">Dados + Completos</div>
+          </div>
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;">
+            <div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Ultimo Backup</div>
+            <div id="card-bkp-ultimo" style="font-size:1rem;font-weight:700;color:#2563eb;margin-top:6px;">--</div>
+            <div id="card-bkp-ultimo-info" style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">--</div>
+          </div>
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;">
+            <div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Ultimo Completo</div>
+            <div id="card-bkp-completo" style="font-size:1rem;font-weight:700;color:#8b5cf6;margin-top:6px;">--</div>
+            <div id="card-bkp-completo-info" style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">--</div>
+          </div>
+          <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;">
+            <div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Ultima Restauracao</div>
+            <div id="card-bkp-restore" style="font-size:1rem;font-weight:700;color:#dc2626;margin-top:6px;">--</div>
+            <div id="card-bkp-restore-info" style="font-size:0.72rem;color:#94a3b8;margin-top:2px;">--</div>
+          </div>
+        </div>
+        <!-- /FASE_9_CARDS_BACKUP -->
+        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
+          Backup automatico diario ativado. Mantemos os ultimos 7 backups (mais antigos sao removidos automaticamente).
+        </p>
+        <div class="table-container">
+          <table class="data-table" id="table-backups">
+            <thead>
+              <tr>
+                <th style="width:60px;">#</th>
+                <th>Arquivo</th>
+                <th style="width:140px;">Tamanho</th>
+                <th style="width:200px;">Data</th>
+                <th style="width:200px;" class="col-center">Acoes</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-backups">
+              <tr><td colspan="5" style="text-align:center;padding:1.5rem;color:#64748b;">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+      <!-- FASE_9_RESTORE_UI -->
+
+      <!-- Modal de Restore -->
+      <div id="modal-restore" style="display:none;position:fixed;inset:0;background:rgba(11,30,58,0.9);backdrop-filter:blur(8px);z-index:10000;align-items:center;justify-content:center;padding:16px;">
+        <div style="background:#fff;border-radius:16px;padding:28px;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.5);">
+          <h2 style="margin:0 0 8px;color:#dc2626;font-size:1.3rem;">&#9888;&#65039; Restaurar Backup</h2>
+          <p style="margin:0 0 16px;font-size:0.85rem;color:#64748b;">
+            Esta acao vai <strong>APAGAR TODOS OS DADOS ATUAIS</strong> e substituir pelos dados do arquivo. 
+            Um backup automatico sera feito antes.
+          </p>
+
+          <div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px;margin-bottom:16px;font-size:0.82rem;color:#78350f;">
+            <strong>Atencao:</strong> Verifique se o arquivo eh o correto antes de continuar.
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block;font-size:0.8rem;font-weight:700;color:#475569;margin-bottom:5px;">Arquivo de backup (.json)</label>
+            <input type="file" id="restore-file" accept=".json" style="width:100%;padding:8px;border:1px solid #cbd5e1;border-radius:8px;font-size:0.85rem;">
+            <div id="restore-info" style="margin-top:6px;font-size:0.78rem;color:#64748b;"></div>
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block;font-size:0.8rem;font-weight:700;color:#475569;margin-bottom:5px;">Sua senha (para confirmar)</label>
+            <input type="password" id="restore-senha" placeholder="Digite sua senha de login" style="width:100%;padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:0.85rem;box-sizing:border-box;">
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:block;font-size:0.8rem;font-weight:700;color:#475569;margin-bottom:5px;">Digite <code style="background:#fee2e2;padding:2px 6px;border-radius:4px;color:#dc2626;">RESTAURAR</code> para confirmar</label>
+            <input type="text" id="restore-confirm" placeholder="RESTAURAR" style="width:100%;padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:0.85rem;box-sizing:border-box;font-family:monospace;">
+          </div>
+
+          <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button onclick="fecharModalRestore()" style="padding:10px 20px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#0f2a4a;font-weight:600;cursor:pointer;">Cancelar</button>
+            <button id="btn-confirmar-restore" onclick="executarRestore()" style="padding:10px 20px;border:0;border-radius:8px;background:#dc2626;color:#fff;font-weight:600;cursor:pointer;">Restaurar agora</button>
+          </div>
+
+          <div id="restore-resultado" style="margin-top:14px;font-size:0.8rem;"></div>
+        </div>
+      </div>
+      <!-- /FASE_9_RESTORE_UI -->
+      <!-- /FASE_9_BACKUP_UI -->
+
       <section id="tab-ajuda" class="tab-content">
         <div class="bar-controls">
           <div class="bar-controls-left">
@@ -11423,6 +11530,301 @@ function renderHistorico(data) {
     // Expor para uso externo
     window.__carregarResumoExecutivo = carregarResumo;
   })();
+  </script>
+
+
+  <script type="text/javascript">
+// @ts-nocheck
+  async function loadBackupsDaAPI(force) {
+    var tbody = document.getElementById('tbody-backups');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1rem;color:#64748b;">Carregando...</td></tr>';
+    try {
+      var res = await apiFetch('/backup/listar');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      renderBackups(data.backups || []);
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1rem;color:#dc2626;">Erro: ' + e.message + '</td></tr>';
+    }
+  }
+  function formatBytes(b) {
+    if (!b) return '0 B';
+    var kb = b / 1024;
+    if (kb < 1024) return kb.toFixed(1) + ' KB';
+    return (kb / 1024).toFixed(2) + ' MB';
+  }
+  // FASE_9_BACKUP_COMPLETO_UI
+  function getBadgeTipo(nome) {
+    if (nome.indexOf('completo_') === 0) {
+      return '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:700;background:#ede9fe;color:#6d28d9;margin-right:6px;">&#128230; COMPLETO</span>';
+    }
+    if (nome.indexOf('pre-restore_') === 0) {
+      return '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:700;background:#fef3c7;color:#78350f;margin-right:6px;">&#9888;&#65039; PRE-RESTORE</span>';
+    }
+    return '<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:700;background:#dbeafe;color:#1e40af;margin-right:6px;">&#128190; DADOS</span>';
+  }
+  function renderBackups(lista) {
+    var tbody = document.getElementById('tbody-backups');
+    if (!tbody) return;
+    // FASE_9_CARDS_BACKUP - atualiza os cards
+    try {
+      var total = (lista || []).length;
+      var ultimo = (lista || [])[0];
+      var ultimoCompleto = (lista || []).find(function(b){ return b.nome.indexOf('completo_') === 0; });
+
+      var elTotal = document.getElementById('card-bkp-total');
+      if (elTotal) elTotal.textContent = total;
+
+      var elUlt = document.getElementById('card-bkp-ultimo');
+      var elUltInfo = document.getElementById('card-bkp-ultimo-info');
+      if (elUlt) {
+        if (ultimo) {
+          elUlt.textContent = new Date(ultimo.criado_em).toLocaleDateString('pt-BR');
+          if (elUltInfo) elUltInfo.textContent = new Date(ultimo.criado_em).toLocaleTimeString('pt-BR') + ' · ' + formatBytes(ultimo.tamanho);
+        } else {
+          elUlt.textContent = '--';
+          if (elUltInfo) elUltInfo.textContent = 'Nenhum backup ainda';
+        }
+      }
+
+      var elComp = document.getElementById('card-bkp-completo');
+      var elCompInfo = document.getElementById('card-bkp-completo-info');
+      if (elComp) {
+        if (ultimoCompleto) {
+          elComp.textContent = new Date(ultimoCompleto.criado_em).toLocaleDateString('pt-BR');
+          if (elCompInfo) elCompInfo.textContent = formatBytes(ultimoCompleto.tamanho);
+        } else {
+          elComp.textContent = '--';
+          if (elCompInfo) elCompInfo.textContent = 'Nenhum completo ainda';
+        }
+      }
+
+      // Ultima restauracao (pega da config salva ou localStorage)
+      var elRes = document.getElementById('card-bkp-restore');
+      var elResInfo = document.getElementById('card-bkp-restore-info');
+      if (elRes) {
+        var ultRestore = localStorage.getItem('__ultimoRestore');
+        if (ultRestore) {
+          var d = new Date(ultRestore);
+          elRes.textContent = d.toLocaleDateString('pt-BR');
+          if (elResInfo) elResInfo.textContent = d.toLocaleTimeString('pt-BR');
+        } else {
+          elRes.textContent = '--';
+          if (elResInfo) elResInfo.textContent = 'Nunca restaurado';
+        }
+      }
+    } catch (e) { console.error('Erro cards backup:', e); }
+
+    if (!lista || lista.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:#64748b;">Nenhum backup ainda. Clique em "Gerar Backup Agora" ou "Backup Completo".</td></tr>';
+      return;
+    }
+    tbody.innerHTML = '';
+    lista.forEach(function(b, idx) {
+      var data = b.criado_em ? new Date(b.criado_em).toLocaleString('pt-BR') : '-';
+      var isZip = b.nome.endsWith('.zip');
+      var iconArquivo = isZip ? '&#128230;' : '&#128190;';
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + (idx + 1) + '</td>' +
+        '<td>' + getBadgeTipo(b.nome) + '<span style="font-family:monospace;font-size:0.82rem;">' + iconArquivo + ' ' + b.nome + '</span></td>' +
+        '<td>' + formatBytes(b.tamanho) + '</td>' +
+        '<td>' + data + '</td>' +
+        '<td class="col-center">' +
+          '<button class="btn-action btn-action-secondary" style="padding:4px 10px;font-size:0.78rem;" onclick="baixarBackupSalvo(\'' + b.nome + '\')">Baixar</button> ' +
+          '<button class="btn-action" style="padding:4px 10px;font-size:0.78rem;background:#dc2626;color:#fff;" onclick="excluirBackup(\'' + b.nome + '\')">Excluir</button>' +
+        '</td>';
+      tbody.appendChild(tr);
+    });
+  }
+
+  // FASE_9_BACKUP_COMPLETO_UI
+  window.gerarBackupCompleto = async function() {
+    if (typeof mostrarToast === 'function') mostrarToast('Gerando backup completo (pode levar 10s)...', 'info', 'Backup');
+    try {
+      var res = await apiFetch('/backup/gerar-completo', { method: 'POST' });
+      var data = await res.json();
+      if (data.ok) {
+        var mb = (data.tamanho / 1024 / 1024).toFixed(2);
+        if (typeof mostrarToast === 'function') mostrarToast('Backup completo: ' + data.arquivo + ' (' + mb + ' MB)', 'success', 'Backup');
+        loadBackupsDaAPI(true);
+      } else {
+        if (typeof mostrarToast === 'function') mostrarToast('Erro: ' + (data.erro || 'desconhecido'), 'error', 'Backup');
+      }
+    } catch (e) {
+      if (typeof mostrarToast === 'function') mostrarToast('Erro: ' + e.message, 'error', 'Backup');
+    }
+  };
+
+
+  // FASE_9_CARDS_BACKUP
+  window.baixarUltimoCompleto = function() {
+    var url = '/api/backup/listar?tipo=completo';
+    var token = localStorage.getItem('token') || '';
+    apiFetch('/backup/listar').then(function(r){ return r.json(); }).then(function(data){
+      var completos = (data.backups || []).filter(function(b){ return b.nome.indexOf('completo_') === 0; });
+      if (completos.length === 0) {
+        if (typeof mostrarToast === 'function') mostrarToast('Nenhum backup completo ainda.', 'warning', 'Backup');
+        return;
+      }
+      var ultimo = completos[0].nome;
+      window.location.href = '/api/backup/baixar/' + encodeURIComponent(ultimo) + '?token=' + encodeURIComponent(token);
+    }).catch(function(e){
+      if (typeof mostrarToast === 'function') mostrarToast('Erro: ' + e.message, 'error', 'Backup');
+    });
+  };
+
+  window.loadBackupsDaAPI = loadBackupsDaAPI;
+
+  window.gerarBackupAgora = async function() {
+    if (typeof mostrarToast === 'function') mostrarToast('Gerando backup...', 'info', 'Backup');
+    try {
+      var res = await apiFetch('/backup/gerar', { method: 'POST' });
+      var data = await res.json();
+      if (data.ok) {
+        if (typeof mostrarToast === 'function') mostrarToast('Backup gerado: ' + data.arquivo, 'success', 'Backup');
+        loadBackupsDaAPI(true);
+      } else {
+        if (typeof mostrarToast === 'function') mostrarToast('Erro: ' + (data.erro || 'desconhecido'), 'error', 'Backup');
+      }
+    } catch (e) {
+      if (typeof mostrarToast === 'function') mostrarToast('Erro: ' + e.message, 'error', 'Backup');
+    }
+  };
+
+  window.baixarBackupDireto = function() {
+    var token = localStorage.getItem('token') || '';
+    window.location.href = '/api/backup/exportar?token=' + encodeURIComponent(token);
+  };
+
+  window.baixarBackupSalvo = function(nome) {
+    var token = localStorage.getItem('token') || '';
+    window.location.href = '/api/backup/baixar/' + encodeURIComponent(nome) + '?token=' + encodeURIComponent(token);
+  };
+
+  window.excluirBackup = async function(nome) {
+    if (!confirm('Excluir backup ' + nome + '?')) return;
+    try {
+      var res = await apiFetch('/backup/' + encodeURIComponent(nome), { method: 'DELETE' });
+      var data = await res.json();
+      if (data.ok) {
+        if (typeof mostrarToast === 'function') mostrarToast('Backup excluido.', 'success', 'Backup');
+        loadBackupsDaAPI(true);
+      }
+    } catch (e) {
+      if (typeof mostrarToast === 'function') mostrarToast('Erro: ' + e.message, 'error', 'Backup');
+    }
+  };
+  </script>
+
+
+  <script type="text/javascript">
+// @ts-nocheck
+  window.__restoreConteudo = null;
+
+  window.abrirModalRestore = function() {
+    document.getElementById('modal-restore').style.display = 'flex';
+    document.getElementById('restore-file').value = '';
+    document.getElementById('restore-senha').value = '';
+    document.getElementById('restore-confirm').value = '';
+    document.getElementById('restore-info').textContent = '';
+    document.getElementById('restore-resultado').innerHTML = '';
+    window.__restoreConteudo = null;
+  };
+  window.fecharModalRestore = function() {
+    document.getElementById('modal-restore').style.display = 'none';
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      var inp = document.getElementById('restore-file');
+      if (!inp) return;
+      inp.addEventListener('change', function(e) {
+        var f = e.target.files && e.target.files[0];
+        if (!f) return;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          try {
+            var json = JSON.parse(ev.target.result);
+            var dados = json.dados || {};
+            var tabelas = Object.keys(dados);
+            var total = tabelas.reduce(function(acc, t){ return acc + (Array.isArray(dados[t]) ? dados[t].length : 0); }, 0);
+            document.getElementById('restore-info').innerHTML = '<strong>Arquivo:</strong> ' + f.name + ' (' + (f.size/1024).toFixed(1) + ' KB)<br>' +
+              '<strong>Gerado em:</strong> ' + (json.gerado_em || '-') + '<br>' +
+              '<strong>Tabelas:</strong> ' + tabelas.length + ' | <strong>Registros:</strong> ' + total;
+            window.__restoreConteudo = ev.target.result;
+          } catch (err) {
+            document.getElementById('restore-info').innerHTML = '<span style="color:#dc2626;">Erro ao ler JSON: ' + err.message + '</span>';
+            window.__restoreConteudo = null;
+          }
+        };
+        reader.readAsText(f);
+      });
+    }, 800);
+  });
+
+  window.executarRestore = async function() {
+    var btn = document.getElementById('btn-confirmar-restore');
+    var res = document.getElementById('restore-resultado');
+    var senha = document.getElementById('restore-senha').value;
+    var conf = document.getElementById('restore-confirm').value;
+
+    if (!window.__restoreConteudo) {
+      res.innerHTML = '<div style="color:#dc2626;">Selecione um arquivo primeiro.</div>';
+      return;
+    }
+    if (!senha) {
+      res.innerHTML = '<div style="color:#dc2626;">Digite sua senha.</div>';
+      return;
+    }
+    if (conf !== 'RESTAURAR') {
+      res.innerHTML = '<div style="color:#dc2626;">Digite RESTAURAR no campo de confirmacao.</div>';
+      return;
+    }
+
+    if (!confirm('CONFIRMAR RESTORE?\n\nTodos os dados atuais serao SUBSTITUIDOS pelos dados do arquivo.')) {
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Restaurando...';
+    res.innerHTML = '<div style="color:#2563eb;">Processando... pode levar ate 1 minuto.</div>';
+
+    try {
+      var resp = await apiFetch('/backup/importar', {
+        method: 'POST',
+        body: JSON.stringify({
+          conteudo: window.__restoreConteudo,
+          senha: senha,
+          confirmacao: conf
+        })
+      });
+      var data = await resp.json();
+      if (resp.ok && data.ok) {
+        var rel = data.relatorio || {};
+        var html = '<div style="color:#059669;font-weight:700;margin-bottom:8px;">&#10004; Restore concluido!</div>';
+        html += '<div>Pre-backup: <code>' + (data.pre_backup || '-') + '</code></div>';
+        html += '<div>Tabelas restauradas: <strong>' + (rel.truncadas || []).length + '</strong></div>';
+        html += '<div>Erros: <strong style="color:' + ((rel.erros || []).length > 0 ? '#dc2626' : '#059669') + ';">' + (rel.erros || []).length + '</strong></div>';
+        if (rel.erros && rel.erros.length > 0) {
+          html += '<div style="margin-top:8px;max-height:120px;overflow-y:auto;font-size:0.72rem;color:#dc2626;">' + rel.erros.slice(0, 10).join('<br>') + '</div>';
+        }
+        res.innerHTML = html;
+        if (typeof mostrarToast === 'function') mostrarToast('Backup restaurado!', 'success', 'Restore');
+        setTimeout(function() {
+          if (confirm('Restore concluido. Recarregar a pagina agora?')) location.reload();
+        }, 1500);
+      } else {
+        res.innerHTML = '<div style="color:#dc2626;">Erro: ' + (data.erro || 'desconhecido') + '</div>';
+      }
+    } catch (e) {
+      res.innerHTML = '<div style="color:#dc2626;">Erro: ' + e.message + '</div>';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Restaurar agora';
+    }
+  };
   </script>
 
 </body>

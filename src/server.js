@@ -263,6 +263,7 @@ const ROTAS = [
   './routes/fechamento',
   './routes/alertas',
   './routes/historico',
+  './routes/backup', // FASE_9_BACKUP
 ];
 
 ROTAS.forEach((caminho) => {
@@ -760,6 +761,67 @@ async function limparAuditoriaSeNecessario() {
 }
 
 await limparAuditoriaSeNecessario();
+
+// =========================================================================
+// FASE_9_AUTO_BACKUP - Backup automatico diario (verificado no boot)
+// =========================================================================
+async function fazerBackupSeNecessario() {
+  try {
+    const bpath = require('path');
+    const bfs = require('fs');
+    const pastaBackups = bpath.resolve(__dirname, '..', 'backups');
+    if (!bfs.existsSync(pastaBackups)) bfs.mkdirSync(pastaBackups, { recursive: true });
+
+    const arquivos = bfs.readdirSync(pastaBackups)
+      .filter(f => f.startsWith('backup_') && f.endsWith('.json'))
+      .map(f => ({ nome: f, mtime: bfs.statSync(bpath.join(pastaBackups, f)).mtime }))
+      .sort((a, b) => b.mtime - a.mtime);
+
+    if (arquivos.length > 0) {
+      const ultimo = arquivos[0].mtime;
+      const horasDesde = (Date.now() - new Date(ultimo).getTime()) / 3600000;
+      if (horasDesde < 24) {
+        console.log('[BACKUP] Ultimo backup: ' + Math.floor(horasDesde) + 'h atras. Pulando.');
+        return;
+      }
+    }
+
+    console.log('[BACKUP] Gerando backup automatico...');
+    const tabelas = await db.query(
+      "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE' ORDER BY table_name"
+    );
+    const dados = {};
+    for (const row of tabelas.rows) {
+      const t = row.table_name;
+      try {
+        const r = await db.query('SELECT * FROM "' + t + '"');
+        dados[t] = r.rows;
+      } catch (e) {
+        dados[t] = { erro: e.message };
+      }
+    }
+    const agora = new Date().toISOString().replace(/[:.]/g, '-');
+    const nome = 'backup_' + agora + '.json';
+    const payload = {
+      versao: 'v1977-backup-auto',
+      gerado_em: new Date().toISOString(),
+      total_tabelas: tabelas.rows.length,
+      dados: dados
+    };
+    bfs.writeFileSync(bpath.join(pastaBackups, nome), JSON.stringify(payload), 'utf8');
+    console.log('[BACKUP] OK Backup salvo: ' + nome);
+
+    const todos = bfs.readdirSync(pastaBackups)
+      .filter(f => f.startsWith('backup_') && f.endsWith('.json'))
+      .map(f => ({ nome: f, mtime: bfs.statSync(bpath.join(pastaBackups, f)).mtime }))
+      .sort((a, b) => b.mtime - a.mtime);
+    todos.slice(7).forEach(x => { try { bfs.unlinkSync(bpath.join(pastaBackups, x.nome)); } catch (e) {} });
+  } catch (e) {
+    console.error('[BACKUP] Erro (nao fatal):', e.message);
+  }
+}
+
+await fazerBackupSeNecessario();
 
 console.log('[BOOT] Chamando fastify.listen...');
     await fastify.listen({ port: Number(PORT), host: HOST });
