@@ -520,6 +520,178 @@
     /* /FASE_4_LOGIN_V2                             */
     /* ============================================ */
 
+
+    /* ==== FASE_7_HISTORICO_MELHORADO ==== */
+    .timeline-acao-icone { font-size:1.05rem; margin-right:4px; }
+    .hist-paginacao { display:flex; justify-content:space-between; align-items:center; gap:0.75rem; flex-wrap:wrap; padding:0.75rem 1rem; background:#fff; border:1px solid var(--border); border-radius:8px; margin:1rem 0; font-size:0.85rem; }
+    .hist-paginacao-info { color:#64748b; }
+    .hist-paginacao-controles { display:flex; gap:0.5rem; align-items:center; }
+    .hist-paginacao-controles button { padding:0.35rem 0.75rem; border:1px solid #cbd5e1; background:#fff; border-radius:6px; cursor:pointer; font-size:0.85rem; font-weight:600; color:#0f2a4a; }
+    .hist-paginacao-controles button:hover:not(:disabled) { background:#f1f5f9; }
+    .hist-paginacao-controles button:disabled { opacity:0.4; cursor:not-allowed; }
+    .hist-paginacao-controles select { padding:0.35rem 0.5rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.85rem; background:#fff; }
+    .hist-paginacao-pagina { font-weight:700; color:#0f2a4a; }
+    @media print {
+      .no-print, .bar-controls, .historico-filtros, .hist-paginacao, .sidebar, header, nav { display:none !important; }
+      .timeline { padding-left:0; }
+      .timeline::before { display:none; }
+      .timeline-item { page-break-inside:avoid; box-shadow:none; border:1px solid #999; }
+      body { background:#fff !important; }
+    }
+    .hist-print-header { display:none; }
+    @media print { .hist-print-header { display:block !important; text-align:center; padding:1rem 0; border-bottom:2px solid #0f2a4a; margin-bottom:1rem; } }
+    /* ==== /FASE_7_HISTORICO_MELHORADO ==== */
+
+    /* ==== FASE_7_HISTORICO_V2 ==== */
+    .hist-toolbar { background:#fff; border:1px solid var(--border); border-radius:10px; padding:0.85rem 1rem; margin-bottom:1rem; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+    .hist-toolbar-atalhos { display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:0.65rem; }
+    .hist-chip-atalho { padding:0.3rem 0.75rem; border:1px solid #cbd5e1; background:#fff; border-radius:14px; font-size:0.78rem; font-weight:600; color:#475569; cursor:pointer; transition:all .15s; }
+    .hist-chip-atalho:hover { background:#f1f5f9; border-color:#94a3b8; }
+    .hist-chip-atalho.ativo { background:#2563eb; color:#fff; border-color:#2563eb; }
+    .hist-filtros-linha { display:flex; gap:0.6rem; flex-wrap:wrap; align-items:end; }
+    .hist-filtro-item2 { flex:1 1 130px; min-width:120px; }
+    .hist-filtro-item2.hist-filtro-busca { flex:1 1 160px; }
+    .hist-filtro-item2 label { display:block; font-size:0.68rem; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:3px; }
+    .hist-filtro-item2 input, .hist-filtro-item2 select { width:100%; padding:0.45rem 0.6rem; border:1px solid #cbd5e1; border-radius:6px; font-size:0.82rem; box-sizing:border-box; background:#fff; color:#0f2a4a; }
+    .hist-filtro-item2 input:focus, .hist-filtro-item2 select:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,0.15); }
+    .hist-filtro-acoes2 { display:flex; gap:0.4rem; }
+    /* Chips de resumo clicaveis */
+    .timeline-resumo-item.chip-clicavel { cursor:pointer; padding:0.25rem 0.6rem; border-radius:14px; border:1px solid transparent; transition:all .15s; }
+    .timeline-resumo-item.chip-clicavel:hover { background:#f1f5f9; border-color:#cbd5e1; }
+    .timeline-resumo-item.chip-clicavel.ativo { background:#dbeafe; border-color:#2563eb; }
+    /* ==== /FASE_7_HISTORICO_V2 ==== */
+
+    /* ==== FASE_7_DARK_HISTORICO ==== */
+    [data-theme="dark"] .hist-toolbar { background:#181c23 !important; border-color:rgba(255,255,255,0.08) !important; }
+    [data-theme="dark"] .hist-chip-atalho { background:#0f131a !important; border-color:rgba(255,255,255,0.12) !important; color:#cbd5e1 !important; }
+    [data-theme="dark"] .hist-chip-atalho:hover { background:#1e242e !important; border-color:rgba(255,255,255,0.24) !important; color:#e2e8f0 !important; }
+    [data-theme="dark"] .hist-chip-atalho.ativo { background:#2563eb !important; color:#fff !important; border-color:#2563eb !important; }
+    [data-theme="dark"] .hist-filtro-item2 label { color:#94a3b8 !important; }
+    [data-theme="dark"] .hist-filtro-item2 input,
+    [data-theme="dark"] .hist-filtro-item2 select { background:#0f131a !important; border-color:rgba(255,255,255,0.12) !important; color:#e2e8f0 !important; }
+    [data-theme="dark"] .hist-filtro-item2 input::placeholder { color:#64748b !important; }
+    [data-theme="dark"] .hist-filtro-item2 input:focus,
+    [data-theme="dark"] .hist-filtro-item2 select:focus { border-color:#3b82f6 !important; box-shadow:0 0 0 3px rgba(59,130,246,0.25) !important; }
+    [data-theme="dark"] .hist-filtro-item2 select option { background:#0f131a; color:#e2e8f0; }
+
+    [data-theme="dark"] .timeline-resumo { background:#181c23 !important; color:#cbd5e1 !important; }
+    [data-theme="dark"] .timeline-resumo-item { color:#cbd5e1 !important; }
+    [data-theme="dark"] .timeline-resumo-item.chip-clicavel { background:transparent !important; }
+    [data-theme="dark"] .timeline-resumo-item.chip-clicavel:hover { background:#1e242e !important; border-color:rgba(255,255,255,0.16) !important; }
+    [data-theme="dark"] .timeline-resumo-item.chip-clicavel.ativo { background:rgba(59,130,246,0.18) !important; border-color:#3b82f6 !important; color:#e2e8f0 !important; }
+    [data-theme="dark"] .timeline-resumo-item strong { color:#e2e8f0 !important; }
+
+    [data-theme="dark"] .timeline-dia { color:#93c5fd !important; }
+    [data-theme="dark"] .timeline-item { background:#181c23 !important; border-color:rgba(255,255,255,0.08) !important; color:#cbd5e1 !important; }
+    [data-theme="dark"] .timeline-item:hover { box-shadow:0 3px 12px rgba(0,0,0,0.35) !important; }
+    [data-theme="dark"] .timeline-hora { color:#94a3b8 !important; }
+    [data-theme="dark"] .timeline-acao { color:#e2e8f0 !important; }
+    [data-theme="dark"] .timeline-meta { color:#94a3b8 !important; }
+    [data-theme="dark"] .timeline-detalhe { color:#cbd5e1 !important; border-top-color:rgba(255,255,255,0.08) !important; }
+
+    [data-theme="dark"] .badge-cadastro { background:rgba(5,150,105,0.18) !important; color:#6ee7b7 !important; }
+    [data-theme="dark"] .badge-operacao { background:rgba(245,158,11,0.18) !important; color:#fcd34d !important; }
+    [data-theme="dark"] .badge-financeiro { background:rgba(139,92,246,0.20) !important; color:#c4b5fd !important; }
+    [data-theme="dark"] .badge-administracao { background:rgba(220,38,38,0.18) !important; color:#fca5a5 !important; }
+    [data-theme="dark"] .badge-sistema { background:rgba(148,163,184,0.18) !important; color:#cbd5e1 !important; }
+    [data-theme="dark"] .badge-outro { background:rgba(148,163,184,0.18) !important; color:#cbd5e1 !important; }
+
+    [data-theme="dark"] .hist-paginacao { background:#181c23 !important; border-color:rgba(255,255,255,0.08) !important; color:#cbd5e1 !important; }
+    [data-theme="dark"] .hist-paginacao-info { color:#94a3b8 !important; }
+    [data-theme="dark"] .hist-paginacao-info strong { color:#e2e8f0 !important; }
+    [data-theme="dark"] .hist-paginacao-pagina { color:#93c5fd !important; }
+    [data-theme="dark"] .hist-paginacao-controles button { background:#0f131a !important; border-color:rgba(255,255,255,0.12) !important; color:#e2e8f0 !important; }
+    [data-theme="dark"] .hist-paginacao-controles button:hover:not(:disabled) { background:#1e242e !important; }
+    [data-theme="dark"] .hist-paginacao-controles select { background:#0f131a !important; border-color:rgba(255,255,255,0.12) !important; color:#e2e8f0 !important; }
+    [data-theme="dark"] .hist-paginacao-controles select option { background:#0f131a; color:#e2e8f0; }
+
+    /* Botao Filtrar escuro (primary) - mantem gradiente */
+    [data-theme="dark"] .hist-filtro-acoes2 .btn-action-primary { color:#fff !important; }
+    /* Botao Limpar (secondary) no dark */
+    [data-theme="dark"] .hist-filtro-acoes2 .btn-action-secondary { background:#0f131a !important; color:#e2e8f0 !important; border:1px solid rgba(255,255,255,0.12) !important; }
+    [data-theme="dark"] .hist-filtro-acoes2 .btn-action-secondary:hover { background:#1e242e !important; }
+    /* ==== /FASE_7_DARK_HISTORICO ==== */
+
+    /* ==== FASE_7_PRINT_HISTORICO ==== */
+    @media print {
+      /* Esconde TUDO por padrao */
+      body * { visibility: hidden !important; }
+
+      /* Mostra apenas o conteudo do historico */
+      #tab-historico,
+      #tab-historico * { visibility: visible !important; }
+
+      /* Posiciona a secao no topo da pagina */
+      #tab-historico {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        padding: 10mm !important;
+        margin: 0 !important;
+        background: #fff !important;
+        color: #000 !important;
+      }
+
+      /* Cabecalho de impressao */
+      #hist-print-header {
+        display: block !important;
+        visibility: visible !important;
+        text-align: center;
+        padding: 0 0 12px 0;
+        border-bottom: 2px solid #0f2a4a;
+        margin-bottom: 16px;
+      }
+      #hist-print-header h2 { margin: 0 0 6px; color: #0f2a4a !important; font-size: 16pt; }
+      #hist-print-header p  { margin: 0; color: #475569 !important; font-size: 10pt; }
+
+      /* Esconde elementos que nao fazem sentido no PDF */
+      #tab-historico .bar-controls,
+      #tab-historico .hist-toolbar,
+      #tab-historico .hist-paginacao,
+      #tab-historico .btn-action { display: none !important; }
+
+      /* Timeline em preto e branco para impressao */
+      #tab-historico .timeline::before { display: none !important; }
+      #tab-historico .timeline { padding-left: 0 !important; }
+
+      #tab-historico .timeline-dia {
+        color: #0f2a4a !important;
+        font-weight: 700 !important;
+        margin-top: 12px !important;
+        page-break-after: avoid;
+      }
+      #tab-historico .timeline-item {
+        background: #fff !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        color: #000 !important;
+        padding: 8px 10px !important;
+        margin-bottom: 6px !important;
+        page-break-inside: avoid;
+        transform: none !important;
+      }
+      #tab-historico .timeline-item::before { display: none !important; }
+      #tab-historico .timeline-hora { color: #475569 !important; }
+      #tab-historico .timeline-acao { color: #0f2a4a !important; font-weight: 700 !important; }
+      #tab-historico .timeline-meta { color: #475569 !important; }
+      #tab-historico .timeline-detalhe { color: #334155 !important; border-top-color: #cbd5e1 !important; }
+      #tab-historico .timeline-badge {
+        background: #f1f5f9 !important;
+        color: #334155 !important;
+        border: 1px solid #cbd5e1 !important;
+      }
+      #tab-historico .timeline-resumo {
+        background: #f8fafc !important;
+        color: #334155 !important;
+        border: 1px solid #e2e8f0 !important;
+      }
+      #tab-historico .timeline-resumo-item strong { color: #0f2a4a !important; }
+
+      /* Pagina em paisagem para caber mais */
+      @page { size: A4 landscape; margin: 10mm; }
+    }
+    /* ==== /FASE_7_PRINT_HISTORICO ==== */
 </style>
   
   <style>
@@ -1682,27 +1854,7 @@
 
     
 
-    async function abrirModalLimparAuditoria() {
-      const op = prompt("LIMPAR LOGS:\n1: Por Usuário\n2: Por Mês (AAAA-MM)\n3: Tudo\nDigite 1, 2 ou 3:");
-      if (!op) return;
-      const payload = {};
-      if (op === '1') { payload.tipo = 'usuario'; payload.usuario = prompt("Nome/e-mail:"); }
-      else if (op === '2') { payload.tipo = 'mes'; payload.mes = prompt("Mês (ex: 2026-08):"); }
-      else if (op === '3') { if (!confirm("Apagar todos os logs?")) return; payload.tipo = 'tudo'; }
-      else return;
-
-      try {
-        const t = state.token || localStorage.getItem('token') || '';
-        const res = await fetch('/api/auditoria/limpar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...(t ? { 'Authorization': 'Bearer ' + t } : {}) },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        alert(data.mensagem || 'Concluído');
-        await loadAuditoriaDaAPI();
-      } catch (err) { alert('Erro ao limpar: ' + err.message); }
-    }
+    // FASE_7_AUDITORIA_REMOVIDA: modal removido
 </script>
 
 
@@ -1884,7 +2036,6 @@
         <button class="nav-tab-btn" data-tab="tab-abastecimentos"><span>&#9981;</span><span class="nav-label">Abastecimentos</span></button>
         <button class="nav-tab-btn" data-tab="tab-manutencoes"><span>&#128295;</span><span class="nav-label">Manutenção</span></button>
         <button class="nav-tab-btn" data-tab="tab-documentos"><span>&#128196;</span><span class="nav-label">Documentos</span></button>
-        <button class="nav-tab-btn" data-tab="tab-historico" onclick="setTimeout(loadHistoricoDaAPI, 150)"><span>&#128220;</span><span class="nav-label">Histórico</span></button>
       </div>
       <button class="nav-tab-btn nav-group-toggle" data-group="grupo-financeiro"><span>&#128176;</span><span class="nav-label">Financeiro</span><span class="nav-arrow">&#9654;</span></button>
       <div class="nav-submenu" id="grupo-financeiro">
@@ -1903,8 +2054,9 @@
       <div class="nav-submenu" id="grupo-admin">
         <button class="nav-tab-btn" data-tab="tab-usuarios" id="nav-tab-usuarios" onclick="setTimeout(loadUsuariosDaAPI, 100)"><span>&#128101;</span><span class="nav-label">Usuários</span></button>
         <button class="nav-tab-btn" data-tab="tab-perfis" id="nav-tab-perfis" onclick="setTimeout(loadPerfisDaAPI, 100)"><span>&#128737;</span><span class="nav-label">Perfis</span></button>
-        <button class="nav-tab-btn" data-tab="tab-auditoria" id="nav-tab-auditoria" onclick="setTimeout(loadAuditoriaDaAPI, 100)"><span>&#128373;</span><span class="nav-label">Auditoria</span></button>
+        <!-- FASE_7_AUDITORIA_REMOVIDA: botao removido -->
         <button class="nav-tab-btn" id="nav-btn-atualizar" onclick="abrirModalAtualizar()"><span>&#128260;</span><span class="nav-label">Atualizar App</span></button>
+        <button class="nav-tab-btn" data-tab="tab-historico" onclick="setTimeout(loadHistoricoDaAPI, 150)"><span>&#128220;</span><span class="nav-label">Histórico</span></button>
         <button class="nav-tab-btn" data-tab="tab-configuracoes" id="nav-tab-configuracoes"><span>&#9881;&#65039;</span><span class="nav-label">Configura&ccedil;&otilde;es</span></button>
         <button class="nav-tab-btn" data-tab="tab-ajuda" id="nav-tab-ajuda"><span>&#10067;</span><span class="nav-label">Ajuda</span></button>
       </div>
@@ -2957,38 +3109,55 @@
             <span class="label-month-select">Historico de Atividades:</span>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-secondary" onclick="exportarHistoricoCSV()">&#11015;&#65039; Exportar CSV</button>
+            <button class="btn-action btn-action-secondary" onclick="exportarHistoricoCSV()">&#11015;&#65039; CSV</button>
+            <button class="btn-action btn-action-secondary" style="background:#059669;color:#fff;" onclick="exportarHistoricoXLS()">&#128202; XLS</button>
+            <button class="btn-action btn-action-secondary" style="background:#dc2626;color:#fff;" onclick="exportarHistoricoPDF()">&#128196; PDF</button>
             <button class="btn-action btn-action-primary" onclick="loadHistoricoDaAPI(true)">&#128260; Atualizar</button>
           </div>
         </div>
 
-        <div class="historico-filtros">
-          <div class="historico-filtros-grid">
-            <div class="historico-filtro-item">
-              <label for="hist-filtro-data-ini">Data Inicio</label>
+        <!-- FASE_7_HISTORICO_V2: filtros redesenhados -->
+        <div class="hist-toolbar">
+          <div class="hist-toolbar-atalhos">
+            <button class="hist-chip-atalho" onclick="histPeriodoRapido('hoje', this)">Hoje</button>
+            <button class="hist-chip-atalho" onclick="histPeriodoRapido('7d', this)">7 dias</button>
+            <button class="hist-chip-atalho" onclick="histPeriodoRapido('30d', this)">30 dias</button>
+            <button class="hist-chip-atalho" onclick="histPeriodoRapido('mes', this)">Este mês</button>
+            <button class="hist-chip-atalho" onclick="histPeriodoRapido('limpar', this)">Limpar período</button>
+          </div>
+          <div class="hist-filtros-linha">
+            <div class="hist-filtro-item2">
+              <label for="hist-filtro-data-ini">De</label>
               <input type="date" id="hist-filtro-data-ini">
             </div>
-            <div class="historico-filtro-item">
-              <label for="hist-filtro-data-fim">Data Fim</label>
+            <div class="hist-filtro-item2">
+              <label for="hist-filtro-data-fim">Até</label>
               <input type="date" id="hist-filtro-data-fim">
             </div>
-            <div class="historico-filtro-item">
-              <label for="hist-filtro-usuario">Usuario</label>
+            <div class="hist-filtro-item2">
+              <label for="hist-filtro-usuario">Usuário</label>
               <select id="hist-filtro-usuario"><option value="">Todos</option></select>
             </div>
-            <div class="historico-filtro-item">
-              <label for="hist-filtro-tipo">Tipo de Acao</label>
-              <input type="text" id="hist-filtro-tipo" placeholder="Ex: CRIAR, EDITAR">
+            <div class="hist-filtro-item2">
+              <label for="hist-filtro-tipo">Ação</label>
+              <select id="hist-filtro-tipo">
+                <option value="">Todas</option>
+                <option value="CRIAR">🟢 Criar</option>
+                <option value="EDITAR">🔵 Editar</option>
+                <option value="EXCLUIR">🔴 Excluir</option>
+                <option value="LOGIN">🔑 Login</option>
+                <option value="LOGOUT">🚪 Logout</option>
+              </select>
             </div>
-            <div class="historico-filtro-item">
-              <label for="hist-filtro-modulo">Modulo</label>
+            <div class="hist-filtro-item2">
+              <label for="hist-filtro-modulo">Módulo</label>
               <select id="hist-filtro-modulo"><option value="">Todos</option></select>
             </div>
-            <div class="historico-filtro-item">
-              <label for="hist-filtro-veiculo">Veiculo / Texto</label>
-              <input type="text" id="hist-filtro-veiculo" placeholder="Ex: ABC1234">
+            <div class="hist-filtro-item2 hist-filtro-busca">
+              <label for="hist-filtro-veiculo">Buscar</label>
+              <input type="text" id="hist-filtro-veiculo" placeholder="Placa, texto...">
             </div>
-            <div class="historico-filtro-item historico-acoes">
+            <div class="hist-filtro-acoes2">
               <button class="btn-action btn-action-secondary" onclick="limparFiltrosHistorico()">Limpar</button>
               <button class="btn-action btn-action-primary" onclick="aplicarFiltrosHistorico()">&#128269; Filtrar</button>
             </div>
@@ -3270,39 +3439,7 @@
       </div>
 
 
-      <section id="tab-auditoria" class="tab-content">
-        <div class="bar-controls" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; margin-bottom:1rem;">
-          <div style="display:flex; align-items:center; gap:0.75rem;">
-            <input type="text" id="filtro-auditoria" placeholder="🔍 Pesquisar em qualquer coluna..." oninput="filtrarAuditoriaNaTela()" style="padding:0.45rem 0.85rem; border:1px solid #cbd5e1; border-radius:6px; width:280px; font-size:0.85rem;">
-            <span style="font-size:0.85rem; color:var(--text-muted);">Trilha de Auditoria</span>
-          </div>
-          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-            <button class="btn-action btn-action-secondary" onclick="loadAuditoriaDaAPI()">🔍„ Atualizar</button>
-            <button class="btn-action" style="background:#0284c7;color:#fff;" onclick="testarAuditoriaManual()">🧪 Testar</button>
-            <button class="btn-action" style="background:#dc2626;color:#fff;" onclick="abrirModalLimparAuditoria()">🗑️ Limpar Logs</button>
-            <button class="btn-action btn-action-secondary" onclick="exportTableToCSV('Trilha_Auditoria.csv', 'table-auditoria')">⬇️ Exportar CSV</button>
-          </div>
-        </div>
-
-        <div class="section-title-wrap">
-          <h2 class="section-title"><span>🕵️</span> Histórico de Ações da Frota</h2>
-        </div>
-
-        <div class="table-container">
-          <table class="data-table" id="table-auditoria">
-            <thead>
-              <tr>
-                <th style="width: 160px;">Data / Hora</th>
-                <th style="width: 180px;">Usuário</th>
-                <th style="width: 130px;">Ação</th>
-                <th style="width: 140px;">Módulo</th>
-                <th>Detalhes do Registro</th>
-              </tr>
-            </thead>
-            <tbody id="tbody-auditoria"></tbody>
-          </table>
-        </div>
-      </section>
+      <!-- FASE_7_AUDITORIA_REMOVIDA: section removida -->
 
     
       <!-- TAB: AJUDA -->
@@ -5769,9 +5906,7 @@
       document.querySelectorAll('[data-tab="tab-perfis"]').forEach(btn => {
         btn.addEventListener('click', () => setTimeout(typeof loadPerfisDaAPI === 'function' ? loadPerfisDaAPI : (() => {}), 100));
       });
-      document.querySelectorAll('[data-tab="tab-auditoria"]').forEach(btn => {
-        btn.addEventListener('click', () => setTimeout(typeof loadAuditoriaDaAPI === 'function' ? loadAuditoriaDaAPI : (() => {}), 100));
-      });
+      // FASE_7_AUDITORIA_REMOVIDA: hook removido
     }, 500);
 
 
@@ -6120,57 +6255,7 @@
     window.atualizarModuloCheckbox = atualizarModuloCheckbox;
 
 
-    async function loadAuditoriaDaAPI() {
-      try {
-        const res = await apiFetch('/auditoria');
-        if (!res.ok) return;
-        const data = await res.json();
-        renderAuditoria(data);
-      } catch (err) {
-        console.error('Erro ao carregar auditoria:', err);
-      }
-    }
-
-    function renderAuditoria(lista) {
-      const tbody = document.getElementById('tbody-auditoria');
-      if (!tbody) return;
-      tbody.innerHTML = '';
-
-      if (!lista || lista.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhum log registrado.</td></tr>';
-        return;
-      }
-
-      lista.forEach(a => {
-        const data = a.created_at ? new Date(a.created_at).toLocaleString('pt-BR') : '-';
-        const tr = document.createElement('tr');
-        tr.innerHTML = '<td>' + data + '</td>' +
-                       '<td>' + (a.usuario_nome || '-') + '</td>' +
-                       '<td>' + (a.acao || '-') + '</td>' +
-                       '<td>' + (a.modulo || '-') + '</td>' +
-                       '<td>' + (a.detalhes || '-') + '</td>';
-        tbody.appendChild(tr);
-      });
-    }
-
-    function filtrarAuditoriaNaTela() {
-      const termo = (document.getElementById('filtro-auditoria')?.value || '').toLowerCase().trim();
-      document.querySelectorAll('#tbody-auditoria tr').forEach(tr => {
-        tr.style.display = tr.textContent.toLowerCase().includes(termo) ? '' : 'none';
-      });
-    }
-
-    function testarAuditoriaManual() {
-      if (typeof registrarLog === 'function') {
-        registrarLog('TESTE', 'SISTEMA', 'Teste manual de auditoria');
-        setTimeout(loadAuditoriaDaAPI, 400);
-      } else {
-        alert('Funcao registrarLog nao disponivel.');
-      }
-    }
-
-    window.loadPerfisDaAPI = loadPerfisDaAPI;
-    window.loadAuditoriaDaAPI = loadAuditoriaDaAPI;
+    // FASE_7_AUDITORIA_REMOVIDA: funcoes removidas
 
     // ==== DRE POR VEICULO v2 - Modulo premium ====
     var __drePlacasCache = null;
@@ -6808,7 +6893,7 @@
       if (__souAdmin) return;
 
       // 1) Esconde BOTOES do menu lateral com base nas permissoes
-      var mapa = {"tab-dashboard":"dashboard.visualizar","tab-cadastro":"veiculos.visualizar","tab-acoplamento":"acoplamentos.visualizar","tab-km":"km.visualizar","tab-abastecimentos":"abastecimentos.visualizar","tab-manutencoes":"manutencoes.visualizar","tab-documentos":"manutencoes.visualizar","tab-historico":"historico.visualizar","tab-lancamentos":"lancamentos.visualizar","tab-dre":"dre.visualizar","tab-dre-consolidada":"dre.consolidada.visualizar","tab-categorias":"categorias.visualizar","tab-centros-custo":"centros_custo.visualizar","tab-resumo":"resumo.visualizar","tab-graficos":"graficos.visualizar","tab-ranking":"ranking.visualizar","tab-metas":"metas.visualizar","tab-usuarios":"usuarios.visualizar","tab-perfis":"perfis.visualizar","tab-auditoria":"auditoria.visualizar"};
+      var mapa = {"tab-dashboard":"dashboard.visualizar","tab-cadastro":"veiculos.visualizar","tab-acoplamento":"acoplamentos.visualizar","tab-km":"km.visualizar","tab-abastecimentos":"abastecimentos.visualizar","tab-manutencoes":"manutencoes.visualizar","tab-documentos":"manutencoes.visualizar","tab-historico":"historico.visualizar","tab-lancamentos":"lancamentos.visualizar","tab-dre":"dre.visualizar","tab-dre-consolidada":"dre.consolidada.visualizar","tab-categorias":"categorias.visualizar","tab-centros-custo":"centros_custo.visualizar","tab-resumo":"resumo.visualizar","tab-graficos":"graficos.visualizar","tab-ranking":"ranking.visualizar","tab-metas":"metas.visualizar","tab-usuarios":"usuarios.visualizar","tab-perfis":"perfis.visualizar",};
       Object.keys(mapa).forEach(function(tabId) {
         var perm = mapa[tabId];
         var btns = document.querySelectorAll('[data-tab="' + tabId + '"]');
@@ -6852,7 +6937,7 @@
       var btn = e.target.closest ? e.target.closest("[data-tab]") : null;
       if (!btn || __souAdmin) return;
       var tabId = btn.getAttribute("data-tab");
-      var perm = {"tab-dashboard":"dashboard.visualizar","tab-cadastro":"veiculos.visualizar","tab-acoplamento":"acoplamentos.visualizar","tab-km":"km.visualizar","tab-abastecimentos":"abastecimentos.visualizar","tab-manutencoes":"manutencoes.visualizar","tab-documentos":"manutencoes.visualizar","tab-historico":"historico.visualizar","tab-lancamentos":"lancamentos.visualizar","tab-dre":"dre.visualizar","tab-dre-consolidada":"dre.consolidada.visualizar","tab-categorias":"categorias.visualizar","tab-centros-custo":"centros_custo.visualizar","tab-resumo":"resumo.visualizar","tab-graficos":"graficos.visualizar","tab-ranking":"ranking.visualizar","tab-metas":"metas.visualizar","tab-usuarios":"usuarios.visualizar","tab-perfis":"perfis.visualizar","tab-auditoria":"auditoria.visualizar"}[tabId];
+      var perm = {"tab-dashboard":"dashboard.visualizar","tab-cadastro":"veiculos.visualizar","tab-acoplamento":"acoplamentos.visualizar","tab-km":"km.visualizar","tab-abastecimentos":"abastecimentos.visualizar","tab-manutencoes":"manutencoes.visualizar","tab-documentos":"manutencoes.visualizar","tab-historico":"historico.visualizar","tab-lancamentos":"lancamentos.visualizar","tab-dre":"dre.visualizar","tab-dre-consolidada":"dre.consolidada.visualizar","tab-categorias":"categorias.visualizar","tab-centros-custo":"centros_custo.visualizar","tab-resumo":"resumo.visualizar","tab-graficos":"graficos.visualizar","tab-ranking":"ranking.visualizar","tab-metas":"metas.visualizar","tab-usuarios":"usuarios.visualizar","tab-perfis":"perfis.visualizar",}[tabId];
       if (perm && !temPermissao(perm)) {
         e.preventDefault();
         e.stopPropagation();
@@ -8148,32 +8233,79 @@
       return "outro";
     }
 
+    // FASE_7_HISTORICO_MELHORADO
+    var __histPaginaAtual = 1;
+    var __histPorPagina = 50;
+    var __histTodosEventos = [];
+
+    function getIconeAcao(acao) {
+      var a = String(acao || "").toUpperCase();
+      if (a.indexOf("CRIAR") !== -1 || a.indexOf("CADASTRAR") !== -1) return "\uD83D\uDFE2";
+      if (a.indexOf("EDITAR") !== -1 || a.indexOf("ATUALIZAR") !== -1) return "\uD83D\uDD35";
+      if (a.indexOf("EXCLUIR") !== -1 || a.indexOf("DELETAR") !== -1) return "\uD83D\uDD34";
+      if (a.indexOf("LOGIN") !== -1) return "\uD83D\uDD11";
+      if (a.indexOf("LOGOUT") !== -1 || a.indexOf("SAIR") !== -1) return "\uD83D\uDEAA";
+      if (a.indexOf("TESTE") !== -1) return "\uD83E\uDDEA";
+      return "\uD83D\uDCCC";
+    }
+
     function renderHistorico(data) {
       var timeline = document.getElementById("historico-timeline");
       var resumo = document.getElementById("historico-resumo");
       if (!timeline) return;
 
+      // FASE_7_FIX_NAN_DEFAULT
+      if (typeof __histPorPagina === "undefined" || !__histPorPagina) __histPorPagina = 50;
+      if (typeof __histPaginaAtual === "undefined" || !__histPaginaAtual) __histPaginaAtual = 1;
       var eventos = data.eventos || [];
+      // FASE_7_HISTORICO_V2: filtro por categoria clicada
+      if (window.__histCatAtiva && typeof classificarEvento === "function") {
+        eventos = eventos.filter(function(e) {
+          return classificarEvento(e.modulo, e.tipo_evento) === window.__histCatAtiva;
+        });
+      }
+      __histTodosEventos = eventos;
+      __histPaginaAtual = 1;
 
-      // Resumo (badges)
       if (resumo) {
         var pt = data.porTipo || {};
-        var htmlRes = '<div class="timeline-resumo-item"><span class="timeline-resumo-dot" style="background:#2563eb"></span><strong>' + (pt.total || 0) + "</strong> total</div>";
-        htmlRes += '<div class="timeline-resumo-item"><span class="timeline-resumo-dot" style="background:#dc2626"></span>Adm: ' + (pt.administracao || 0) + "</div>";
-        htmlRes += '<div class="timeline-resumo-item"><span class="timeline-resumo-dot" style="background:#059669"></span>Cad: ' + (pt.cadastro || 0) + "</div>";
-        htmlRes += '<div class="timeline-resumo-item"><span class="timeline-resumo-dot" style="background:#f59e0b"></span>Ope: ' + (pt.operacao || 0) + "</div>";
-        htmlRes += '<div class="timeline-resumo-item"><span class="timeline-resumo-dot" style="background:#8b5cf6"></span>Fin: ' + (pt.financeiro || 0) + "</div>";
+        var catAtiva = window.__histCatAtiva || "";
+        var mk = function(cat, cor, nome, cnt) {
+          var sel = (catAtiva === cat) ? " ativo" : "";
+          return '<div class="timeline-resumo-item chip-clicavel' + sel + '" onclick="histFiltrarCategoria(\'' + cat + '\')"><span class="timeline-resumo-dot" style="background:' + cor + '"></span><strong>' + nome + '</strong>: ' + cnt + "</div>";
+        };
+        var htmlRes = mk("", "#2563eb", "\uD83D\uDCCA Total", pt.total || 0);
+        htmlRes += mk("administracao", "#dc2626", "\uD83D\uDD12 Admin", pt.administracao || 0);
+        htmlRes += mk("cadastro", "#059669", "\uD83D\uDCCB Cadastros", pt.cadastro || 0);
+        htmlRes += mk("operacao", "#f59e0b", "\uD83D\uDE9B Opera\u00e7\u00e3o", pt.operacao || 0);
+        htmlRes += mk("financeiro", "#8b5cf6", "\uD83D\uDCB0 Financeiro", pt.financeiro || 0);
         resumo.innerHTML = htmlRes;
       }
 
+      renderizarPaginaHistorico();
+    }
+
+    function renderizarPaginaHistorico() {
+      var timeline = document.getElementById("historico-timeline");
+      if (!timeline) return;
+
+      var eventos = __histTodosEventos;
       if (eventos.length === 0) {
         timeline.innerHTML = '<div class="timeline-empty">Nenhum evento encontrado com os filtros atuais.</div>';
         return;
       }
 
-      // Agrupa por dia
+      // FASE_7_FIX_NAN - valida __histPorPagina antes de calcular
+      var __pp = parseInt(__histPorPagina, 10);
+      if (!Number.isFinite(__pp) || __pp <= 0) __pp = 50;
+      __histPorPagina = __pp;
+      var totalPag = Math.max(1, Math.ceil(eventos.length / __pp));
+      if (__histPaginaAtual > totalPag) __histPaginaAtual = totalPag;
+      var inicio = (__histPaginaAtual - 1) * __histPorPagina;
+      var paginaEventos = eventos.slice(inicio, inicio + __histPorPagina);
+
       var porDia = {};
-      eventos.forEach(function(e) {
+      paginaEventos.forEach(function(e) {
         var d = e.data_evento ? new Date(e.data_evento) : new Date();
         var diaKey = d.toLocaleDateString("pt-BR");
         if (!porDia[diaKey]) porDia[diaKey] = [];
@@ -8185,23 +8317,41 @@
         html += '<div class="timeline-dia">&#128197; ' + dia + " (" + porDia[dia].length + " evento" + (porDia[dia].length > 1 ? "s" : "") + ")</div>";
         porDia[dia].forEach(function(e) {
           var cat = classificarEvento(e.modulo, e.tipo_evento);
-          var catClass = "cat-" + cat;
-          var badgeClass = "badge-" + cat;
           var hora = e.data_evento ? new Date(e.data_evento).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--";
-          html += '<div class="timeline-item ' + catClass + '">';
-          html += '<div><span class="timeline-hora">' + hora + '</span><span class="timeline-acao">' + (e.tipo_evento || "ACAO") + '</span>';
-          html += ' <span class="timeline-badge ' + badgeClass + '">' + cat + "</span></div>";
-          html += '<div class="timeline-meta">';
-          html += '<span>&#128100; ' + (e.usuario || "Sistema") + "</span>";
-          html += '<span>&#128193; ' + (e.modulo || "SISTEMA") + "</span>";
-          html += "</div>";
-          if (e.detalhes) {
-            html += '<div class="timeline-detalhe">' + e.detalhes + "</div>";
-          }
+          var icone = getIconeAcao(e.tipo_evento);
+          html += '<div class="timeline-item cat-' + cat + '">';
+          html += '<div><span class="timeline-hora">' + hora + '</span><span class="timeline-acao"><span class="timeline-acao-icone">' + icone + '</span>' + (e.tipo_evento || "ACAO") + '</span>';
+          html += ' <span class="timeline-badge badge-' + cat + '">' + cat + "</span></div>";
+          html += '<div class="timeline-meta"><span>&#128100; ' + (e.usuario || "Sistema") + '</span><span>&#128193; ' + (e.modulo || "SISTEMA") + "</span></div>";
+          if (e.detalhes) html += '<div class="timeline-detalhe">' + e.detalhes + "</div>";
           html += "</div>";
         });
       });
+
+      html += renderizarPaginacaoHistorico(totalPag, eventos.length);
       timeline.innerHTML = html;
+
+      var bP = document.getElementById("hist-btn-prev");
+      var bN = document.getElementById("hist-btn-next");
+      var sP = document.getElementById("hist-sel-porpagina");
+      if (bP) bP.onclick = function() { __histPaginaAtual--; renderizarPaginaHistorico(); };
+      if (bN) bN.onclick = function() { __histPaginaAtual++; renderizarPaginaHistorico(); };
+      if (sP) sP.onchange = function() { __histPorPagina = parseInt(this.value, 10) || 50; __histPaginaAtual = 1; renderizarPaginaHistorico(); };
+    }
+
+    function renderizarPaginacaoHistorico(totalPag, totalItens) {
+      var h = '<div class="hist-paginacao">';
+      h += '<div class="hist-paginacao-info">Mostrando <strong>' + totalItens + '</strong> eventos &middot; P\u00e1gina <span class="hist-paginacao-pagina">' + __histPaginaAtual + '</span> de ' + totalPag + '</div>';
+      h += '<div class="hist-paginacao-controles">';
+      h += '<button id="hist-btn-prev" ' + (__histPaginaAtual <= 1 ? "disabled" : "") + '>&#9664; Anterior</button>';
+      h += '<select id="hist-sel-porpagina">';
+      [20,50,100,200].forEach(function(n) {
+        h += '<option value="' + n + '"' + (n === __histPorPagina ? " selected" : "") + '>' + n + ' por p\u00e1gina</option>';
+      });
+      h += '</select>';
+      h += '<button id="hist-btn-next" ' + (__histPaginaAtual >= totalPag ? "disabled" : "") + '>Pr\u00f3ximo &#9654;</button>';
+      h += '</div></div>';
+      return h;
     }
 
     function aplicarFiltrosHistorico() {
@@ -8216,13 +8366,9 @@
       loadHistoricoDaAPI();
     }
 
-    function exportarHistoricoCSV() {
-      if (!__historicoCache || __historicoCache.length === 0) {
-        alert("Nada para exportar.");
-        return;
-      }
+    function montarLinhasHistorico() {
       var linhas = [["Data","Hora","Usuario","Tipo","Modulo","Detalhes"]];
-      __historicoCache.forEach(function(e) {
+      (__historicoCache || []).forEach(function(e) {
         var d = e.data_evento ? new Date(e.data_evento) : null;
         linhas.push([
           d ? d.toLocaleDateString("pt-BR") : "",
@@ -8233,22 +8379,130 @@
           (e.detalhes || "").replace(/"/g, ""),
         ]);
       });
+      return linhas;
+    }
+
+    function exportarHistoricoCSV() {
+      if (!__historicoCache || __historicoCache.length === 0) { alert("Nada para exportar."); return; }
+      var linhas = montarLinhasHistorico();
       var csv = linhas.map(function(l) { return l.map(function(c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(","); }).join("\n");
       var blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
       var url = URL.createObjectURL(blob);
       var a = document.createElement("a");
       a.href = url;
       a.download = "historico_" + new Date().toISOString().substring(0,10) + ".csv";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
+
+    function exportarHistoricoXLS() {
+      if (!__historicoCache || __historicoCache.length === 0) { alert("Nada para exportar."); return; }
+      var linhas = montarLinhasHistorico();
+      var xls = linhas.map(function(l) {
+        return l.map(function(c) {
+          var s = String(c == null ? "" : c);
+          if (s.indexOf(";") !== -1 || s.indexOf("\n") !== -1 || s.indexOf('"') !== -1) {
+            s = '"' + s.replace(/"/g, '""') + '"';
+          }
+          return s;
+        }).join(";");
+      }).join("\r\n");
+      var blob = new Blob(["\uFEFF" + xls], { type: "application/vnd.ms-excel;charset=utf-8;" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "historico_" + new Date().toISOString().substring(0,10) + ".xls";
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function exportarHistoricoPDF() {
+      if (!__historicoCache || __historicoCache.length === 0) { alert("Nada para imprimir."); return; }
+
+      // FASE_7_PRINT_HISTORICO - garante que o historico esta visivel antes de imprimir
+      var secHist = document.getElementById("tab-historico");
+      if (secHist) secHist.classList.add("active");
+
+      // Monta cabecalho
+      var cab = document.getElementById("hist-print-header");
+      if (!cab) {
+        cab = document.createElement("div");
+        cab.id = "hist-print-header";
+        cab.className = "hist-print-header";
+        var tl = document.getElementById("historico-timeline");
+        if (tl && tl.parentNode) tl.parentNode.insertBefore(cab, tl);
+      }
+      var agora = new Date().toLocaleString("pt-BR");
+
+      // Mostra os filtros aplicados no cabecalho (se houver)
+      var filtrosInfo = [];
+      var vIni = document.getElementById("hist-filtro-data-ini");
+      var vFim = document.getElementById("hist-filtro-data-fim");
+      var vUsu = document.getElementById("hist-filtro-usuario");
+      var vAcao = document.getElementById("hist-filtro-tipo");
+      var vMod = document.getElementById("hist-filtro-modulo");
+      var vTxt = document.getElementById("hist-filtro-veiculo");
+      if (vIni && vIni.value) filtrosInfo.push("De: " + vIni.value);
+      if (vFim && vFim.value) filtrosInfo.push("At\u00e9: " + vFim.value);
+      if (vUsu && vUsu.value) filtrosInfo.push("Usu\u00e1rio: " + vUsu.value);
+      if (vAcao && vAcao.value) filtrosInfo.push("A\u00e7\u00e3o: " + vAcao.value);
+      if (vMod && vMod.value) filtrosInfo.push("M\u00f3dulo: " + vMod.value);
+      if (vTxt && vTxt.value) filtrosInfo.push("Busca: " + vTxt.value);
+      var linhaFiltros = filtrosInfo.length ? "<br><span style=\"font-size:9pt;color:#475569;\">" + filtrosInfo.join(" &middot; ") + "</span>" : "";
+
+      cab.innerHTML = '<h2 style="margin:0 0 0.5rem;color:#0f2a4a;">Caderninho de Frota &mdash; Hist\u00f3rico de Atividades</h2>' +
+        '<p style="margin:0;font-size:0.9rem;color:#64748b;">Gerado em ' + agora + ' &middot; Total de ' + __historicoCache.length + ' evento(s)' + linhaFiltros + '</p>';
+
+      // Executa o print
+      setTimeout(function() { window.print(); }, 150);
+    }
+
+    // FASE_7_HISTORICO_V2
+    window.__histCatAtiva = "";
+    window.histFiltrarCategoria = function(cat) {
+      window.__histCatAtiva = (window.__histCatAtiva === cat) ? "" : cat;
+      // Reaplica o filtro
+      if (typeof aplicarFiltrosHistorico === "function") aplicarFiltrosHistorico();
+    };
+
+    window.histPeriodoRapido = function(tipo, el) {
+      var hoje = new Date();
+      var ini = new Date();
+      var fim = new Date();
+      if (tipo === "hoje") {
+        // ini = fim = hoje
+      } else if (tipo === "7d") {
+        ini.setDate(hoje.getDate() - 7);
+      } else if (tipo === "30d") {
+        ini.setDate(hoje.getDate() - 30);
+      } else if (tipo === "mes") {
+        ini = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+      } else if (tipo === "limpar") {
+        document.getElementById("hist-filtro-data-ini").value = "";
+        document.getElementById("hist-filtro-data-fim").value = "";
+        document.querySelectorAll(".hist-chip-atalho").forEach(function(b) { b.classList.remove("ativo"); });
+        if (typeof aplicarFiltrosHistorico === "function") aplicarFiltrosHistorico();
+        return;
+      }
+      var fmt = function(d) {
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, "0");
+        var dia = String(d.getDate()).padStart(2, "0");
+        return y + "-" + m + "-" + dia;
+      };
+      document.getElementById("hist-filtro-data-ini").value = fmt(ini);
+      document.getElementById("hist-filtro-data-fim").value = fmt(fim);
+      document.querySelectorAll(".hist-chip-atalho").forEach(function(b) { b.classList.remove("ativo"); });
+      if (el) el.classList.add("ativo");
+      if (typeof aplicarFiltrosHistorico === "function") aplicarFiltrosHistorico();
+    };
 
     window.loadHistoricoDaAPI = loadHistoricoDaAPI;
     window.aplicarFiltrosHistorico = aplicarFiltrosHistorico;
     window.limparFiltrosHistorico = limparFiltrosHistorico;
     window.exportarHistoricoCSV = exportarHistoricoCSV;
+    window.exportarHistoricoXLS = exportarHistoricoXLS;
+    window.exportarHistoricoPDF = exportarHistoricoPDF;
 
 
 </script>
@@ -8951,8 +9205,7 @@
     "tab-metas": "Metas",
     "tab-usuarios": "Usuarios",
     "tab-perfis": "Perfis de Acesso",
-    "tab-auditoria": "Auditoria"
-  };
+    };
 
   function getSecaoAtiva() {
     var secao = document.querySelector(".tab-content.active");
