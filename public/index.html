@@ -703,7 +703,24 @@
     [data-theme="dark"] .timeline-diff-depois { color:#6ee7b7 !important; }
     [data-theme="dark"] .timeline-diff-linha { border-bottom-color:rgba(255,255,255,0.06) !important; }
     /* ==== /FASE_8_DIFF_CSS ==== */
-  </style>
+  
+    /* ==== FASE_8_CONFIG_COMPLETA ==== */
+    .config-field { margin-bottom: 12px; }
+    .config-field label { display: block; font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 5px; }
+    .config-field input, .config-field select { width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.88rem; background: #fff; color: #0f2a4a; box-sizing: border-box; font-family: inherit; }
+    .config-field input:focus, .config-field select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+    .config-field small { display: block; font-size: 0.72rem; color: #94a3b8; margin-top: 3px; }
+    .config-field-row { display: flex; gap: 10px; }
+    .config-field-row .config-field { flex: 1; }
+    .config-group h3 { margin: 0 0 14px; font-size: 0.95rem; color: #0f2a4a; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+    [data-theme="dark"] .config-field input,
+    [data-theme="dark"] .config-field select { background: #0f131a !important; border-color: rgba(255,255,255,0.12) !important; color: #e2e8f0 !important; }
+    [data-theme="dark"] .config-field input::placeholder { color: #64748b !important; }
+    [data-theme="dark"] .config-field label { color: #94a3b8 !important; }
+    [data-theme="dark"] .config-field small { color: #64748b !important; }
+    [data-theme="dark"] .config-group h3 { color: #93c5fd !important; border-bottom-color: rgba(255,255,255,0.08) !important; }
+    /* ==== /FASE_8_CONFIG_COMPLETA ==== */
+</style>
   
   <style>
     :root {
@@ -3516,34 +3533,129 @@
         <div class="section-title-wrap">
           <h2 class="section-title"><span>&#9881;&#65039;</span> Configuracoes do Sistema</h2>
         </div>
+        <!-- FASE_8_CONFIG_COMPLETA -->
         <div id="config-form" class="config-form">
+
           <div class="config-group">
-            <h3>Contato e Suporte</h3>
+            <h3>&#127970; Dados da Empresa</h3>
+            <div class="config-field">
+              <label>Nome Fantasia</label>
+              <input type="text" id="config-nome_empresa" placeholder="Caderninho de Frota">
+            </div>
+            <div class="config-field">
+              <label>Raz&atilde;o Social</label>
+              <input type="text" id="config-razao_social" placeholder="Empresa LTDA">
+            </div>
+            <div class="config-field-row">
+              <div class="config-field">
+                <label>CNPJ</label>
+                <input type="text" id="config-cnpj" placeholder="00.000.000/0000-00" maxlength="18">
+              </div>
+              <div class="config-field">
+                <label>Inscr. Estadual</label>
+                <input type="text" id="config-inscricao_estadual" placeholder="000.000.000">
+              </div>
+            </div>
+          </div>
+
+          <div class="config-group">
+            <h3>&#128205; Endere&ccedil;o</h3>
+            <div class="config-field-row">
+              <div class="config-field" style="flex:3;">
+                <label>Logradouro</label>
+                <input type="text" id="config-endereco_logradouro" placeholder="Rua, Av., etc.">
+              </div>
+              <div class="config-field" style="flex:1;">
+                <label>N&uacute;mero</label>
+                <input type="text" id="config-endereco_numero" placeholder="123">
+              </div>
+            </div>
+            <div class="config-field">
+              <label>Complemento</label>
+              <input type="text" id="config-endereco_complemento" placeholder="Sala, Andar, etc.">
+            </div>
+            <div class="config-field-row">
+              <div class="config-field">
+                <label>Bairro</label>
+                <input type="text" id="config-endereco_bairro" placeholder="Centro">
+              </div>
+              <div class="config-field">
+                <label>Cidade</label>
+                <input type="text" id="config-endereco_cidade" placeholder="S&atilde;o Paulo">
+              </div>
+              <div class="config-field" style="flex:0 0 80px;">
+                <label>UF</label>
+                <input type="text" id="config-endereco_uf" placeholder="SP" maxlength="2" style="text-transform:uppercase;">
+              </div>
+            </div>
+            <div class="config-field">
+              <label>CEP</label>
+              <input type="text" id="config-endereco_cep" placeholder="00000-000" maxlength="9" style="max-width:160px;">
+            </div>
+          </div>
+
+          <div class="config-group">
+            <h3>&#128231; Contato e Suporte</h3>
             <div class="config-field">
               <label>E-mail de suporte</label>
               <input type="email" id="config-email_suporte" placeholder="contato@empresa.com">
-              <small>Usado no botao Enviar e-mail da tela Ajuda</small>
+              <small>Usado no bot&atilde;o Enviar e-mail da tela Ajuda</small>
             </div>
-            <div class="config-field">
-              <label>Telefone de suporte</label>
-              <input type="text" id="config-telefone_suporte" placeholder="(00) 0000-0000">
-            </div>
-            <div class="config-field">
-              <label>WhatsApp</label>
-              <input type="text" id="config-whatsapp_suporte" placeholder="(00) 90000-0000">
-            </div>
-          </div>
-          <div class="config-group">
-            <h3>Empresa</h3>
-            <div class="config-field">
-              <label>Nome da empresa</label>
-              <input type="text" id="config-nome_empresa" placeholder="Minha Empresa LTDA">
+            <div class="config-field-row">
+              <div class="config-field">
+                <label>Telefone de suporte</label>
+                <input type="text" id="config-telefone_suporte" placeholder="(00) 0000-0000">
+              </div>
+              <div class="config-field">
+                <label>WhatsApp</label>
+                <input type="text" id="config-whatsapp_suporte" placeholder="(00) 90000-0000">
+              </div>
             </div>
             <div class="config-field">
               <label>Site</label>
               <input type="url" id="config-site_empresa" placeholder="https://minhaempresa.com">
             </div>
           </div>
+
+          <div class="config-group">
+            <h3>&#9881;&#65039; Prefer&ecirc;ncias do Sistema</h3>
+            <div class="config-field">
+              <label>Nome do Sistema</label>
+              <input type="text" id="config-nome_sistema" placeholder="Caderninho de Frota">
+              <small>Aparece no cabe&ccedil;alho e nos relat&oacute;rios</small>
+            </div>
+            <div class="config-field-row">
+              <div class="config-field">
+                <label>Timezone</label>
+                <select id="config-timezone">
+                  <option value="America/Sao_Paulo">Am&eacute;rica/S&atilde;o Paulo (BRT)</option>
+                  <option value="America/Manaus">Am&eacute;rica/Manaus (AMT)</option>
+                  <option value="America/Belem">Am&eacute;rica/Bel&eacute;m (BRT)</option>
+                  <option value="America/Fortaleza">Am&eacute;rica/Fortaleza (BRT)</option>
+                  <option value="America/Cuiaba">Am&eacute;rica/Cuiab&aacute; (AMT)</option>
+                  <option value="America/Rio_Branco">Am&eacute;rica/Rio Branco (ACT)</option>
+                  <option value="America/Noronha">Am&eacute;rica/Noronha (FNT)</option>
+                </select>
+              </div>
+              <div class="config-field">
+                <label>Formato de Data</label>
+                <select id="config-formato_data">
+                  <option value="DD/MM/YYYY">DD/MM/AAAA</option>
+                  <option value="YYYY-MM-DD">AAAA-MM-DD</option>
+                  <option value="MM/DD/YYYY">MM/DD/AAAA</option>
+                </select>
+              </div>
+            </div>
+            <div class="config-field">
+              <label>Moeda</label>
+              <select id="config-moeda">
+                <option value="BRL">Real (R$)</option>
+                <option value="USD">D&oacute;lar (US$)</option>
+                <option value="EUR">Euro (&euro;)</option>
+              </select>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -10280,14 +10392,37 @@ function renderHistorico(data) {
   <script type="text/javascript">
 // @ts-nocheck
     // FASE_4_CONFIG_LOGICA
+    // FASE_8_CONFIG_COMPLETA - defaults se vazio
+    var CONFIG_DEFAULTS = {
+      nome_sistema: "Caderninho de Frota",
+      nome_empresa: "",
+      timezone: "America/Sao_Paulo",
+      formato_data: "DD/MM/YYYY",
+      moeda: "BRL"
+    };
+
     async function loadConfiguracoes() {
       try {
         const res = await apiFetch("/configuracoes");
         if (!res.ok) return;
         const config = await res.json();
-        Object.keys(config).forEach(function(chave) {
+        // Preenche todos os campos com valor salvo ou padrao
+        var todasChaves = [
+          "nome_empresa","razao_social","cnpj","inscricao_estadual",
+          "endereco_logradouro","endereco_numero","endereco_complemento",
+          "endereco_bairro","endereco_cidade","endereco_uf","endereco_cep",
+          "email_suporte","telefone_suporte","whatsapp_suporte","site_empresa",
+          "nome_sistema","timezone","formato_data","moeda"
+        ];
+        todasChaves.forEach(function(chave) {
           var el = document.getElementById("config-" + chave);
-          if (el) el.value = config[chave].valor || "";
+          if (!el) return;
+          var valorSalvo = config[chave] && config[chave].valor;
+          if (valorSalvo !== undefined && valorSalvo !== null && valorSalvo !== "") {
+            el.value = valorSalvo;
+          } else if (CONFIG_DEFAULTS[chave] !== undefined) {
+            el.value = CONFIG_DEFAULTS[chave];
+          }
         });
         var email = config.email_suporte && config.email_suporte.valor;
         if (email) window.__emailSuporte = email;
@@ -10295,7 +10430,17 @@ function renderHistorico(data) {
     }
     window.salvarConfiguracoes = async function() {
       var dados = {};
-      var campos = ["email_suporte", "telefone_suporte", "whatsapp_suporte", "nome_empresa", "site_empresa"];
+      var campos = [
+        // Empresa
+        "nome_empresa", "razao_social", "cnpj", "inscricao_estadual",
+        // Endereco
+        "endereco_logradouro", "endereco_numero", "endereco_complemento",
+        "endereco_bairro", "endereco_cidade", "endereco_uf", "endereco_cep",
+        // Contato
+        "email_suporte", "telefone_suporte", "whatsapp_suporte", "site_empresa",
+        // Sistema
+        "nome_sistema", "timezone", "formato_data", "moeda"
+      ];
       campos.forEach(function(c) {
         var el = document.getElementById("config-" + c);
         if (el) dados[c] = el.value;
