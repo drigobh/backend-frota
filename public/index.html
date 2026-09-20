@@ -720,6 +720,103 @@
     [data-theme="dark"] .config-field small { color: #64748b !important; }
     [data-theme="dark"] .config-group h3 { color: #93c5fd !important; border-bottom-color: rgba(255,255,255,0.08) !important; }
     /* ==== /FASE_8_CONFIG_COMPLETA ==== */
+
+    /* ==== FASE_8_DROPDOWN_RELATORIOS ==== */
+    .dropdown-relatorio-wrap { position: relative; display: inline-block; }
+    .dropdown-caret { font-size: 0.7rem; margin-left: 4px; opacity: 0.8; }
+    .dropdown-relatorio-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      padding: 6px;
+      min-width: 240px;
+      z-index: 9999;
+      animation: dropdownIn .15s ease-out;
+    }
+    @keyframes dropdownIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .dropdown-relatorio-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 12px;
+      border: none;
+      background: transparent;
+      text-align: left;
+      font-size: 0.88rem;
+      font-family: inherit;
+      color: #0f2a4a;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background 0.12s;
+    }
+    .dropdown-relatorio-item:hover { background: #f1f5f9; }
+    .dropdown-relatorio-item span { font-size: 1rem; }
+    [data-theme="dark"] .dropdown-relatorio-menu { background: #181c23; border-color: rgba(255,255,255,0.1); }
+    [data-theme="dark"] .dropdown-relatorio-item { color: #e2e8f0; }
+    [data-theme="dark"] .dropdown-relatorio-item:hover { background: #1e242e; }
+    /* ==== /FASE_8_DROPDOWN_RELATORIOS ==== */
+
+    /* ==== FASE_8_FIX_RELATORIOS_22 ==== */
+    /* DRE Consolidada - forcando legibilidade */
+    #tab-dre-consolidada .data-table tbody tr td,
+    #tab-dre-consolidada #tbody-dre-consolidada tr td {
+      color: #14171f !important;
+      font-weight: 500 !important;
+    }
+    #tab-dre-consolidada .data-table tbody tr:nth-child(even) td {
+      background: #f8fafc !important;
+    }
+    #tab-dre-consolidada .data-table tbody tr:hover td {
+      background: #eff6ff !important;
+    }
+    #tab-dre-consolidada .data-table tbody tr.total-consolidado td,
+    #tab-dre-consolidada .data-table tbody tr:last-child td {
+      font-weight: 700 !important;
+      background: #f1f5f9 !important;
+      color: #0f2a4a !important;
+      border-top: 2px solid #0f2a4a !important;
+    }
+    [data-theme="dark"] #tab-dre-consolidada .data-table tbody tr td,
+    [data-theme="dark"] #tab-dre-consolidada #tbody-dre-consolidada tr td {
+      color: #e6edf3 !important;
+      background: #181c23 !important;
+    }
+    [data-theme="dark"] #tab-dre-consolidada .data-table tbody tr:nth-child(even) td {
+      background: #1c2330 !important;
+    }
+    [data-theme="dark"] #tab-dre-consolidada .data-table tbody tr:hover td {
+      background: #1e242e !important;
+    }
+    [data-theme="dark"] #tab-dre-consolidada .data-table tbody tr:last-child td {
+      background: #0f2a4a !important;
+      color: #ffffff !important;
+    }
+    /* ==== /FASE_8_FIX_RELATORIOS_22 ==== */
+
+    /* ==== FASE_8_FIX_23 ==== */
+    /* Linha atual da Evolucao Mensal (light e dark) */
+    table.data-table tbody tr.tr-mes-atual td,
+    #tab-resumo table.data-table tbody tr.tr-mes-atual td,
+    #tab-resumo tr.tr-mes-atual td {
+      background-color: #eff6ff !important;
+      color: #0f2a4a !important;
+      font-weight: 600 !important;
+    }
+    [data-theme="dark"] table.data-table tbody tr.tr-mes-atual td,
+    [data-theme="dark"] #tab-resumo table.data-table tbody tr.tr-mes-atual td,
+    [data-theme="dark"] #tab-resumo tr.tr-mes-atual td {
+      background-color: #1e3a5f !important;
+      color: #e6edf3 !important;
+    }
+    /* ===== /FASE_8_FIX_23 ===== */
 </style>
   
   <style>
@@ -2104,9 +2201,29 @@
         <button class="header-btn" onclick="fazerLogout()" title="Sair do sistema">
           Sair
         </button>
-        <button class="header-btn" id="btn-print-report" title="Imprimir resumo executivo do mês">
-          <span>🖨️</span> Exportar Relatório
-        </button>
+        <!-- FASE_8_DROPDOWN_RELATORIOS -->
+        <div class="dropdown-relatorio-wrap">
+          <button class="header-btn" id="btn-print-report" title="Exportar Relatorio em PDF">
+            <span>&#128424;&#65039;</span> Exportar Relat&oacute;rio <span class="dropdown-caret">&#9662;</span>
+          </button>
+          <div class="dropdown-relatorio-menu" id="dropdown-relatorio-menu" style="display:none;">
+            <button class="dropdown-relatorio-item" data-rel="resumo">
+              <span>&#128202;</span> Resumo Executivo do M&ecirc;s
+            </button>
+            <button class="dropdown-relatorio-item" data-rel="dre">
+              <span>&#128200;</span> DRE Consolidada
+            </button>
+            <button class="dropdown-relatorio-item" data-rel="ranking">
+              <span>&#127942;</span> Ranking da Frota
+            </button>
+            <button class="dropdown-relatorio-item" data-rel="empresa">
+              <span>&#127970;</span> Dados da Empresa
+            </button>
+            <button class="dropdown-relatorio-item" data-rel="config">
+              <span>&#9881;&#65039;</span> Configura&ccedil;&otilde;es Completas
+            </button>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -4757,6 +4874,8 @@
         if (!res.ok) throw new Error("HTTP " + res.status);
         var data = await res.json();
         __lancamentosCache = data || [];
+        // FASE_8_FIX_24: sincroniza state.lancamentos para o Resumo Executivo funcionar
+        state.lancamentos = data || [];
         renderLancamentos(__lancamentosCache);
 
         // Garante que os selects estao populados
@@ -5275,67 +5394,63 @@
     // =========================================================================
     // API E RENDERIZAÇÃO: RESUMO EXECUTIVO
     // =========================================================================
+    // FASE_8_FIX_25
+    function mesParaAnoMes(mes) {
+      if (!mes) return "";
+      var map = { "Janeiro":"01","Fevereiro":"02","Marco":"03","Março":"03","Abril":"04","Maio":"05","Junho":"06","Julho":"07","Agosto":"08","Setembro":"09","Outubro":"10","Novembro":"11","Dezembro":"12" };
+      var parts = mes.split("/");
+      if (parts.length !== 2) return "";
+      return parts[1] + "-" + (map[parts[0]] || "01");
+    }
+    function ehMesmoMes(dataISO, mesRef) {
+      if (!dataISO || !mesRef) return false;
+      return String(dataISO).substring(0, 7) === mesRef;
+    }
     function renderResumo() {
       const tbody = document.getElementById('tbody-resumo-veiculos');
-      tbody.innerHTML = '';
-      
-      let tRec = 0;
-      let tDesp = 0;
-      let tKm = 0;
-
+      if (tbody) tbody.innerHTML = '';
+      let tRec = 0, tDesp = 0, tKm = 0, tLitros = 0, tCustoCombustivel = 0;
+      const mesRef = mesParaAnoMes(state.currentMonth);
       state.cavalos.forEach((c, idx) => {
-        let rec = 0;
-        let despM = 0;
-        
+        let rec = 0, despManual = 0;
         state.lancamentos.forEach(l => {
-          if (l.placa === c.placa) {
-            const v = Number(l.valor) || 0;
-            if (l.tipo === 'Receita') rec += v;
-            if (l.tipo === 'Despesa') despM += v;
-          }
+          if (l.placa !== c.placa) return;
+          if (!ehMesmoMes(l.data, mesRef)) return;
+          const v = Number(l.valor) || 0;
+          if (l.tipo === 'Receita') rec += v;
+          if (l.tipo === 'Despesa') despManual += v;
         });
-        
-        let comb = getFuelExpenseForPlate(c.placa, state.currentMonth);
-        
-        const desp = despM + comb;
+        const combustivel = (typeof getFuelExpenseForPlate === 'function') ? getFuelExpenseForPlate(c.placa, state.currentMonth) : 0;
+        const desp = despManual + combustivel;
         const res = rec - desp;
         const margem = rec > 0 ? (res / rec) * 100 : 0;
-
-        let kmRodado = 0;
-        const kData = state.kmData[state.currentMonth]?.[c.placa];
+        let kmRodado = 0, litros = 0, precoMedioL = 0;
+        const kData = state.kmData[state.currentMonth] && state.kmData[state.currentMonth][c.placa];
         if (kData) {
           kmRodado = Math.max(0, (Number(kData.final) || 0) - (Number(kData.inicial) || 0));
+          litros = Number(kData.litros) || 0;
+          precoMedioL = Number(kData.precoLitro) || 0;
         }
-
-        tRec += rec;
-        tDesp += desp;
-        tKm += kmRodado;
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${idx + 1}</td>
-          <td><span class="vehicle-tag">${c.placa}</span></td>
-          <td class="col-num">${formatBRL(rec)}</td>
-          <td class="col-num">${formatBRL(desp)}</td>
-          <td class="col-num ${res >= 0 ? 'pos' : 'neg'}">${formatBRL(res)}</td>
-          <td class="col-num">${formatPct(margem)}</td>
-          <td class="col-num">${formatNum(kmRodado)} km</td>
-          <td class="col-num">${formatBRL(kmRodado > 0 ? rec / kmRodado : 0)}/km</td>
-          <td class="col-num">${formatBRL(kmRodado > 0 ? desp / kmRodado : 0)}/km</td>
-        `;
-        tbody.appendChild(tr);
+        tRec += rec; tDesp += desp; tKm += kmRodado; tLitros += litros;
+        tCustoCombustivel += (litros * precoMedioL);
+        if (tbody) {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${idx + 1}</td><td><span class="vehicle-tag">${c.placa}</span></td><td class="col-num">${formatBRL(rec)}</td><td class="col-num">${formatBRL(desp)}</td><td class="col-num ${res >= 0 ? 'pos' : 'neg'}">${formatBRL(res)}</td><td class="col-num">${formatPct(margem)}</td><td class="col-num">${formatNum(kmRodado)} km</td><td class="col-num">${formatBRL(kmRodado > 0 ? rec / kmRodado : 0)}/km</td><td class="col-num">${formatBRL(kmRodado > 0 ? desp / kmRodado : 0)}/km</td>`;
+          tbody.appendChild(tr);
+        }
       });
-
       const tRes = tRec - tDesp;
-      document.getElementById('kpi-res-faturamento').textContent = formatBRL(tRec);
-      document.getElementById('kpi-res-despesas').textContent = formatBRL(tDesp);
-      
+      const setTxt = (id, val) => { var el = document.getElementById(id); if (el) el.textContent = val; };
+      setTxt('kpi-res-faturamento', formatBRL(tRec));
+      setTxt('kpi-res-despesas', formatBRL(tDesp));
       const rRes = document.getElementById('kpi-res-resultado');
-      rRes.textContent = formatBRL(tRes);
-      rRes.className = `kpi-card-val ${tRes >= 0 ? 'pos' : 'neg'}`;
-      
-      document.getElementById('kpi-res-km').textContent = `${formatNum(tKm)} km`;
-      
+      if (rRes) { rRes.textContent = formatBRL(tRes); rRes.className = 'kpi-card-val ' + (tRes >= 0 ? 'pos' : 'neg'); }
+      setTxt('kpi-res-margem', 'Margem: ' + formatPct(tRec > 0 ? (tRes / tRec) * 100 : 0));
+      setTxt('kpi-res-km', formatNum(tKm) + ' km');
+      setTxt('kpi-res-rec-km', 'R$ ' + (tKm > 0 ? (tRec / tKm) : 0).toFixed(2).replace('.', ',') + '/km');
+      setTxt('kpi-res-custo-km', 'R$ ' + (tKm > 0 ? (tDesp / tKm) : 0).toFixed(2).replace('.', ',') + '/km');
+      setTxt('kpi-res-kml', (tLitros > 0 ? (tKm / tLitros) : 0).toFixed(2).replace('.', ',') + ' km/l');
+      setTxt('kpi-res-diesel', 'R$ ' + (tLitros > 0 ? (tCustoCombustivel / tLitros) : 0).toFixed(2).replace('.', ','));
       renderEvolucaoMensal();
     }
 
@@ -5343,48 +5458,33 @@
       const tbody = document.getElementById('tbody-evolucao-mensal');
       if (!tbody) return;
       tbody.innerHTML = '';
-      
       state.meses.forEach(m => {
-        let mRec = 0;
-        let mDesp = 0;
-        let mKm = 0;
-        
+        var mesRef = mesParaAnoMes(m);
+        let mRec = 0, mDesp = 0, mKm = 0, mLitros = 0;
         state.cavalos.forEach(c => {
-          let r = 0;
-          let d = 0;
-          
+          let r = 0, d = 0;
           state.lancamentos.forEach(l => {
-            if (l.placa === c.placa && l.tipo === 'Receita') {
-              r += Number(l.valor) || 0;
-            }
+            if (l.placa !== c.placa) return;
+            if (!ehMesmoMes(l.data, mesRef)) return;
+            var v = Number(l.valor) || 0;
+            if (l.tipo === 'Receita') r += v;
+            if (l.tipo === 'Despesa') d += v;
           });
-          
-          let cAuto = getFuelExpenseForPlate(c.placa, m);
-          const kD = state.kmData[m]?.[c.placa];
+          let cAuto = (typeof getFuelExpenseForPlate === 'function') ? getFuelExpenseForPlate(c.placa, m) : 0;
+          const kD = state.kmData[m] && state.kmData[m][c.placa];
           if (kD) {
             mKm += Math.max(0, (Number(kD.final) || 0) - (Number(kD.inicial) || 0));
+            mLitros += Number(kD.litros) || 0;
           }
-          
-          mRec += r;
-          mDesp += (d + cAuto);
+          mRec += r; mDesp += (d + cAuto);
         });
-        
         const mRes = mRec - mDesp;
         const mMargem = mRec > 0 ? (mRes / mRec) * 100 : 0;
         const isCurrent = m === state.currentMonth;
-        
+        const kml = mLitros > 0 ? (mKm / mLitros) : 0;
         const tr = document.createElement('tr');
-        if (isCurrent) tr.style.backgroundColor = '#eff6ff';
-        
-        tr.innerHTML = `
-          <td><strong>${m}</strong>${isCurrent ? '<span class="badge-pos" style="font-size:0.7rem; margin-left:6px;">Atual</span>' : ''}</td>
-          <td class="col-num">${formatBRL(mRec)}</td>
-          <td class="col-num">${formatBRL(mDesp)}</td>
-          <td class="col-num ${mRes >= 0 ? 'pos' : 'neg'}">${formatBRL(mRes)}</td>
-          <td class="col-num">${formatPct(mMargem)}</td>
-          <td class="col-num">${formatNum(mKm)} km</td>
-          <td class="col-num">-</td>
-        `;
+        if (isCurrent) tr.classList.add('tr-mes-atual');
+        tr.innerHTML = `<td><strong>${m}</strong>${isCurrent ? '<span class="badge-pos" style="font-size:0.7rem; margin-left:6px;">Atual</span>' : ''}</td><td class="col-num">${formatBRL(mRec)}</td><td class="col-num">${formatBRL(mDesp)}</td><td class="col-num ${mRes >= 0 ? 'pos' : 'neg'}">${formatBRL(mRes)}</td><td class="col-num">${formatPct(mMargem)}</td><td class="col-num">${formatNum(mKm)} km</td><td class="col-num">${kml > 0 ? kml.toFixed(2).replace('.', ',') : '-'}</td>`;
         tbody.appendChild(tr);
       });
     }
@@ -5759,11 +5859,31 @@
       }
       window.__dreInicializado = true;
       
-      document.getElementById('btn-print-report').addEventListener('click', () => {
-        const resumoBtn = document.querySelector('[data-tab="tab-resumo"]');
-        if (resumoBtn) resumoBtn.click();
-        window.print();
+      // FASE_8_DROPDOWN_RELATORIOS
+    (function() {
+      var btn = document.getElementById('btn-print-report');
+      var menu = document.getElementById('dropdown-relatorio-menu');
+      if (!btn || !menu) return;
+
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
       });
+      document.addEventListener('click', function() {
+        menu.style.display = 'none';
+      });
+      menu.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+
+      menu.querySelectorAll('.dropdown-relatorio-item').forEach(function(item) {
+        item.addEventListener('click', async function() {
+          menu.style.display = 'none';
+          var tipo = this.getAttribute('data-rel');
+          await window.gerarRelatorioPDF(tipo);
+        });
+      });
+    })();
 
       // Exportações CSV
       document.getElementById('btn-export-km')?.addEventListener('click', () => {
@@ -7288,8 +7408,8 @@
     });
     window.__dreAutoCarregar = true;
 
-    window.filtrarAuditoriaNaTela = filtrarAuditoriaNaTela;
-    window.testarAuditoriaManual = testarAuditoriaManual;
+    // FASE_8_FIX_23: referencia orfa removida
+    // FASE_8_FIX_24: referencia orfa removida
 
     // ==== MODULO DE LANCAMENTOS ====
     var __lancamentosCache = [];
@@ -10951,6 +11071,359 @@ function renderHistorico(data) {
 })();
 </script>
 <!-- /FASE_5_VALIDADOR_EMAIL -->
+
+
+  <script type="text/javascript">
+// @ts-nocheck
+  // ==========================================================================
+  // FASE_8_DROPDOWN_RELATORIOS - Relatorios PDF do header
+  // ==========================================================================
+
+  async function carregarConfigEmpresa() {
+    try {
+      var res = await apiFetch("/configuracoes");
+      if (!res.ok) return {};
+      var config = await res.json();
+      var out = {};
+      Object.keys(config).forEach(function(k) {
+        out[k] = config[k].valor || "";
+      });
+      return out;
+    } catch (e) {
+      console.error("Erro config:", e);
+      return {};
+    }
+  }
+
+  function montarCabecalhoEmpresa(cfg) {
+    var nomeEmp = cfg.nome_empresa || "Caderninho de Frota";
+    var nomeSis = cfg.nome_sistema || "Caderninho de Motorista";
+    var cnpj = cfg.cnpj ? "CNPJ: " + cfg.cnpj : "";
+    var endereco = [
+      cfg.endereco_logradouro, cfg.endereco_numero, cfg.endereco_complemento,
+      cfg.endereco_bairro, cfg.endereco_cidade, cfg.endereco_uf, cfg.endereco_cep
+    ].filter(Boolean).join(", ");
+    var contato = [
+      cfg.telefone_suporte ? "Tel: " + cfg.telefone_suporte : "",
+      cfg.whatsapp_suporte ? "WhatsApp: " + cfg.whatsapp_suporte : "",
+      cfg.email_suporte ? "Email: " + cfg.email_suporte : "",
+      cfg.site_empresa || ""
+    ].filter(Boolean).join(" &middot; ");
+    return {
+      nomeEmp: nomeEmp,
+      nomeSis: nomeSis,
+      linha1: [cnpj, endereco].filter(Boolean).join(" &middot; "),
+      linha2: contato
+    };
+  }
+
+  function gerarHTMLRelatorio(titulo, subtitulo, conteudoHTML, cfg) {
+    var dh = new Date().toLocaleString("pt-BR");
+    var u = (typeof getUsuario === "function") ? getUsuario() : "Sistema";
+    var meta = montarCabecalhoEmpresa(cfg || {});
+    var p = [];
+    p.push('<!DOCTYPE html><html><head><meta charset="UTF-8">');
+    p.push('<title>' + titulo + '</title>');
+    p.push('<style>');
+    p.push('@page{size:A4 portrait;margin:14mm}');
+    p.push('*{box-sizing:border-box}');
+    p.push('body{font-family:Arial,Helvetica,sans-serif;color:#14171f;margin:0;font-size:11px;line-height:1.4}');
+    p.push('.rel-header{border-bottom:3px solid #0f2a4a;padding-bottom:10px;margin-bottom:16px}');
+    p.push('.rel-header-top{display:flex;align-items:center;gap:14px;margin-bottom:8px}');
+    p.push('.rel-logo{width:48px;height:48px;background:#2563eb;color:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;flex-shrink:0}');
+    p.push('.rel-title-block{flex:1;min-width:0}');
+    p.push('.rel-title-block h1{margin:0;font-size:17px;color:#0f2a4a}');
+    p.push('.rel-title-block p{margin:2px 0 0;font-size:10px;color:#64748b}');
+    p.push('.rel-meta{font-size:9px;color:#475569;text-align:right;line-height:1.5;flex-shrink:0}');
+    p.push('.rel-meta strong{color:#0f2a4a}');
+    p.push('.rel-empresa{font-size:9px;color:#475569;line-height:1.5;padding:6px 0;border-top:1px solid #e2e8f0}');
+    p.push('.rel-empresa strong{color:#0f2a4a}');
+    p.push('.rel-titulo-sec{font-size:14px;font-weight:700;color:#0f2a4a;margin:0 0 12px;padding-bottom:6px;border-bottom:2px solid #2563eb}');
+    p.push('.rel-sub{font-size:10px;color:#64748b;margin-bottom:12px}');
+    p.push('h2.rel-h2{font-size:12px;color:#0f2a4a;margin:16px 0 8px;border-bottom:1px solid #cbd5e1;padding-bottom:4px}');
+    p.push('table{width:100%;border-collapse:collapse;margin-bottom:14px}');
+    p.push('thead th{background:#0f2a4a;color:#fff;padding:6px 8px;text-align:left;font-size:9px;font-weight:600;text-transform:uppercase;border:1px solid #0f2a4a}');
+    p.push('tbody td{padding:5px 8px;border:1px solid #e2e8f0;font-size:10px}');
+    p.push('tbody tr:nth-child(even){background:#f8fafc}');
+    p.push('.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}');
+    p.push('.kpi-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:8px 10px}');
+    p.push('.kpi-card-title{font-size:8px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:0.03em}');
+    p.push('.kpi-card-val{font-size:14px;font-weight:700;color:#0f2a4a;margin-top:2px}');
+    p.push('.kpi-card-val.pos{color:#059669}');
+    p.push('.kpi-card-val.neg{color:#dc2626}');
+    p.push('.kpi-card-sub{font-size:8px;color:#94a3b8;margin-top:2px}');
+    p.push('.rel-footer{margin-top:20px;padding-top:8px;border-top:1px solid #cbd5e1;display:flex;justify-content:space-between;font-size:8px;color:#64748b}');
+    p.push('@media print{body{print-color-adjust:exact;-webkit-print-color-adjust:exact}}');
+    p.push('</style>');
+    p.push('</head><body>');
+    // Cabecalho
+    p.push('<div class="rel-header">');
+    p.push('<div class="rel-header-top">');
+    p.push('<div class="rel-logo">C</div>');
+    p.push('<div class="rel-title-block"><h1>' + meta.nomeEmp + '</h1><p>' + meta.nomeSis + '</p></div>');
+    p.push('<div class="rel-meta"><div><strong>Gerado em:</strong> ' + dh + '</div><div><strong>Usuário:</strong> ' + u + '</div></div>');
+    p.push('</div>');
+    if (meta.linha1 || meta.linha2) {
+      p.push('<div class="rel-empresa">');
+      if (meta.linha1) p.push('<div>' + meta.linha1 + '</div>');
+      if (meta.linha2) p.push('<div>' + meta.linha2 + '</div>');
+      p.push('</div>');
+    }
+    p.push('</div>');
+    // Titulo
+    p.push('<h2 class="rel-titulo-sec">' + titulo + '</h2>');
+    if (subtitulo) p.push('<div class="rel-sub">' + subtitulo + '</div>');
+    // Conteudo
+    p.push(conteudoHTML || '<p style="color:#64748b;font-style:italic">Sem conteudo.</p>');
+    // Rodape
+    p.push('<div class="rel-footer"><div>' + meta.nomeEmp + '</div><div>Relatório gerado automaticamente pelo sistema</div></div>');
+    p.push('</body></html>');
+    return p.join('\n');
+  }
+
+  // -----------------------------------------------------------------
+  // Relatorio 1: Resumo Executivo
+  // -----------------------------------------------------------------
+  async function relatorioResumoExecutivo(cfg) {
+    // FASE_8_FIX_RELATORIOS_22
+    if (typeof mostrarToast === 'function') mostrarToast('Carregando Resumo Executivo...', 'info', 'PDF');
+    // Abre a tela do Resumo para garantir que carregou
+    var tabResumo = document.getElementById('tab-resumo');
+    if (tabResumo && !tabResumo.classList.contains('active')) {
+      document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); });
+      tabResumo.classList.add('active');
+    }
+    // Forca carregar os dados
+    if (typeof loadResumoDaAPI === 'function') {
+      try { await loadResumoDaAPI(true); } catch(e){}
+      await new Promise(function(r){ setTimeout(r, 800); });
+    } else if (typeof renderResumo === 'function') {
+      try { renderResumo(); } catch(e){}
+      await new Promise(function(r){ setTimeout(r, 300); });
+    }
+    var conteudo = '';
+    if (tabResumo) {
+      var clone = tabResumo.cloneNode(true);
+      ['.bar-controls','.btn-action','.no-print','button','select','input'].forEach(function(s) {
+        try { clone.querySelectorAll(s).forEach(function(el){ el.remove(); }); } catch(e){}
+      });
+      clone.querySelectorAll('.ds-skeleton-row, .ds-no-results').forEach(function(el){ el.remove(); });
+      conteudo = clone.innerHTML;
+    } else {
+      conteudo = '<p style="color:#64748b;font-style:italic">Tela de Resumo Executivo nao encontrada.</p>';
+    }
+    var mes = (typeof state !== 'undefined' && state.currentMonth) ? state.currentMonth : '';
+    var sub = mes ? '<strong>M\u00eas de Refer\u00eancia:</strong> ' + mes + ' &middot; <strong>Gerado:</strong> ' + new Date().toLocaleString('pt-BR') : '';
+    return gerarHTMLRelatorio('Resumo Executivo do M\u00eas', sub, conteudo, cfg);
+  }
+
+  // -----------------------------------------------------------------
+  // Relatorio 2: DRE Consolidada
+  // -----------------------------------------------------------------
+  async function relatorioDreConsolidada(cfg) {
+    var conteudo = '';
+    var sec = document.getElementById('tab-dre-consolidada');
+    if (sec) {
+      var clone = sec.cloneNode(true);
+      ['bar-controls','btn-action','button','.no-print','select','input'].forEach(function(s) {
+        try { clone.querySelectorAll(s).forEach(function(el){ el.remove(); }); } catch(e){}
+      });
+      clone.querySelectorAll('.ds-skeleton-row, .ds-no-results').forEach(function(el){ el.remove(); });
+      conteudo = clone.innerHTML;
+    } else {
+      conteudo = '<p style="color:#64748b;font-style:italic">Abra a tela de DRE Consolidada primeiro.</p>';
+    }
+    return gerarHTMLRelatorio('DRE Consolidada', '', conteudo, cfg);
+  }
+
+  // -----------------------------------------------------------------
+  // Relatorio 3: Ranking
+  // -----------------------------------------------------------------
+  async function relatorioRanking(cfg) {
+    // FASE_8_FIX_RELATORIOS_22 - forca carregar dados
+    if (typeof mostrarToast === 'function') mostrarToast('Carregando Ranking...', 'info', 'PDF');
+    var tabRank = document.getElementById('tab-ranking');
+    if (tabRank && !tabRank.classList.contains('active')) {
+      document.querySelectorAll('.tab-content').forEach(function(t){ t.classList.remove('active'); });
+      tabRank.classList.add('active');
+    }
+    // Forca carregar o ranking da API
+    if (typeof loadRankingDaAPI === 'function') {
+      try { await loadRankingDaAPI(); } catch(e){}
+      await new Promise(function(r){ setTimeout(r, 1000); });
+    }
+    var conteudo = '';
+    if (tabRank) {
+      var clone = tabRank.cloneNode(true);
+      ['.bar-controls','.btn-action','.no-print','button','select','input'].forEach(function(s) {
+        try { clone.querySelectorAll(s).forEach(function(el){ el.remove(); }); } catch(e){}
+      });
+      clone.querySelectorAll('.ds-skeleton-row, .ds-no-results').forEach(function(el){ el.remove(); });
+      conteudo = clone.innerHTML;
+    } else {
+      conteudo = '<p style="color:#64748b;font-style:italic">Tela de Ranking nao encontrada.</p>';
+    }
+    var mes = (typeof state !== 'undefined' && state.currentMonth) ? state.currentMonth : '';
+    var sub = mes ? '<strong>M\u00eas de Refer\u00eancia:</strong> ' + mes : '';
+    return gerarHTMLRelatorio('Ranking da Frota', sub, conteudo, cfg);
+  }
+
+  // -----------------------------------------------------------------
+  // Relatorio 4: Historico
+  // -----------------------------------------------------------------
+  async function relatorioHistorico(cfg) {
+    var conteudo = '';
+    var sec = document.getElementById('tab-historico');
+    if (sec) {
+      var clone = sec.cloneNode(true);
+      ['bar-controls','btn-action','button','.no-print','select','input','.hist-toolbar','.hist-paginacao'].forEach(function(s) {
+        try { clone.querySelectorAll(s).forEach(function(el){ el.remove(); }); } catch(e){}
+      });
+      conteudo = clone.innerHTML;
+    } else {
+      conteudo = '<p style="color:#64748b;font-style:italic">Abra a tela de Histórico primeiro.</p>';
+    }
+    return gerarHTMLRelatorio('Histórico de Atividades', '', conteudo, cfg);
+  }
+
+  // -----------------------------------------------------------------
+  // Relatorio 5: Dados da Empresa
+  // -----------------------------------------------------------------
+  async function relatorioEmpresa(cfg) {
+    var linhas = [
+      ["Nome Fantasia", cfg.nome_empresa || "-"],
+      ["Razão Social", cfg.razao_social || "-"],
+      ["CNPJ", cfg.cnpj || "-"],
+      ["Inscrição Estadual", cfg.inscricao_estadual || "-"],
+      ["", ""],
+      ["Endereço", [cfg.endereco_logradouro, cfg.endereco_numero, cfg.endereco_complemento].filter(Boolean).join(", ") || "-"],
+      ["Bairro", cfg.endereco_bairro || "-"],
+      ["Cidade/UF", [cfg.endereco_cidade, cfg.endereco_uf].filter(Boolean).join("/") || "-"],
+      ["CEP", cfg.endereco_cep || "-"],
+      ["", ""],
+      ["Telefone", cfg.telefone_suporte || "-"],
+      ["WhatsApp", cfg.whatsapp_suporte || "-"],
+      ["E-mail", cfg.email_suporte || "-"],
+      ["Site", cfg.site_empresa || "-"]
+    ];
+    var h = '<table>';
+    h += '<thead><tr><th style="width:40%">Campo</th><th>Valor</th></tr></thead><tbody>';
+    linhas.forEach(function(l) {
+      if (l[0] === "" && l[1] === "") {
+        h += '<tr><td colspan="2" style="background:#f1f5f9;height:6px;padding:0"></td></tr>';
+      } else {
+        h += '<tr><td><strong>' + l[0] + '</strong></td><td>' + l[1] + '</td></tr>';
+      }
+    });
+    h += '</tbody></table>';
+    return gerarHTMLRelatorio('Dados da Empresa', '', h, cfg);
+  }
+
+  // -----------------------------------------------------------------
+  // Relatorio 6: Configuracoes completas
+  // -----------------------------------------------------------------
+  async function relatorioConfiguracoes(cfg) {
+    var h = '<table>';
+    h += '<thead><tr><th style="width:40%">Chave</th><th>Valor</th></tr></thead><tbody>';
+    Object.keys(cfg).sort().forEach(function(k) {
+      h += '<tr><td><strong>' + k + '</strong></td><td>' + (cfg[k] || '<em style="color:#94a3b8">(vazio)</em>') + '</td></tr>';
+    });
+    h += '</tbody></table>';
+    return gerarHTMLRelatorio('Configurações Completas do Sistema', '', h, cfg);
+  }
+
+  // -----------------------------------------------------------------
+  // Despachante principal
+  // -----------------------------------------------------------------
+  window.gerarRelatorioPDF = async function(tipo) {
+    try {
+      if (typeof mostrarToast === 'function') mostrarToast('Gerando relatório...', 'info', 'PDF');
+      var cfg = await carregarConfigEmpresa();
+      var html;
+      if (tipo === 'resumo')        html = await relatorioResumoExecutivo(cfg);
+      else if (tipo === 'dre')      html = await relatorioDreConsolidada(cfg);
+      else if (tipo === 'ranking')  html = await relatorioRanking(cfg);
+      // historico removido (FASE_8_FIX_RELATORIOS_22)
+      else if (tipo === 'empresa')  html = await relatorioEmpresa(cfg);
+      else if (tipo === 'config')   html = await relatorioConfiguracoes(cfg);
+      else {
+        if (typeof mostrarToast === 'function') mostrarToast('Tipo de relatório desconhecido.', 'error', 'Erro');
+        return;
+      }
+      var w = window.open('', '_blank');
+      w.document.write(html);
+      w.document.close();
+      w.focus();
+      setTimeout(function() { w.print(); }, 500);
+      if (typeof mostrarToast === 'function') mostrarToast('Relatório gerado!', 'success', 'PDF');
+    } catch (err) {
+      console.error('Erro ao gerar relatorio:', err);
+      if (typeof mostrarToast === 'function') mostrarToast('Erro ao gerar relatório: ' + err.message, 'error', 'Erro');
+    }
+  };
+  </script>
+
+
+  <script type="text/javascript">
+// @ts-nocheck
+  // FASE_8_FIX_RELATORIOS_22 - Listener do select do Resumo
+  (function() {
+    function bindResumoMes() {
+      var sel = document.getElementById('select-mes-resumo');
+      if (!sel || sel.dataset.fase8Bound === '1') return;
+      sel.dataset.fase8Bound = '1';
+      sel.addEventListener('change', async function() {
+        if (typeof state !== 'undefined') state.currentMonth = this.value;
+        if (typeof mostrarToast === 'function') mostrarToast('Carregando ' + this.value + '...', 'info', 'Resumo');
+        try {
+          if (typeof loadLancamentosDaAPI === 'function') await loadLancamentosDaAPI();
+          if (typeof loadKmDaAPI === 'function') await loadKmDaAPI();
+          if (typeof renderResumo === 'function') renderResumo();
+          if (typeof mostrarToast === 'function') mostrarToast('Resumo atualizado!', 'success', 'Resumo');
+        } catch (e) { console.error('[FASE_8] Erro:', e); }
+      });
+      console.log('[FASE_8] Listener do select-mes-resumo registrado');
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(bindResumoMes, 800);
+      setTimeout(bindResumoMes, 2500);
+    });
+    // Tenta tambem se ja carregou
+    setTimeout(bindResumoMes, 1200);
+  })();
+  </script>
+
+
+  <script type="text/javascript">
+// @ts-nocheck
+  // FASE_8_FIX_24 - Carrega lancamentos ao abrir Resumo Executivo
+  (function() {
+    function carregarResumo() {
+      // Se state.lancamentos esta vazio, carrega
+      if (!state.lancamentos || state.lancamentos.length === 0) {
+        if (typeof loadLancamentosDaAPI === 'function') {
+          loadLancamentosDaAPI().then(function() {
+            if (typeof renderResumo === 'function') renderResumo();
+          }).catch(function(e){ console.error('[FASE_8] Erro:', e); });
+        }
+      } else {
+        if (typeof renderResumo === 'function') renderResumo();
+      }
+    }
+    // Interceptar clique no menu Resumo
+    document.addEventListener('click', function(e) {
+      var btn = e.target.closest ? e.target.closest('[data-tab="tab-resumo"]') : null;
+      if (btn) setTimeout(carregarResumo, 200);
+    });
+    // Tambem se jah estiver na tab resumo
+    setTimeout(function() {
+      var tab = document.getElementById('tab-resumo');
+      if (tab && tab.classList.contains('active')) carregarResumo();
+    }, 2000);
+    // Expor para uso externo
+    window.__carregarResumoExecutivo = carregarResumo;
+  })();
+  </script>
 
 </body>
 </html>
