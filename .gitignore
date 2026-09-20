@@ -13,3 +13,13 @@ correcao/
 
 # VS Code
 .vscode/
+
+# Backups locais (nao commitar ZIPs e JSONs de backup)
+backups/
+
+# Logs locais
+log-servidor.txt
+*.log
+
+# Testes temporarios
+_teste_*.js
