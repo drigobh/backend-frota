@@ -685,7 +685,25 @@
       @page { size: A4 landscape; margin: 10mm; }
     }
     /* ==== /FASE_7_PRINT_HISTORICO ==== */
-</style>
+
+    /* ==== FASE_8_DIFF_CSS ==== */
+    .timeline-diff { margin-top:8px; padding:8px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; font-size:0.78rem; }
+    .timeline-diff-titulo { font-weight:700; color:#0f2a4a; margin-bottom:5px; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.03em; }
+    .timeline-diff-linha { display:grid; grid-template-columns:110px 1fr auto 1fr; gap:6px; align-items:center; padding:3px 0; border-bottom:1px dashed #e2e8f0; }
+    .timeline-diff-linha:last-child { border-bottom:none; }
+    .timeline-diff-campo { font-family:monospace; font-size:0.72rem; color:#475569; font-weight:600; }
+    .timeline-diff-antes { color:#dc2626; text-decoration:line-through; opacity:0.75; word-break:break-all; font-size:0.75rem; }
+    .timeline-diff-seta { color:#94a3b8; font-weight:700; }
+    .timeline-diff-depois { color:#059669; font-weight:700; word-break:break-all; font-size:0.75rem; }
+    .timeline-diff-vazio { color:#94a3b8; font-style:italic; font-size:0.75rem; }
+    [data-theme="dark"] .timeline-diff { background:#0f131a !important; border-color:rgba(255,255,255,0.08) !important; }
+    [data-theme="dark"] .timeline-diff-titulo { color:#93c5fd !important; }
+    [data-theme="dark"] .timeline-diff-campo { color:#cbd5e1 !important; }
+    [data-theme="dark"] .timeline-diff-antes { color:#fca5a5 !important; }
+    [data-theme="dark"] .timeline-diff-depois { color:#6ee7b7 !important; }
+    [data-theme="dark"] .timeline-diff-linha { border-bottom-color:rgba(255,255,255,0.06) !important; }
+    /* ==== /FASE_8_DIFF_CSS ==== */
+  </style>
   
   <style>
     :root {
@@ -8242,7 +8260,40 @@
       return "\uD83D\uDCCC";
     }
 
-    function renderHistorico(data) {
+    // FASE_8_DIFF_HISTORICO
+function gerarDiffHTML(antes, depois) {
+  if (!antes || !depois || typeof antes !== 'object' || typeof depois !== 'object') return '';
+  var IGNORAR = ['id', 'created_at', 'updated_at', 'senha_hash', 'senha', 'token', 'deleted_at', 'deleted_by', 'updated_by', 'created_by'];
+  var campos = {};
+  Object.keys(antes).forEach(function(k) { campos[k] = true; });
+  Object.keys(depois).forEach(function(k) { campos[k] = true; });
+  var mudancas = [];
+  Object.keys(campos).forEach(function(k) {
+    if (IGNORAR.indexOf(k) !== -1) return;
+    var va = antes[k];
+    var vd = depois[k];
+    var sa = (va === null || va === undefined) ? '' : String(va);
+    var sd = (vd === null || vd === undefined) ? '' : String(vd);
+    if (sa === sd) return;
+    mudancas.push({ campo: k, antes: sa, depois: sd });
+  });
+  if (mudancas.length === 0) return '';
+  var h = '<div class="timeline-diff">';
+  h += '<div class="timeline-diff-titulo">\uD83D\uDCDD Mudan\u00e7as (' + mudancas.length + ')</div>';
+  mudancas.forEach(function(m) {
+    var va = m.antes.length > 40 ? m.antes.substring(0, 40) + '...' : m.antes;
+    var vd = m.depois.length > 40 ? m.depois.substring(0, 40) + '...' : m.depois;
+    h += '<div class="timeline-diff-linha">';
+    h += '<span class="timeline-diff-campo">' + m.campo + '</span>';
+    h += '<span class="timeline-diff-antes">' + (va || 'vazio') + '</span>';
+    h += '<span class="timeline-diff-seta">\u2192</span>';
+    h += '<span class="timeline-diff-depois">' + (vd || 'vazio') + '</span>';
+    h += '</div>';
+  });
+  h += '</div>';
+  return h;
+}
+function renderHistorico(data) {
       var timeline = document.getElementById("historico-timeline");
       var resumo = document.getElementById("historico-resumo");
       if (!timeline) return;
@@ -8317,6 +8368,10 @@
           html += ' <span class="timeline-badge badge-' + cat + '">' + cat + "</span></div>";
           html += '<div class="timeline-meta"><span>&#128100; ' + (e.usuario || "Sistema") + '</span><span>&#128193; ' + (e.modulo || "SISTEMA") + "</span></div>";
           if (e.detalhes) html += '<div class="timeline-detalhe">' + e.detalhes + "</div>";
+          // FASE_8_DIFF_INJETADO
+          if (e.valor_anterior || e.valor_novo) {
+            html += gerarDiffHTML(e.valor_anterior, e.valor_novo);
+          }
           html += "</div>";
         });
       });

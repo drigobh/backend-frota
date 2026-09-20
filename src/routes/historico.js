@@ -1,3 +1,4 @@
+// FASE_8_DIFF_HISTORICO
 const db = require('../database');
 
 module.exports = async function (fastify, options) {
@@ -27,7 +28,9 @@ module.exports = async function (fastify, options) {
           acao AS tipo_evento,
           COALESCE(NULLIF(modulo, 'null'), NULLIF(entidade, 'null'), NULLIF(tabela, 'null'), 'SISTEMA') AS modulo,
           COALESCE(NULLIF(detalhes, '-'), NULLIF(descricao, '-'), 'Acao registrada') AS detalhes,
-          COALESCE(created_at, NOW()) AS data_evento
+          COALESCE(created_at, NOW()) AS data_evento,
+          valor_anterior,
+          valor_novo
         FROM auditoria
         WHERE 1=1
       `;
