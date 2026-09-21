@@ -19,11 +19,15 @@ function getTransporter() {
     return null;
   }
 
+  /* FASE_12_TIMEOUTS_SMTP - evita travamento infinito no envio */
   _transporter = nodemailer.createTransport({
     host: host,
     port: port,
     secure: false,
     auth: { user: user, pass: pass },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 30000,
   });
 
   return _transporter;
