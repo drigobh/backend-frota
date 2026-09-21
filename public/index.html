@@ -12261,11 +12261,11 @@ function renderHistorico(data) {
       // Puxa a versao do /configuracoes e atualiza todos os elementos com [data-versao-sistema]
       async function atualizarVersaoDinamica() {
         try {
-          var res = await apiFetch("/configuracoes");
+          /* FASE_13_VERSION_API */
+          var res = await fetch("/api/versao");
           if (!res || !res.ok) return;
           var cfg = await res.json();
-          var v = cfg.versao_sistema;
-          var valor = (v && typeof v === "object") ? v.valor : v;
+          var valor = cfg.versao;
           if (!valor) return;
 
           // Atualiza meta tag

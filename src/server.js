@@ -391,6 +391,7 @@ fastify.get('/health', async (req, reply) => {
     );
     const existentes = r.rows.map(function (x) { return x.tablename; });
     const faltando = TBL_CHECK.filter(function (t) { return existentes.indexOf(t) === -1; });
+
     checks.tables = {
       status: faltando.length === 0 ? 'ok' : 'warning',
       total_esperado: TBL_CHECK.length,
@@ -585,6 +586,20 @@ const bcryptLib = require("bcrypt");
 const { enviarEmailRecuperacaoSenha } = require("./email");
 
 // POST /api/recuperar-senha — recebe { email }
+  // ============================================================
+  // FASE_13_ROTA_VERSAO - GET /api/versao (publica, sem auth)
+  // ============================================================
+  fastify.get('/api/versao', async (req, reply) => {
+    try {
+      const r = await db.query("SELECT valor FROM configuracoes WHERE chave = 'versao_sistema'");
+      var v = r.rows[0] && r.rows[0].valor;
+      return reply.send({ ok: true, versao: v || 'desconhecida' });
+    } catch (e) {
+      req.log.warn({ err: e }, 'Erro em /api/versao');
+      return reply.send({ ok: false, versao: 'desconhecida' });
+    }
+  });
+
 fastify.post("/api/recuperar-senha", async (req, reply) => {
   try {
     const { email } = req.body || {};
