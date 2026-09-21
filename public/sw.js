@@ -72,7 +72,7 @@ self.addEventListener('fetch', (event) => {
   // 5) HTML (navegacao): NETWORK-FIRST (sempre busca do servidor, fallback pro cache)
   if (request.mode === 'navigate' || url.pathname === '/' || url.pathname.endsWith('.html')) {
     event.respondWith(
-      fetch(request).then((response) => {
+      fetch(request, { cache: 'no-store' }).then((response) => { // FASE_14_SW_NO_STORE
         // Atualiza o cache com a versao nova
         if (response && response.status === 200) {
           const clone = response.clone();

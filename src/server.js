@@ -332,6 +332,7 @@ fastify.put("/api/configuracoes", { preHandler: [fastify.autenticar] }, fastify.
 // =========================================================================
 fastify.get('/', (req, reply) => {
     // FASE_4_NO_CACHE_HTML - X-HTML-No-Cache
+    reply.header('Cache-Control', 'no-cache, no-store, must-revalidate'); // FASE_14_NO_CACHE_HTML
     reply.header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
     reply.header('Pragma', 'no-cache');
     reply.header('Expires', '0');
