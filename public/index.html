@@ -11232,11 +11232,24 @@ function renderHistorico(data) {
     btn.textContent = "Enviando...";
     msg.textContent = "";
 
+    /* FASE_12_TIMEOUT_ACORDANDO */
+
+    var avisoAcordando = setTimeout(function() {
+      if (btn.disabled) {
+        btn.textContent = "Acordando o servidor...";
+        msg.style.color = "#f59e0b";
+        msg.textContent = "O servidor pode levar ate 1 minuto para responder. Aguarde...";
+      }
+    }, 5000);
+
+    var controller = new AbortController();
+    var timeoutId = setTimeout(function() { controller.abort(); }, 90000);
     try {
       var res = await fetch("/api/recuperar-senha", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email })
+        body: JSON.stringify({ email: email }),
+        signal: controller.signal
       });
       var data = await res.json();
       if (res.ok && data.ok) {
@@ -11249,10 +11262,15 @@ function renderHistorico(data) {
       }
     } catch (e) {
       msg.style.color = "#dc2626";
-      msg.textContent = "Erro de rede. Tente novamente.";
+      if (e.name === "AbortError") {
+        msg.textContent = "O servidor demorou mais que o esperado. Tente novamente em alguns segundos.";
+      } else {
+        msg.textContent = "Erro de rede. Tente novamente.";
+      }
     } finally {
+      clearTimeout(avisoAcordando);
+      clearTimeout(timeoutId);
       btn.disabled = false;
-      btn.textContent = "Enviar link de recuperação";
     }
   };
 
