@@ -56,7 +56,11 @@ function detectarDispositivo(userAgent) {
   else if (/iPhone|iPad|iPod/i.test(ua)) so = "iOS";
   else if (/Linux/i.test(ua)) so = "Linux";
 
-  nome = (so ? so + " / " : "") + browser;
+  nome = (so ? so + " / " : "") + browser; // FASE_13_DEVICE_TIPO
+
+  // Adiciona o tipo no final: " · PC" ou " · Celular" ou " · Tablet"
+  var tipoLabel = tipo === "pc" ? "PC" : (tipo === "celular" ? "Celular" : (tipo === "tablet" ? "Tablet" : (tipo === "bot" ? "Bot" : "")));
+  if (tipoLabel) nome = nome + " \u00B7 " + tipoLabel;
 
   return { tipo: tipo, nome: nome };
 }
