@@ -11,7 +11,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Caderninho">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="versao-sistema" content="v1977-51">
+  <!-- FASE_13_VERSION_DINAMICA -->
+  <meta name="versao-sistema" content="v1977-55">
   <title>Caderninho de Motorista — Gestão de Frota</title>
   <!-- Basecoat CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@1.0.2/dist/basecoat.cdn.min.css">
@@ -12191,5 +12192,46 @@ function renderHistorico(data) {
   };
   </script>
 
+
+  <!-- FASE_13_VERSION_DINAMICA_SCRIPT -->
+  <script>
+    (function() {
+      // Puxa a versao do /configuracoes e atualiza todos os elementos com [data-versao-sistema]
+      async function atualizarVersaoDinamica() {
+        try {
+          var res = await apiFetch("/configuracoes");
+          if (!res || !res.ok) return;
+          var cfg = await res.json();
+          var v = cfg.versao_sistema;
+          var valor = (v && typeof v === "object") ? v.valor : v;
+          if (!valor) return;
+
+          // Atualiza meta tag
+          var meta = document.querySelector('meta[name="versao-sistema"]');
+          if (meta) meta.setAttribute("content", valor);
+
+          // Atualiza elementos com [data-versao-sistema]
+          document.querySelectorAll("[data-versao-sistema]").forEach(function(el) {
+            el.textContent = valor;
+          });
+
+          // Atualiza rodape do login (id login-versao)
+          var elLogin = document.getElementById("login-versao");
+          if (elLogin) elLogin.textContent = valor;
+
+          // Atualiza card da Ajuda
+          var elAjuda = document.getElementById("ajuda-versao-valor");
+          if (elAjuda) elAjuda.textContent = valor;
+        } catch (e) {
+          console.warn("[FASE_13] Erro ao atualizar versao:", e);
+        }
+      }
+
+      // Roda no boot e a cada 30s (caso mude em runtime)
+      setTimeout(atualizarVersaoDinamica, 1000);
+      setInterval(atualizarVersaoDinamica, 30000);
+    })();
+  </script>
+  <!-- /FASE_13_VERSION_DINAMICA_SCRIPT -->
 </body>
 </html>
