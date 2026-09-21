@@ -1,4 +1,5 @@
 const db = require('../database');
+const { capturarSessaoInfo, gravarLogAcesso } = require('../session'); // FASE_13_SESSAO
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 
@@ -24,8 +25,15 @@ async function routes(fastify, options) {
         }
       } // FASE_3B_RATE_LIMIT
     }, async (req, reply) => {
+    // FASE_13_SESSAO - captura IP/geo/device ANTES de qualquer coisa
+    var sessao = { ip: null, cidade: null, uf: null, pais: null, isp: null, device_nome: null, device_tipo: null, user_agent: null };
+    try { sessao = await capturarSessaoInfo(req); } catch (e) { console.warn('[FASE_13] Erro ao capturar sessao:', e.message); }
+
     const { email, senha } = req.body || {};
     if (!email || !senha) {
+      await gravarLogAcesso(db, Object.assign({}, sessao, {
+        email_tentado: email || null, sucesso: false, motivo_falha: 'campos_vazios'
+      }));
       return reply.code(400).send({ erro: 'E-mail e senha são obrigatórios.' });
     }
 
@@ -41,11 +49,17 @@ async function routes(fastify, options) {
       // 2. DEMAIS USUÁRIOS
       const res = await db.query('SELECT * FROM usuarios WHERE LOWER(email) = $1', [emailLimpo]);
       if (res.rows.length === 0) {
+        await gravarLogAcesso(db, Object.assign({}, sessao, {
+          email_tentado: emailLimpo, sucesso: false, motivo_falha: 'usuario_nao_encontrado'
+        }));
         return reply.code(401).send({ erro: 'Usuário não encontrado.' });
       }
 
       const user = res.rows[0];
       if (user.ativo === false) {
+        await gravarLogAcesso(db, Object.assign({}, sessao, {
+          usuario_id: user.id, email_tentado: emailLimpo, sucesso: false, motivo_falha: 'usuario_inativo'
+        }));
         return reply.code(401).send({ erro: 'Usuário inativo no sistema.' });
       }
 
@@ -65,6 +79,9 @@ async function routes(fastify, options) {
       }
 
       if (!senhaValida) {
+        await gravarLogAcesso(db, Object.assign({}, sessao, {
+          usuario_id: user.id, email_tentado: emailLimpo, sucesso: false, motivo_falha: 'senha_incorreta'
+        }));
         return reply.code(401).send({ erro: 'Senha incorreta.' });
       }
 
@@ -83,11 +100,34 @@ async function routes(fastify, options) {
         }
       }
 
+      await gravarLogAcesso(db, Object.assign({}, sessao, {
+        usuario_id: user.id, email_tentado: emailLimpo, sucesso: true, motivo_falha: null
+      }));
       return reply.send({ token, usuario: payload });
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
     }
   });
+
+  // ============================================================
+  // FASE_13_SESSAO - GET /api/auth/sessao-info
+  // ============================================================
+  // Retorna IP/geo/ISP/device da sessao atual. NAO grava no banco.
+  // Usada pelo frontend no boot para mostrar "Sobre esta sessao".
+  // ============================================================
+  fastify.get('/api/auth/sessao-info', async (req, reply) => {
+    try {
+      var sessao = await capturarSessaoInfo(req);
+      return reply.send(sessao);
+    } catch (e) {
+      req.log.warn({ err: e }, 'Erro em /api/auth/sessao-info');
+      return reply.send({ ip: null, cidade: null, uf: null, pais: null, isp: null, device_nome: null, device_tipo: null, user_agent: null });
+    }
+  });
+
+  // ============================================================
+  // FIM FASE_13_SESSAO
+  // ============================================================
 }
 
 module.exports = routes;

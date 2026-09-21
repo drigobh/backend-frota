@@ -966,6 +966,58 @@
       border-color: rgba(148, 163, 184, 0.35);
     }
   
+
+    /* FASE_13_SESSAO_UI - rodape "Sobre esta sessao" */
+    .login-sessao-info {
+      margin-top: 14px;
+      padding: 10px 12px;
+      background: rgba(15, 23, 42, 0.35);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 8px;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      line-height: 1.5;
+      cursor: pointer;
+    }
+    .login-sessao-info summary {
+      list-style: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+    }
+    .login-sessao-info summary::before {
+      content: "ℹ️";
+      font-size: 0.9rem;
+    }
+    .login-sessao-info summary::-webkit-details-marker { display: none; }
+    .login-sessao-info[open] summary {
+      margin-bottom: 8px;
+      color: #e2e8f0;
+    }
+    .login-sessao-info[open] summary::before {
+      content: "▾";
+    }
+    .login-sessao-linha {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+    .login-sessao-linha strong {
+      color: #cbd5e1;
+      font-weight: 600;
+      min-width: 68px;
+    }
+    .login-sessao-valor {
+      color: #e2e8f0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.7rem;
+    }
 </style>
   
   <style>
@@ -2280,6 +2332,16 @@
       <div class="login-footer-info">
         Caderninho de Frota &middot; <strong id="login-versao">v1977-34</strong>
       </div>
+
+      <!-- FASE_13_SESSAO_UI -->
+      <details class="login-sessao-info" id="login-sessao-info">
+        <summary>Sobre esta sessao</summary>
+        <div class="login-sessao-linha"><strong>IP:</strong> <span class="login-sessao-valor" id="login-sessao-ip">--</span></div>
+        <div class="login-sessao-linha"><strong>Local:</strong> <span class="login-sessao-valor" id="login-sessao-local">--</span></div>
+        <div class="login-sessao-linha"><strong>Provedor:</strong> <span class="login-sessao-valor" id="login-sessao-isp">--</span></div>
+        <div class="login-sessao-linha"><strong>Dispositivo:</strong> <span class="login-sessao-valor" id="login-sessao-device">--</span></div>
+      </details>
+      <!-- /FASE_13_SESSAO_UI -->
     </div>
   </div>
 
@@ -12233,5 +12295,52 @@ function renderHistorico(data) {
     })();
   </script>
   <!-- /FASE_13_VERSION_DINAMICA_SCRIPT -->
+
+  <!-- FASE_13_SESSAO_UI_SCRIPT -->
+  <script>
+    (function() {
+      var _carregou = false;
+
+      async function carregarSessaoInfo() {
+        if (_carregou) return;
+        try {
+          var res = await fetch("/api/auth/sessao-info");
+          if (!res.ok) return;
+          var d = await res.json();
+
+          var elIp = document.getElementById("login-sessao-ip");
+          var elLocal = document.getElementById("login-sessao-local");
+          var elIsp = document.getElementById("login-sessao-isp");
+          var elDevice = document.getElementById("login-sessao-device");
+
+          if (elIp) elIp.textContent = d.ip || "--";
+
+          var local = [];
+          if (d.cidade) local.push(d.cidade);
+          if (d.uf) local.push(d.uf);
+          if (d.pais) local.push(d.pais);
+          if (elLocal) elLocal.textContent = local.length ? local.join(" / ") : "--";
+
+          if (elIsp) elIsp.textContent = d.isp || "--";
+          if (elDevice) elDevice.textContent = d.device_nome || "--";
+
+          _carregou = true;
+        } catch (e) {
+          console.warn("[FASE_13] Erro ao carregar sessao-info:", e);
+        }
+      }
+
+      // Carrega no boot (apos 1.5s para nao competir com login)
+      setTimeout(carregarSessaoInfo, 1500);
+
+      // Carrega quando o usuario abre o <details>
+      document.addEventListener("toggle", function(e) {
+        if (e.target && e.target.id === "login-sessao-info" && e.target.open) {
+          carregarSessaoInfo();
+        }
+      }, true);
+    })();
+  </script>
+  <!-- /FASE_13_SESSAO_UI_SCRIPT -->
 </body>
 </html>
