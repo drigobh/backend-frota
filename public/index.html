@@ -1238,6 +1238,28 @@
     .login-screen-card.shake {
       animation: loginShake 0.4s ease;
     }
+
+    /* FASE_15_AUDITORIA_UI */
+    .aud-badge { display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:700;text-transform:uppercase; }
+    .aud-badge-criar { background:#dcfce7;color:#166534; }
+    .aud-badge-editar { background:#dbeafe;color:#1e40af; }
+    .aud-badge-excluir { background:#fee2e2;color:#991b1b; }
+    .aud-badge-login { background:#ede9fe;color:#5b21b6; }
+    .aud-badge-outro { background:#f1f5f9;color:#475569; }
+    .aud-modal-diff { display:none;position:fixed;inset:0;background:rgba(9,27,48,0.85);z-index:99999;align-items:center;justify-content:center;padding:20px; }
+    .aud-modal-diff.aberto { display:flex; }
+    .aud-modal-diff-conteudo { background:#fff;border-radius:14px;padding:24px;max-width:800px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.5); }
+    .aud-diff-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px; }
+    .aud-diff-col { background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;font-family:monospace;font-size:0.75rem;white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto; }
+    .aud-diff-col.antes { border-color:#fecaca;background:#fef2f2; }
+    .aud-diff-col.depois { border-color:#bbf7d0;background:#f0fdf4; }
+    .aud-diff-titulo { font-weight:700;margin-bottom:8px;font-size:0.8rem;text-transform:uppercase; }
+    .aud-diff-titulo.antes { color:#991b1b; }
+    .aud-diff-titulo.depois { color:#166534; }
+    [data-theme="dark"] .aud-diff-col { background:#1e293b;border-color:#334155;color:#e2e8f0; }
+    [data-theme="dark"] .aud-diff-col.antes { background:#450a0a;border-color:#7f1d1d; }
+    [data-theme="dark"] .aud-diff-col.depois { background:#052e16;border-color:#166534; }
+    [data-theme="dark"] .aud-modal-diff-conteudo { background:#0f172a;color:#e2e8f0; }
 </style>
   
   <style>
@@ -2609,6 +2631,7 @@
       <button class="nav-tab-btn nav-group-toggle" data-group="grupo-admin"><span>&#128274;</span><span class="nav-label">Administração</span><span class="nav-arrow">&#9654;</span></button>
       <div class="nav-submenu" id="grupo-admin">
         <button class="nav-tab-btn" data-tab="tab-usuarios" id="nav-tab-usuarios" onclick="setTimeout(loadUsuariosDaAPI, 100)"><span>&#128101;</span><span class="nav-label">Usuários</span></button>
+        <button class="nav-tab-btn" data-tab="tab-auditoria" id="nav-tab-auditoria" onclick="setTimeout(loadAuditoria, 200)"><span>&#128373;</span><span class="nav-label">Auditoria</span></button>
         <button class="nav-tab-btn" data-tab="tab-perfis" id="nav-tab-perfis" onclick="setTimeout(loadPerfisDaAPI, 100)"><span>&#128737;</span><span class="nav-label">Perfis</span></button>
         <button class="nav-tab-btn" data-tab="tab-backup" id="nav-tab-backup" onclick="setTimeout(loadBackupsDaAPI, 200)"><span>&#128190;</span><span class="nav-label">Backup</span></button>
         <!-- FASE_7_AUDITORIA_REMOVIDA: botao removido -->
@@ -4022,6 +4045,49 @@
       <!-- TAB: AJUDA -->
       <!-- FASE_9_BACKUP_UI -->
       <!-- FASE_10_FRONTEND_BACKUP -->
+      <section id="tab-auditoria" class="tab-content">
+        <div class="bar-controls">
+          <div class="bar-controls-left">
+            <span class="label-month-select">AUDITORIA DO SISTEMA:</span>
+          </div>
+          <div class="bar-controls-right">
+            <button class="btn-action btn-action-secondary" onclick="exportarAuditoriaCSV()">&#128200; Exportar CSV</button>
+            <button class="btn-action btn-action-secondary" onclick="limparAuditoriaAntiga()">&#128465;&#65039; Limpar +90 dias</button>
+            <button class="btn-action btn-action-primary" onclick="loadAuditoria()">&#128260; Atualizar</button>
+          </div>
+        </div>
+        <div class="section-title-wrap">
+          <h2 class="section-title"><span>&#128373;</span> Auditoria do Sistema</h2>
+        </div>
+        <div id="auditoria-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px;">
+          <div class="meta-card" style="padding:14px;"><div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;">Total</div><div id="aud-total" style="font-size:1.5rem;font-weight:700;color:#0f2a4a;margin-top:4px;">--</div></div>
+          <div class="meta-card" style="padding:14px;"><div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;">Tabelas</div><div id="aud-tabelas" style="font-size:1.5rem;font-weight:700;color:#0f2a4a;margin-top:4px;">--</div></div>
+          <div class="meta-card" style="padding:14px;"><div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;">Acoes</div><div id="aud-acoes" style="font-size:1.5rem;font-weight:700;color:#0f2a4a;margin-top:4px;">--</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto auto;gap:8px;margin-bottom:14px;align-items:end;">
+          <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">Tabela</label><select id="aud-filtro-tabela" class="login-input" style="width:100%;padding:8px;margin:0;"><option value="">Todas</option></select></div>
+          <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">Acao</label><select id="aud-filtro-acao" class="login-input" style="width:100%;padding:8px;margin:0;"><option value="">Todas</option></select></div>
+          <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">Inicio</label><input type="date" id="aud-filtro-inicio" class="login-input" style="width:100%;padding:8px;margin:0;"></div>
+          <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">Fim</label><input type="date" id="aud-filtro-fim" class="login-input" style="width:100%;padding:8px;margin:0;"></div>
+          <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">Busca</label><input type="text" id="aud-filtro-busca" class="login-input" placeholder="Email, usuario..." style="width:100%;padding:8px;margin:0;"></div>
+          <button class="btn-action btn-action-primary" onclick="loadAuditoria(1)">Filtrar</button>
+          <button class="btn-action btn-action-secondary" onclick="limparFiltrosAuditoria()">Limpar</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table" id="table-auditoria">
+            <thead><tr><th style="width:180px;">Data/Hora</th><th style="width:200px;">Usuario</th><th style="width:100px;">Acao</th><th style="width:150px;">Tabela</th><th>Detalhes</th><th style="width:80px;" class="col-center">IP</th><th style="width:80px;" class="col-center">Acoes</th></tr></thead>
+            <tbody id="tbody-auditoria"><tr><td colspan="7" style="text-align:center;padding:1.5rem;color:#64748b;">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:0.85rem;color:#64748b;">
+          <div id="aud-paginacao-info">--</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-action btn-action-secondary" id="aud-btn-anterior" onclick="mudarPaginaAuditoria(-1)">&larr; Anterior</button>
+            <button class="btn-action btn-action-secondary" id="aud-btn-proximo" onclick="mudarPaginaAuditoria(1)">Proxima &rarr;</button>
+          </div>
+        </div>
+      </section>
+
       <section id="tab-backup" class="tab-content">
         <div class="bar-controls">
           <div class="bar-controls-left">
@@ -12725,5 +12791,182 @@ function renderHistorico(data) {
     })();
   </script>
   <!-- /FASE_14_LOGIN_UX_SCRIPT -->
+
+  <!-- FASE_15_AUDITORIA_UI_MODAL -->
+  <div id="modal-auditoria-diff" class="aud-modal-diff">
+    <div class="aud-modal-diff-conteudo">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h2 style="margin:0;color:#0f2a4a;font-size:1.2rem;">Detalhes da Alteracao</h2>
+        <button onclick="fecharModalDiffAuditoria()" style="background:none;border:0;font-size:1.5rem;cursor:pointer;color:#64748b;">&times;</button>
+      </div>
+      <div id="aud-diff-meta" style="font-size:0.85rem;color:#64748b;margin-bottom:12px;"></div>
+      <div class="aud-diff-grid">
+        <div class="aud-diff-col antes"><div class="aud-diff-titulo antes">Antes</div><div id="aud-diff-antes">--</div></div>
+        <div class="aud-diff-col depois"><div class="aud-diff-titulo depois">Depois</div><div id="aud-diff-depois">--</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FASE_15_AUDITORIA_UI_SCRIPT -->
+  <script>
+    (function() {
+      window.__auditoriaPagina = 1;
+      window.__auditoriaDados = null;
+
+      function badgeClasse(acao) {
+        var a = (acao || "").toUpperCase();
+        if (a === "CRIAR" || a === "CREATE") return "aud-badge-criar";
+        if (a === "EDITAR" || a === "UPDATE") return "aud-badge-editar";
+        if (a === "EXCLUIR" || a === "DELETE") return "aud-badge-excluir";
+        if (a === "LOGIN" || a === "LOGOUT") return "aud-badge-login";
+        return "aud-badge-outro";
+      }
+
+      function fmtData(d) {
+        if (!d) return "-";
+        try { return new Date(d).toLocaleString("pt-BR"); } catch (e) { return d; }
+      }
+
+      function esc(s) {
+        if (s === null || s === undefined) return "";
+        return String(s).replace(/[&<>"']/g, function(c) {
+          return { "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c];
+        });
+      }
+
+      window.loadAuditoria = async function(pagina) {
+        if (pagina) window.__auditoriaPagina = pagina;
+        var tbody = document.getElementById("tbody-auditoria");
+        if (!tbody) return;
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:#64748b;">Carregando...</td></tr>';
+
+        var params = new URLSearchParams();
+        params.set("page", window.__auditoriaPagina);
+        params.set("limit", "50");
+        var t = document.getElementById("aud-filtro-tabela");
+        var a = document.getElementById("aud-filtro-acao");
+        var i = document.getElementById("aud-filtro-inicio");
+        var f = document.getElementById("aud-filtro-fim");
+        var b = document.getElementById("aud-filtro-busca");
+        if (t && t.value) params.set("tabela", t.value);
+        if (a && a.value) params.set("acao", a.value);
+        if (i && i.value) params.set("data_inicio", i.value);
+        if (f && f.value) params.set("data_fim", f.value);
+        if (b && b.value) params.set("busca", b.value);
+
+        try {
+          var res = await apiFetch("/auditoria?" + params.toString());
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          var d = await res.json();
+          window.__auditoriaDados = d;
+
+          var elTotal = document.getElementById("aud-total");
+          var elTab = document.getElementById("aud-tabelas");
+          var elAc = document.getElementById("aud-acoes");
+          if (elTotal) elTotal.textContent = d.total || 0;
+          if (elTab) elTab.textContent = (d.tabelas || []).length;
+          if (elAc) elAc.textContent = (d.acoes || []).length;
+
+          var selT = document.getElementById("aud-filtro-tabela");
+          var selA = document.getElementById("aud-filtro-acao");
+          if (selT && selT.options.length <= 1 && d.tabelas) {
+            d.tabelas.forEach(function(x) { var o = document.createElement("option"); o.value = x; o.textContent = x; selT.appendChild(o); });
+          }
+          if (selA && selA.options.length <= 1 && d.acoes) {
+            d.acoes.forEach(function(x) { var o = document.createElement("option"); o.value = x; o.textContent = x; selA.appendChild(o); });
+          }
+
+          if (!d.itens || d.itens.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:#64748b;">Nenhum registro.</td></tr>';
+          } else {
+            var htmlRows = d.itens.map(function(it) {
+              var temDiff = (it.valor_anterior || it.valor_novo);
+              var btnDiff = temDiff ? '<button class="btn-row-acao btn-row-testar" onclick="verDiffAuditoria(\'' + it.id + '\')" title="Ver diff">&#128065;</button>' : '<span style="color:#cbd5e1;">--</span>';
+              return '<tr>' +
+                '<td style="font-size:0.78rem;">' + esc(fmtData(it.created_at)) + '</td>' +
+                '<td>' + esc(it.usuario_email || it.usuario_nome || "-") + '</td>' +
+                '<td><span class="aud-badge ' + badgeClasse(it.acao) + '">' + esc(it.acao || "-") + '</span></td>' +
+                '<td><code style="font-size:0.78rem;">' + esc(it.tabela || "-") + '</code></td>' +
+                '<td style="font-size:0.78rem;color:#475569;">' + esc((it.detalhes || "").substring(0, 100)) + '</td>' +
+                '<td class="col-center" style="font-size:0.72rem;font-family:monospace;">' + esc(it.ip || "-") + '</td>' +
+                '<td class="col-center">' + btnDiff + '</td>' +
+              '</tr>';
+            }).join("");
+            tbody.innerHTML = htmlRows;
+          }
+
+          var info = document.getElementById("aud-paginacao-info");
+          if (info) info.textContent = "Pagina " + d.page + " de " + d.total_paginas + " (" + d.total + " registros)";
+          var btnAnt = document.getElementById("aud-btn-anterior");
+          var btnProx = document.getElementById("aud-btn-proximo");
+          if (btnAnt) btnAnt.disabled = d.page <= 1;
+          if (btnProx) btnProx.disabled = d.page >= d.total_paginas;
+        } catch (e) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:#dc2626;">Erro: ' + esc(e.message) + '</td></tr>';
+        }
+      };
+
+      window.mudarPaginaAuditoria = function(delta) {
+        var nova = (window.__auditoriaPagina || 1) + delta;
+        if (nova < 1) return;
+        if (window.__auditoriaDados && nova > window.__auditoriaDados.total_paginas) return;
+        window.loadAuditoria(nova);
+      };
+
+      window.limparFiltrosAuditoria = function() {
+        ["aud-filtro-tabela","aud-filtro-acao","aud-filtro-inicio","aud-filtro-fim","aud-filtro-busca"].forEach(function(id) {
+          var el = document.getElementById(id); if (el) el.value = "";
+        });
+        window.loadAuditoria(1);
+      };
+
+      window.verDiffAuditoria = function(id) {
+        var d = window.__auditoriaDados;
+        if (!d) return;
+        var item = (d.itens || []).find(function(x) { return x.id === id; });
+        if (!item) return;
+        var modal = document.getElementById("modal-auditoria-diff");
+        var meta = document.getElementById("aud-diff-meta");
+        var antes = document.getElementById("aud-diff-antes");
+        var depois = document.getElementById("aud-diff-depois");
+        if (meta) meta.innerHTML = '<strong>Tabela:</strong> ' + esc(item.tabela) + ' | <strong>Acao:</strong> ' + esc(item.acao) + ' | <strong>Data:</strong> ' + esc(fmtData(item.created_at)) + ' | <strong>Usuario:</strong> ' + esc(item.usuario_email || item.usuario_nome);
+        if (antes) antes.textContent = item.valor_anterior ? JSON.stringify(item.valor_anterior, null, 2) : "(sem valor anterior)";
+        if (depois) depois.textContent = item.valor_novo ? JSON.stringify(item.valor_novo, null, 2) : "(sem valor novo)";
+        if (modal) modal.classList.add("aberto");
+      };
+
+      window.fecharModalDiffAuditoria = function() {
+        var modal = document.getElementById("modal-auditoria-diff");
+        if (modal) modal.classList.remove("aberto");
+      };
+
+      window.exportarAuditoriaCSV = function() {
+        var d = window.__auditoriaDados;
+        if (!d || !d.itens) return;
+        var linhas = [["Data","Usuario","Acao","Tabela","Detalhes","IP"]];
+        d.itens.forEach(function(it) {
+          linhas.push([fmtData(it.created_at), it.usuario_email || it.usuario_nome || "", it.acao || "", it.tabela || "", (it.detalhes || "").replace(/[\r\n;]/g, " "), it.ip || ""]);
+        });
+        var csv = linhas.map(function(l) { return l.map(function(c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(";"); }).join("\n");
+        var blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a"); a.href = url;
+        a.download = "auditoria_" + new Date().toISOString().substring(0, 19).replace(/[:T]/g, "-") + ".csv";
+        a.click(); URL.revokeObjectURL(url);
+      };
+
+      window.limparAuditoriaAntiga = async function() {
+        if (!confirm("Remover registros de auditoria com mais de 90 dias?")) return;
+        try {
+          var res = await apiFetch("/auditoria/limpar", { method: "POST", body: JSON.stringify({ tipo: "periodo", data_inicio: "1970-01-01", data_fim: new Date(Date.now() - 90*24*3600*1000).toISOString().substring(0,10) }) });
+          var d = await res.json();
+          if (res.ok) { alert("Registros antigos removidos!"); window.loadAuditoria(1); }
+          else alert("Erro: " + (d.erro || "desconhecido"));
+        } catch (e) { alert("Erro: " + e.message); }
+      };
+    })();
+  </script>
+  <!-- /FASE_15_AUDITORIA_UI_SCRIPT -->
+
 </body>
 </html>
