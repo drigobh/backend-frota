@@ -1176,6 +1176,68 @@
     @media (max-width: 540px) {
       .ajuda-sessao-grid { grid-template-columns: 1fr; }
     }
+
+    /* FASE_14_LOGIN_UX - micro-interacoes refinadas */
+    .login-new-input-wrap .login-new-input:focus {
+      border-color: #3b82f6 !important;
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.15), 0 0 20px rgba(59,130,246,0.2) !important;
+      background: rgba(255,255,255,0.12) !important;
+      transition: all 0.25s ease;
+    }
+    .login-new-input-wrap .input-icon {
+      transition: color 0.25s ease;
+    }
+    .login-new-input-wrap:focus-within .input-icon {
+      color: #3b82f6 !important;
+    }
+    .login-btn-new {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s ease, box-shadow 0.25s ease;
+    }
+    .login-btn-new:hover:not(:disabled) {
+      box-shadow: 0 12px 30px rgba(59,130,246,0.5);
+    }
+    .login-btn-new::after {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      background: rgba(255,255,255,0.25);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.5s, height 0.5s;
+    }
+    .login-btn-new:active::after {
+      width: 300px; height: 300px;
+      transition: width 0s, height 0s;
+    }
+    .login-btn-new.loading {
+      pointer-events: none;
+      opacity: 0.85;
+    }
+    .login-btn-new.loading::before {
+      content: "";
+      display: inline-block;
+      width: 14px; height: 14px;
+      margin-right: 8px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: login-spinner 0.7s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes login-spinner {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes loginShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .login-screen-card.shake {
+      animation: loginShake 0.4s ease;
+    }
 </style>
   
   <style>
@@ -12613,5 +12675,55 @@ function renderHistorico(data) {
     })();
   </script>
   <!-- /FASE_13_AJUDA_SESSAO_V2_SCRIPT -->
+
+  <!-- FASE_14_LOGIN_UX_SCRIPT -->
+  <script>
+    (function() {
+      function aplicarLoadingLogin() {
+        var btn = document.getElementById("btn-login-novo");
+        var txt = document.getElementById("btn-login-txt");
+        if (!btn) return;
+
+        var original = txt ? txt.textContent : "";
+
+        btn.addEventListener("click", function() {
+          if (btn.disabled) return;
+          btn.classList.add("loading");
+          if (txt) txt.textContent = "Entrando...";
+        });
+
+        setInterval(function() {
+          if (!btn.classList.contains("loading")) {
+            delete btn.dataset.loadingStart;
+            return;
+          }
+          if (btn.dataset.loadingStart) {
+            var tempo = Date.now() - parseInt(btn.dataset.loadingStart);
+            if (tempo > 8000) {
+              btn.classList.remove("loading");
+              if (txt) txt.textContent = original;
+              delete btn.dataset.loadingStart;
+            }
+          } else {
+            btn.dataset.loadingStart = Date.now();
+          }
+        }, 1000);
+      }
+
+      window.__loginShake = function() {
+        var card = document.querySelector(".login-screen-card");
+        if (!card) return;
+        card.classList.add("shake");
+        setTimeout(function() { card.classList.remove("shake"); }, 500);
+      };
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", aplicarLoadingLogin);
+      } else {
+        aplicarLoadingLogin();
+      }
+    })();
+  </script>
+  <!-- /FASE_14_LOGIN_UX_SCRIPT -->
 </body>
 </html>
