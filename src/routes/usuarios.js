@@ -20,8 +20,8 @@ async function ensureUsuariosETabelas() {
 
       INSERT INTO perfis (nome, descricao) VALUES 
       ('Administrador', 'Acesso total ao sistema'),
-      ('Operador', 'Lançamentos operacionais'),
-      ('Financeiro', 'Gestão financeira e DRE')
+      ('Operador', 'LanÃƒÂ§amentos operacionais'),
+      ('Financeiro', 'GestÃƒÂ£o financeira e DRE')
       ON CONFLICT (nome) DO NOTHING;
 
       CREATE TABLE IF NOT EXISTS usuarios (
@@ -60,9 +60,8 @@ async function ensureUsuariosETabelas() {
 }
 
 async function routes(fastify, options) {
-  ensureUsuariosETabelas().catch(() => {});
 
-  // Listar usuários sem erro de tipo (conversão mútua para ::text)
+  // Listar usuÃƒÂ¡rios sem erro de tipo (conversÃƒÂ£o mÃƒÂºtua para ::text)
   fastify.get('/api/usuarios', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     try {
       await ensureUsuariosETabelas();
@@ -89,16 +88,16 @@ async function routes(fastify, options) {
         LEFT JOIN perfis p ON u.perfil_id::text = p.id::text
         WHERE u.id::text = $1::text
       `, [id]);
-      if (res.rows.length === 0) return reply.code(404).send({ erro: 'Usuário não encontrado' });
+      if (res.rows.length === 0) return reply.code(404).send({ erro: 'UsuÃƒÂ¡rio nÃƒÂ£o encontrado' });
       return reply.send(res.rows[0]);
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
     }
   });
 
-  fastify.post('/api/usuarios', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.post('/api/usuarios', { preHandler: [fastify.autenticar] }, fastify.comAuditoria(async (req, reply) => {
     const { nome, email, senha, perfil_id, ativo = true } = req.body || {};
-    if (!nome || !email) return reply.code(400).send({ erro: 'Nome e e-mail são obrigatórios.' });
+    if (!nome || !email) return reply.code(400).send({ erro: 'Nome e e-mail sÃƒÂ£o obrigatÃƒÂ³rios.' });
     
     const senhaFinal = senha || '123456';
     const senhaHash = await hashSenha(senhaFinal);
@@ -120,11 +119,11 @@ async function routes(fastify, options) {
       return reply.code(201).send(res.rows[0]);
     } catch (err) {
       if (err.code === '23505') {
-        return reply.code(400).send({ erro: 'Já existe um usuário com este e-mail.' });
+        return reply.code(400).send({ erro: 'JÃƒÂ¡ existe um usuÃƒÂ¡rio com este e-mail.' });
       }
       return reply.code(500).send({ erro: err.message });
     }
-  });
+  }));
 
   fastify.put('/api/usuarios/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { id } = req.params;
@@ -151,7 +150,7 @@ async function routes(fastify, options) {
       `, [nome, email ? email.toLowerCase().trim() : null, perfil_id ? String(perfil_id) : null, perfilNome, ativo, id]);
       });
 
-      if (res.rows.length === 0) return reply.code(404).send({ erro: 'Usuário não encontrado' });
+      if (res.rows.length === 0) return reply.code(404).send({ erro: 'UsuÃƒÂ¡rio nÃƒÂ£o encontrado' });
       return reply.send(res.rows[0]);
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
@@ -162,7 +161,7 @@ async function routes(fastify, options) {
     const { id } = req.params;
     const { nova_senha } = req.body || {};
     if (!nova_senha || nova_senha.length < 6) {
-      return reply.code(400).send({ erro: 'A senha deve conter no mínimo 6 caracteres.' });
+      return reply.code(400).send({ erro: 'A senha deve conter no mÃƒÂ­nimo 6 caracteres.' });
     }
     const senhaHash = await hashSenha(nova_senha);
     try {
@@ -179,7 +178,7 @@ async function routes(fastify, options) {
     try {
       await ensureUsuariosETabelas();
       await db.query('UPDATE usuarios SET ativo = false WHERE id::text = $1::text', [id]);
-      return reply.send({ mensagem: 'Usuário desativado com sucesso!' });
+      return reply.send({ mensagem: 'UsuÃƒÂ¡rio desativado com sucesso!' });
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
     }

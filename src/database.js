@@ -38,6 +38,7 @@ async function query(text, params) {
       await client.query("SELECT set_config('app.user_email', $1, true)", [String(ctx.user.email)]);
       if (ctx.user.nome) await client.query("SELECT set_config('app.user_nome', $1, true)", [String(ctx.user.nome)]);
       if (ctx.user.id)   await client.query("SELECT set_config('app.user_id', $1, true)",   [String(ctx.user.id)]);
+      if (ctx.user.ip)   await client.query("SELECT set_config('app.user_ip', $1, true)",   [String(ctx.user.ip)]); // FASE_17_IP_AUDITORIA
       const result = await client.query(text, params);
       await client.query('COMMIT');
       return result;
@@ -69,6 +70,7 @@ async function runAsUser(user, callback) {
     await client.query("SELECT set_config('app.user_email', $1, true)", [String(user.email)]);
     if (user.nome) await client.query("SELECT set_config('app.user_nome', $1, true)", [String(user.nome)]);
     if (user.id)   await client.query("SELECT set_config('app.user_id', $1, true)",   [String(user.id)]);
+    if (user.ip)   await client.query("SELECT set_config('app.user_ip', $1, true)",   [String(user.ip)]); // FASE_17_IP_AUDITORIA
 
     const ctx = { user, client };
     const result = await userStorage.run(ctx, callback);

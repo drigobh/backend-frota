@@ -2818,6 +2818,14 @@
 .perm-modulo-body{padding:0.6rem 1.2rem 0.85rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.4rem}
 .perm-item{display:flex;align-items:center;gap:0.5rem;font-size:0.82rem;color:#334155;cursor:pointer;padding:0.25rem 0}
 .perm-item input[type=checkbox]{width:15px;height:15px;cursor:pointer}
+
+/* FASE_59_PERM_DARK: tema escuro para permissoes */
+[data-theme="dark"] .permissoes-wrapper { background:#0d1117 !important; border-color:#30363d !important; }
+[data-theme="dark"] .perm-modulo { background:#161b22 !important; border-color:#30363d !important; }
+[data-theme="dark"] .perm-modulo-header { background:#1c2128 !important; color:#e6edf3 !important; }
+[data-theme="dark"] .perm-modulo-header:hover { background:#22272e !important; }
+[data-theme="dark"] .perm-item { color:#e6edf3 !important; }
+[data-theme="dark"] .perm-item input[type=checkbox] { accent-color:#2563eb; }
 .badge-perm{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;background:#dbeafe;color:#1e40af}
 .badge-sistema{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.72rem;font-weight:700;background:#fef3c7;color:#92400e;margin-left:4px}
 
@@ -10497,7 +10505,7 @@ function renderHistorico(data) {
     [data-theme="dark"] .input-yellow { background-color: #3a3000 !important; color: #fde68a !important; border-color: #a16207 !important; }
     [data-theme="dark"] .user-badge { background: var(--ds-surface-2) !important; color: var(--ds-text) !important; }
     [data-theme="dark"] .header-btn { background: var(--ds-surface-2) !important; color: var(--ds-text) !important; border-color: var(--ds-border-strong) !important; }
-    [data-theme="dark"] .modal-card, [data-theme="dark"] .login-card { background: var(--ds-surface) !important; color: var(--ds-text) !important; }
+    [data-theme="dark"] .modal-card, [data-theme="dark"] .login-card { background: #161b22 !important; color: #e6edf3 !important; }
     [data-theme="dark"] .modal-header h2, [data-theme="dark"] .modal-field label { color: var(--ds-text) !important; }
     [data-theme="dark"] .modal-field input[type=text], [data-theme="dark"] .modal-field textarea, [data-theme="dark"] .modal-field select, [data-theme="dark"] .login-input { background: var(--ds-surface-2) !important; color: var(--ds-text) !important; border-color: var(--ds-border-strong) !important; }
     [data-theme="dark"] .plate-tab-btn, [data-theme="dark"] .subtab-btn { background: var(--ds-surface-2) !important; color: var(--ds-text) !important; border-color: var(--ds-border-strong) !important; }
@@ -11408,6 +11416,21 @@ function renderHistorico(data) {
 
 /* --- Modais --- */
 [data-theme="dark"] .modal-card { background: #161b22 !important; color: #e6edf3 !important; }
+[data-theme="dark"] .modal-card h2,
+[data-theme="dark"] .modal-card label,
+[data-theme="dark"] .modal-card p { color: #e6edf3 !important; }
+[data-theme="dark"] .modal-card input[type="text"],
+[data-theme="dark"] .modal-card input[type="email"],
+[data-theme="dark"] .modal-card input[type="password"],
+[data-theme="dark"] .modal-card textarea,
+[data-theme="dark"] .modal-card select {
+  background: #0d1117 !important;
+  color: #e6edf3 !important;
+  border: 1px solid #30363d !important;
+}
+[data-theme="dark"] .modal-card input::placeholder,
+[data-theme="dark"] .modal-card textarea::placeholder { color: #8b949e !important; }
+[data-theme="dark"] .modal-card input[type="checkbox"] { accent-color: #2563eb; }
 [data-theme="dark"] .modal-header { border-bottom-color: rgba(230,237,243,0.10) !important; }
 [data-theme="dark"] .modal-header h2 { color: #e6edf3 !important; }
 [data-theme="dark"] .modal-footer { border-top-color: rgba(230,237,243,0.10) !important; }
