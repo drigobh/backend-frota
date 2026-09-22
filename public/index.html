@@ -3151,7 +3151,13 @@
     display: none !important;
   }
 }
-</style></head>
+</style>
+<style id="fase71-ocultar-flutuante">
+/* FASE_71_OCULTAR_FLUTUANTE: esconde o botao flutuante na tela de empresas */
+body.tab-empresas-ativa .ds-pdf-fab { display: none !important; }
+body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
+</style>
+</head>
 <body>
 
   <!-- Tela de Login Inicial -->
@@ -3252,6 +3258,7 @@
         <button class="nav-tab-btn" data-tab="tab-backup" id="nav-tab-backup" onclick="setTimeout(loadBackupsDaAPI, 200)"><span>&#128190;</span><span class="nav-label">Backup</span></button>
         <!-- FASE_7_AUDITORIA_REMOVIDA: botao removido -->
         <button class="nav-tab-btn" id="nav-btn-atualizar" onclick="abrirModalAtualizar()"><span>&#128260;</span><span class="nav-label">Atualizar App</span></button>
+        <button class="nav-tab-btn" data-tab="tab-empresas" id="nav-tab-empresas"><span>&#127970;</span><span class="nav-label">Empresas</span></button>
         <button class="nav-tab-btn" data-tab="tab-configuracoes" id="nav-tab-configuracoes"><span>&#9881;&#65039;</span><span class="nav-label">Configura&ccedil;&otilde;es</span></button>
         <button class="nav-tab-btn" data-tab="tab-ajuda" id="nav-tab-ajuda"><span>&#10067;</span><span class="nav-label">Ajuda</span></button>
       </div>
@@ -5170,7 +5177,12 @@
         </div>
       </section>
 
-    </main>
+    
+  <!-- TAB: EMPRESAS -->
+  <section id="tab-empresas" class="tab-content">
+    <iframe src="/empresas.html" style="width:100%;height:calc(100vh - 120px);border:none;background:#0f172a;display:block;"></iframe>
+  </section>
+</main>
 
     <footer class="app-footer no-print">
       <div><strong>Caderninho de Motorista</strong> — Gestão de Frota</div>
@@ -14113,5 +14125,30 @@ window.audAbrirHistoricoCompleto = function() { /* FASE_19_HIST */
   </script>
   <!-- /FASE_15_AUDITORIA_UI_SCRIPT -->
 
+
+<script id="fase71-ocultar-flutuante-js">
+// FASE_71_OCULTAR_FLUTUANTE: esconde o botao flutuante na tela de empresas
+(function() {
+  function atualizarClasseFlutuante() {
+    var tabEmp = document.getElementById('tab-empresas');
+    if (tabEmp && tabEmp.classList.contains('active')) {
+      document.body.classList.add('tab-empresas-ativa');
+    } else {
+      document.body.classList.remove('tab-empresas-ativa');
+    }
+  }
+  
+  document.addEventListener('click', function(e) {
+    var btn = e.target && e.target.closest ? e.target.closest('[data-tab]') : null;
+    if (btn) setTimeout(atualizarClasseFlutuante, 100);
+  });
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(atualizarClasseFlutuante, 500);
+  });
+  
+  setInterval(atualizarClasseFlutuante, 1000);
+})();
+</script>
 </body>
 </html>
