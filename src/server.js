@@ -233,23 +233,23 @@ fastify.register(require('@fastify/static'), {
   // NAO serve index.html pelo static — deixar a rota / cuidar disso
   index: false,
   setHeaders: function (res, filepath) {
-    // FASE_4_NO_CACHE_STATIC - X-STATIC-No-Cache
+    // FASE_60_STATIC_CONTENT_TYPE: usa setHeader (API correta do Node)
     if (filepath.endsWith('.html')) {
-      res['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0';
-      res['Pragma'] = 'no-cache';
-      res['Expires'] = '0';
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
     }
 
-    // Fastify v5: res e um objeto plain de headers
     var ext = filepath.substring(filepath.lastIndexOf('.'));
     var tipos = {
       '.json': 'application/json; charset=utf-8',
       '.js':   'application/javascript; charset=utf-8',
       '.css':  'text/css; charset=utf-8',
-      '.svg':  'image/svg+xml; charset=utf-8'
+      '.svg':  'image/svg+xml; charset=utf-8',
+      '.min.js': 'application/javascript; charset=utf-8'
     };
     if (tipos[ext]) {
-      res['Content-Type'] = tipos[ext];
+      res.setHeader('Content-Type', tipos[ext]);
     }
   }
 });
