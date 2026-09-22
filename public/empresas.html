@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empresas e Filiais</title>
+<link rel="stylesheet" href="/empresas.css">
+</head>
+<body>
+
+<div class="emp-container">
+  <div class="emp-header">
+    <div class="emp-title">
+      <div class="emp-icon-box">&#127970;</div>
+      <div>
+        <h1>Empresas & Filiais</h1>
+        <p class="emp-subtitle">Gestao multi-tenant do sistema</p>
+      </div>
+    </div>
+    <div class="emp-actions">
+      <button class="btn-primary" onclick="abrirModalEmpresa()">+ Nova Empresa</button>
+      <button class="btn-secondary" onclick="abrirModalFilial()">+ Nova Filial</button>
+    </div>
+  </div>
+
+  <div class="emp-kpis">
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-blue">&#127970;</div>
+      <div>
+        <div class="kpi-label">Total Empresas</div>
+        <div class="kpi-value" id="kpi-total-empresas">--</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-green">&#127968;</div>
+      <div>
+        <div class="kpi-label">Total Filiais</div>
+        <div class="kpi-value" id="kpi-total-filiais">--</div>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon kpi-purple">&#9989;</div>
+      <div>
+        <div class="kpi-label">Ativas</div>
+        <div class="kpi-value" id="kpi-ativas">--</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="emp-section">
+    <div class="emp-section-header">
+      <h2><span class="dot dot-blue"></span> Empresas</h2>
+    </div>
+    <div class="emp-grid" id="emp-grid-empresas">
+      <div class="emp-card placeholder">Carregando empresas...</div>
+    </div>
+  </div>
+
+  <div class="emp-section">
+    <div class="emp-section-header">
+      <h2><span class="dot dot-green"></span> Filiais</h2>
+    </div>
+    <div class="emp-grid" id="emp-grid-filiais">
+      <div class="emp-card placeholder">Carregando filiais...</div>
+    </div>
+  </div>
+</div>
+
+<button id="emp-pdf-btn" class="emp-pdf-fab" title="Exportar PDF" onclick="exportarEmpresasPDF()">&#128196;</button>
+
+<!-- MODAL Empresa -->
+<div class="emp-modal-overlay" id="emp-modal-empresa">
+  <div class="emp-modal-card">
+    <div class="emp-modal-header">
+      <h3 id="emp-modal-empresa-titulo">Nova Empresa</h3>
+      <button class="emp-modal-close" onclick="fecharModalEmpresa()">X</button>
+    </div>
+    <div class="emp-modal-body">
+      <input type="hidden" id="emp-empresa-id">
+      <div class="emp-field">
+        <label>Razao Social *</label>
+        <input type="text" id="emp-empresa-razao" placeholder="Ex: Transportadora Silva LTDA" maxlength="200">
+      </div>
+      <div class="emp-field">
+        <label>CNPJ *</label>
+        <input type="text" id="emp-empresa-cnpj" placeholder="00.000.000/0000-00" maxlength="18">
+      </div>
+      <div class="emp-field row">
+        <input type="checkbox" id="emp-empresa-ativo" checked>
+        <label for="emp-empresa-ativo">Empresa ativa</label>
+      </div>
+    </div>
+    <div class="emp-modal-footer">
+      <button class="btn-secondary" onclick="fecharModalEmpresa()">Cancelar</button>
+      <button class="btn-primary" onclick="salvarEmpresa()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL Filial -->
+<div class="emp-modal-overlay" id="emp-modal-filial">
+  <div class="emp-modal-card">
+    <div class="emp-modal-header">
+      <h3 id="emp-modal-filial-titulo">Nova Filial</h3>
+      <button class="emp-modal-close" onclick="fecharModalFilial()">X</button>
+    </div>
+    <div class="emp-modal-body">
+      <input type="hidden" id="emp-filial-id">
+      <div class="emp-field">
+        <label>Empresa *</label>
+        <select id="emp-filial-empresa"></select>
+      </div>
+      <div class="emp-field">
+        <label>Nome da Filial *</label>
+        <input type="text" id="emp-filial-nome" placeholder="Ex: Filial Sao Paulo" maxlength="200">
+      </div>
+      <div class="emp-field">
+        <label>CNPJ da Filial</label>
+        <input type="text" id="emp-filial-cnpj" placeholder="00.000.000/0000-00" maxlength="18">
+      </div>
+      <div class="emp-field row">
+        <input type="checkbox" id="emp-filial-ativo" checked>
+        <label for="emp-filial-ativo">Filial ativa</label>
+      </div>
+    </div>
+    <div class="emp-modal-footer">
+      <button class="btn-secondary" onclick="fecharModalFilial()">Cancelar</button>
+      <button class="btn-primary" onclick="salvarFilial()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script src="/libs/html2pdf.bundle.min.js"></script>
+<script src="/empresas.js"></script>
+</body>
+</html>

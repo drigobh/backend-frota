@@ -249,6 +249,7 @@ const ROTAS = [
   './routes/metas',
   './routes/me_permissoes',
   './routes/categorias',
+  './routes/empresas',
   './routes/centros_custo',
   './routes/dre_consolidada',
   './routes/dashboard',
