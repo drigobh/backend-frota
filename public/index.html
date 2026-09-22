@@ -1246,20 +1246,599 @@
     .aud-badge-excluir { background:#fee2e2;color:#991b1b; }
     .aud-badge-login { background:#ede9fe;color:#5b21b6; }
     .aud-badge-outro { background:#f1f5f9;color:#475569; }
-    .aud-modal-diff { display:none;position:fixed;inset:0;background:rgba(9,27,48,0.85);z-index:99999;align-items:center;justify-content:center;padding:20px; }
+    /* FASE_50_DIFF_PREMIUM: layout premium do modal */
+    /* FASE_56_MODAL_PREMIUM - Layout ultra premium */
+    .aud-modal-diff { display:none;position:fixed;inset:0;background:rgba(9,27,48,0.85);backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center;padding:20px; }
     .aud-modal-diff.aberto { display:flex; }
-    .aud-modal-diff-conteudo { background:#fff;border-radius:14px;padding:24px;max-width:800px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,0.5); }
-    .aud-diff-grid { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px; }
-    .aud-diff-col { background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;font-family:monospace;font-size:0.75rem;white-space:pre-wrap;word-break:break-word;max-height:400px;overflow-y:auto; }
-    .aud-diff-col.antes { border-color:#fecaca;background:#fef2f2; }
-    .aud-diff-col.depois { border-color:#bbf7d0;background:#f0fdf4; }
-    .aud-diff-titulo { font-weight:700;margin-bottom:8px;font-size:0.8rem;text-transform:uppercase; }
-    .aud-diff-titulo.antes { color:#991b1b; }
-    .aud-diff-titulo.depois { color:#166534; }
-    [data-theme="dark"] .aud-diff-col { background:#1e293b;border-color:#334155;color:#e2e8f0; }
-    [data-theme="dark"] .aud-diff-col.antes { background:#450a0a;border-color:#7f1d1d; }
-    [data-theme="dark"] .aud-diff-col.depois { background:#052e16;border-color:#166534; }
+    .aud-modal-diff-conteudo { background:#fff;border-radius:20px;padding:0;max-width:1100px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(148,163,184,0.1);color:#14171f; }
+    
+    /* Header com gradiente */
+    .aud-modal-header { display:flex;justify-content:space-between;align-items:center;padding:24px 32px;background:linear-gradient(135deg,#0f2a4a 0%,#1e3a5f 50%,#2563eb 100%);border-radius:20px 20px 0 0;position:relative;overflow:hidden; }
+    .aud-modal-header::before { content:"";position:absolute;top:-50%;right:-10%;width:300px;height:300px;background:radial-gradient(circle,rgba(59,130,246,0.4) 0%,transparent 70%);border-radius:50%;pointer-events:none; }
+    .aud-modal-header::after { content:"";position:absolute;bottom:-30%;left:10%;width:200px;height:200px;background:radial-gradient(circle,rgba(139,92,246,0.3) 0%,transparent 70%);border-radius:50%;pointer-events:none; }
+    .aud-modal-titulo { margin:0;color:#fff;font-size:1.5rem;font-weight:800;display:flex;align-items:center;gap:14px;letter-spacing:-0.02em;position:relative;z-index:1; }
+    .aud-modal-titulo::before { content:"🔍";font-size:1.6rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+    .aud-modal-fechar { background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.2);width:40px;height:40px;border-radius:12px;font-size:1.5rem;cursor:pointer;color:#fff;transition:all .25s;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;backdrop-filter:blur(10px); }
+    .aud-modal-fechar:hover { background:rgba(220,38,38,0.8);border-color:rgba(220,38,38,0.9);transform:rotate(90deg) scale(1.05); }
+    
+    /* Meta com pills */
+    .aud-diff-meta { font-size:0.85rem;color:#475569;padding:20px 32px;background:linear-gradient(180deg,#f8fafc 0%,#fff 100%);display:flex;flex-wrap:wrap;gap:10px;border-bottom:1px solid rgba(148,163,184,0.15); }
+    .aud-diff-meta-item { display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:#fff;border:1px solid rgba(148,163,184,0.25);border-radius:10px;font-size:0.82rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);transition:all .2s; }
+    .aud-diff-meta-item:hover { border-color:#2563eb;box-shadow:0 2px 8px rgba(37,99,235,0.12); }
+    .aud-diff-meta-item .icone { font-size:1rem; }
+    .aud-diff-meta-item strong { color:#0f2a4a;font-weight:700; }
+    .aud-diff-meta-item span { color:#475569; }
+    
+    /* Grid de cards */
+    .aud-diff-grid { display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:24px 32px 32px;background:#fff;border-radius:0 0 20px 20px; }
+    .aud-diff-col { border-radius:16px;padding:0;font-family:inherit;font-size:0.85rem;white-space:pre-wrap;word-break:break-word;max-height:480px;overflow-y:auto;border:2px solid;position:relative;background:#fff; }
+    .aud-diff-col.antes { border-color:#fecaca;box-shadow:0 4px 20px rgba(220,38,38,0.08); }
+    .aud-diff-col.depois { border-color:#bbf7d0;box-shadow:0 4px 20px rgba(22,163,74,0.08); }
+    
+    /* Titulo do card */
+    .aud-diff-titulo { font-weight:800;padding:16px 20px;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.08em;display:flex;align-items:center;gap:10px;border-bottom:2px solid; }
+    .aud-diff-titulo.antes { color:#991b1b;background:linear-gradient(135deg,#fef2f2 0%,#fee2e2 100%);border-bottom-color:#fecaca; }
+    .aud-diff-titulo.antes::before { content:"⚠️";font-size:1.2rem; }
+    .aud-diff-titulo.depois { color:#166534;background:linear-gradient(135deg,#f0fdf4 0%,#dcfce7 100%);border-bottom-color:#bbf7d0; }
+    .aud-diff-titulo.depois::before { content:"✅";font-size:1.2rem; }
+    
+    /* Itens */
+    .aud-diff-item { display:flex;flex-direction:column;gap:6px;padding:16px 20px;border-bottom:1px solid rgba(148,163,184,0.12);transition:background .2s; }
+    .aud-diff-item:hover { background:rgba(148,163,184,0.04); }
+    .aud-diff-item:last-child { border-bottom:0; }
+    .aud-diff-campo { font-weight:700;color:#64748b;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;display:flex;align-items:center;gap:6px; }
+    .aud-diff-campo::before { content:"▸";color:#94a3b8;font-size:0.9rem; }
+    .aud-diff-valor { font-size:0.92rem;padding:10px 14px;border-radius:10px;font-family:'SF Mono',Monaco,monospace;word-break:break-word;font-weight:600;border-left:4px solid;transition:transform .2s; }
+    .aud-diff-valor:hover { transform:translateX(2px); }
+    .aud-diff-valor.antes { background:linear-gradient(90deg,#fef2f2 0%,#fff 100%);color:#991b1b;border-left-color:#dc2626; }
+    .aud-diff-valor.depois { background:linear-gradient(90deg,#f0fdf4 0%,#fff 100%);color:#166534;border-left-color:#16a34a; }
+    .aud-diff-vazio { padding:40px 20px;text-align:center;color:#94a3b8;font-style:italic;font-size:0.9rem;display:flex;flex-direction:column;align-items:center;gap:12px; }
+    .aud-diff-vazio::before { content:"📭";font-size:2.5rem;opacity:0.5; }
+    
+    /* Dark mode */
     [data-theme="dark"] .aud-modal-diff-conteudo { background:#0f172a;color:#e2e8f0; }
+    [data-theme="dark"] .aud-modal-header { background:linear-gradient(135deg,#0a1828 0%,#0f2a4a 50%,#1e40af 100%); }
+    [data-theme="dark"] .aud-diff-meta { background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);border-bottom-color:rgba(148,163,184,0.2); }
+    [data-theme="dark"] .aud-diff-meta-item { background:#1e293b;border-color:rgba(148,163,184,0.25);color:#cbd5e1; }
+    [data-theme="dark"] .aud-diff-meta-item strong { color:#e2e8f0; }
+    [data-theme="dark"] .aud-diff-meta-item span { color:#94a3b8; }
+    [data-theme="dark"] .aud-diff-grid { background:#0f172a; }
+    [data-theme="dark"] .aud-diff-col.antes { border-color:#7f1d1d;box-shadow:0 4px 20px rgba(220,38,38,0.15);background:#0f172a; }
+    [data-theme="dark"] .aud-diff-col.depois { border-color:#166534;box-shadow:0 4px 20px rgba(22,163,74,0.15);background:#0f172a; }
+    [data-theme="dark"] .aud-diff-titulo.antes { background:linear-gradient(135deg,#450a0a 0%,#7f1d1d 100%);color:#fca5a5; }
+    [data-theme="dark"] .aud-diff-titulo.depois { background:linear-gradient(135deg,#052e16 0%,#166534 100%);color:#86efac; }
+    [data-theme="dark"] .aud-diff-item { border-bottom-color:rgba(148,163,184,0.15); }
+    [data-theme="dark"] .aud-diff-item:hover { background:rgba(148,163,184,0.08); }
+    [data-theme="dark"] .aud-diff-campo { color:#94a3b8; }
+    [data-theme="dark"] .aud-diff-valor.antes { background:linear-gradient(90deg,#450a0a 0%,#0f172a 100%);color:#fca5a5; }
+    [data-theme="dark"] .aud-diff-valor.depois { background:linear-gradient(90deg,#052e16 0%,#0f172a 100%);color:#86efac; }
+
+    /* FASE_15_AUDITORIA_FIX4 - print da auditoria */
+    body.print-auditoria * { visibility: hidden !important; }
+    body.print-auditoria #tab-auditoria,
+    body.print-auditoria #tab-auditoria * { visibility: visible !important; }
+    body.print-auditoria #tab-auditoria {
+      position: absolute !important;
+      left: 0; top: 0;
+      width: 100% !important;
+      padding: 20px !important;
+    }
+    body.print-auditoria #aud-print-header {
+      display: block !important;
+      margin-bottom: 16px !important;
+      padding-bottom: 12px !important;
+      border-bottom: 2px solid #0f2a4a !important;
+    }
+    body.print-auditoria #aud-print-header h2 { margin: 0 0 6px; color: #0f2a4a !important; font-size: 16pt; }
+    body.print-auditoria #aud-print-header p { margin: 0; color: #475569 !important; font-size: 10pt; }
+    body.print-auditoria #tab-auditoria .bar-controls,
+    body.print-auditoria #tab-auditoria .hist-toolbar,
+    body.print-auditoria #tab-auditoria .hist-chip-atalho,
+    body.print-auditoria #tab-auditoria .btn-action,
+    body.print-auditoria #tab-auditoria .data-table th:last-child,
+    body.print-auditoria #tab-auditoria .data-table td:last-child { display: none !important; }
+    body.print-auditoria #tab-auditoria .data-table { width: 100% !important; border-collapse: collapse !important; }
+    body.print-auditoria #tab-auditoria .data-table th,
+    body.print-auditoria #tab-auditoria .data-table td {
+      border: 1px solid #cbd5e1 !important;
+      padding: 4px 6px !important;
+      font-size: 9pt !important;
+      color: #0f2a4a !important;
+    }
+    body.print-auditoria #tab-auditoria .data-table th { background: #f1f5f9 !important; font-weight: 700 !important; }
+
+    /* FASE_18_AUDITORIA_FINAL */
+    .aud-card-premium {
+      position: relative;
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.05);
+      transition: transform .15s, box-shadow .2s;
+    }
+    .aud-card-premium:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(15,23,42,0.1);
+    }
+    .aud-card-premium::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+    }
+    .aud-card-total::before { background: linear-gradient(180deg, #3b82f6, #6366f1); }
+    .aud-card-tabelas::before { background: linear-gradient(180deg, #10b981, #059669); }
+    .aud-card-acoes::before { background: linear-gradient(180deg, #f59e0b, #d97706); }
+    .aud-card-premium .aud-card-icon-svg {
+      position: absolute;
+      right: 14px; top: 14px;
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+    .aud-card-total .aud-card-icon-svg { background: linear-gradient(135deg, #3b82f6, #6366f1); }
+    .aud-card-tabelas .aud-card-icon-svg { background: linear-gradient(135deg, #10b981, #059669); }
+    .aud-card-acoes .aud-card-icon-svg { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .aud-card-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+    .aud-card-valor {
+      font-size: 1.7rem;
+      font-weight: 800;
+      line-height: 1;
+      color: #0f172a;
+    }
+    .aud-card-sub {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+
+    /* Graficos */
+    .aud-graficos-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 700px) {
+      .aud-graficos-grid { grid-template-columns: 1fr; }
+    }
+    .aud-grafico-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.05);
+    }
+    .aud-grafico-titulo {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .aud-grafico-body {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .aud-donut { flex-shrink: 0; }
+    .aud-donut circle { transition: stroke-dasharray 0.6s ease; }
+    .aud-legenda {
+      flex: 1;
+      font-size: 0.78rem;
+    }
+    .aud-legenda-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 3px 0;
+    }
+    .aud-legenda-cor {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 3px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .aud-bar-wrap {
+      margin-bottom: 8px;
+      font-size: 0.75rem;
+    }
+    .aud-bar-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+      color: #475569;
+    }
+    .aud-bar-track {
+      background: #f1f5f9;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .aud-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+      transition: width 0.6s ease;
+    }
+    [data-theme="dark"] .aud-card-premium,
+    [data-theme="dark"] .aud-grafico-card {
+      background: #1e293b;
+      border-color: #334155;
+    }
+    [data-theme="dark"] .aud-card-valor { color: #f1f5f9; }
+    [data-theme="dark"] .aud-card-label { color: #94a3b8; }
+    [data-theme="dark"] .aud-card-sub { color: #64748b; }
+    [data-theme="dark"] .aud-grafico-titulo { color: #e2e8f0; }
+    [data-theme="dark"] .aud-legenda { color: #cbd5e1; }
+    [data-theme="dark"] .aud-bar-label { color: #cbd5e1; }
+    [data-theme="dark"] .aud-bar-track { background: #334155; }
+
+    /* Print premium */
+    body.print-auditoria {
+      background: #fff !important;
+    }
+    body.print-auditoria * { 
+      visibility: hidden !important; 
+      color: #0f172a !important;
+    }
+    body.print-auditoria #tab-auditoria,
+    body.print-auditoria #tab-auditoria * { 
+      visibility: visible !important; 
+    }
+    body.print-auditoria #tab-auditoria {
+      position: absolute !important;
+      left: 0; top: 0;
+      width: 100% !important;
+      padding: 12px !important;
+      background: #fff !important;
+      color: #0f172a !important;
+    }
+    body.print-auditoria #aud-print-header {
+      display: block !important;
+      margin-bottom: 10px !important;
+      padding-bottom: 8px !important;
+      border-bottom: 2px solid #0f2a4a !important;
+      color: #0f2a4a !important;
+    }
+    body.print-auditoria #aud-print-header h2 { margin: 0 0 4px; color: #0f2a4a !important; font-size: 14pt; }
+    body.print-auditoria #aud-print-header p { margin: 0; color: #475569 !important; font-size: 9pt; }
+    body.print-auditoria #tab-auditoria .bar-controls,
+    body.print-auditoria #tab-auditoria .hist-toolbar,
+    body.print-auditoria #tab-auditoria .hist-chip-atalho,
+    body.print-auditoria #tab-auditoria .btn-action,
+    body.print-auditoria #tab-auditoria #auditoria-cards,
+    body.print-auditoria #tab-auditoria .aud-graficos-grid,
+    body.print-auditoria #tab-auditoria .data-table th:last-child,
+    body.print-auditoria #tab-auditoria .data-table td:last-child { display: none !important; }
+    body.print-auditoria #tab-auditoria .data-table { 
+      width: 100% !important; 
+      border-collapse: collapse !important; 
+      page-break-inside: auto;
+    }
+    body.print-auditoria #tab-auditoria .data-table tr { 
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+    body.print-auditoria #tab-auditoria .data-table thead { display: table-header-group; }
+    body.print-auditoria #tab-auditoria .data-table th,
+    body.print-auditoria #tab-auditoria .data-table td {
+      border: 1px solid #cbd5e1 !important;
+      padding: 3px 5px !important;
+      font-size: 8pt !important;
+      color: #0f2a4a !important;
+      background: #fff !important;
+    }
+    body.print-auditoria #tab-auditoria .data-table th { 
+      background: #f1f5f9 !important; 
+      font-weight: 700 !important;
+      color: #0f2a4a !important;
+    }
+    body.print-auditoria #tab-auditoria .aud-badge {
+      background: transparent !important;
+      color: #0f2a4a !important;
+      padding: 0 !important;
+      border: 0 !important;
+      font-size: 8pt !important;
+    }
+
+    /* FASE_19_AUDITORIA_V3 */
+    /* Esconder tudo que e flutuante ou do chrome do app no print */
+    body.print-auditoria .no-print,
+    body.print-auditoria .app-sidebar,
+    body.print-auditoria .app-header,
+    body.print-auditoria .fab,
+    body.print-auditoria .fab-print,
+    body.print-auditoria [class*="flutuante"],
+    body.print-auditoria [class*="print-btn"],
+    body.print-auditoria .btn-floating,
+    body.print-auditoria button[onclick*="print"],
+    body.print-auditoria button[onclick*="Print"],
+    body.print-auditoria button[onclick*="imprimir"],
+    body.print-auditoria button[onclick*="Imprimir"],
+    body.print-auditoria .print-hide,
+    body.print-auditoria .hide-print { 
+      display: none !important; 
+      visibility: hidden !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+
+    /* Esconder TUDO com display:none (evita espaco em branco) */
+    body.print-auditoria .app-sidebar,
+    body.print-auditoria > header,
+    body.print-auditoria .bar-controls,
+    body.print-auditoria .hist-toolbar,
+    body.print-auditoria .hist-chip-atalho,
+    body.print-auditoria #auditoria-cards .aud-card-icon-svg,
+    body.print-auditoria .aud-grafico-card,
+    body.print-auditoria #tab-auditoria .data-table th:last-child,
+    body.print-auditoria #tab-auditoria .data-table td:last-child {
+      display: none !important;
+    }
+
+    /* Esconde o resto da app, mostra so a auditoria */
+    body.print-auditoria > *:not(#tab-auditoria):not(.print-auditoria-wrapper) {
+      display: none !important;
+    }
+
+    /* Torna a auditoria visivel e bonita */
+    body.print-auditoria #tab-auditoria {
+      display: block !important;
+      position: static !important;
+      padding: 12px !important;
+      background: #fff !important;
+      color: #0f172a !important;
+    }
+
+    /* Cards no print - versao compacta */
+    body.print-auditoria #auditoria-cards {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 8px !important;
+      margin-bottom: 10px !important;
+    }
+    body.print-auditoria .aud-card-premium {
+      padding: 8px 10px !important;
+      border: 1px solid #cbd5e1 !important;
+      background: #f8fafc !important;
+      box-shadow: none !important;
+    }
+    body.print-auditoria .aud-card-label {
+      font-size: 7pt !important;
+      color: #475569 !important;
+    }
+    body.print-auditoria .aud-card-valor {
+      font-size: 14pt !important;
+      color: #0f2a4a !important;
+    }
+    body.print-auditoria .aud-card-sub {
+      font-size: 7pt !important;
+      color: #64748b !important;
+    }
+
+    /* Cabecalho */
+    body.print-auditoria #aud-print-header {
+      display: block !important;
+      margin-bottom: 10px !important;
+      padding-bottom: 8px !important;
+      border-bottom: 2px solid #0f2a4a !important;
+    }
+    body.print-auditoria #aud-print-header h2 {
+      margin: 0 0 4px !important;
+      color: #0f2a4a !important;
+      font-size: 14pt !important;
+    }
+    body.print-auditoria #aud-print-header p {
+      margin: 0 !important;
+      color: #475569 !important;
+      font-size: 9pt !important;
+    }
+
+    /* Tabela compacta */
+    body.print-auditoria #tab-auditoria .data-table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      font-size: 8pt !important;
+      page-break-inside: auto !important;
+    }
+    body.print-auditoria #tab-auditoria .data-table thead {
+      display: table-header-group !important;
+    }
+    body.print-auditoria #tab-auditoria .data-table tr {
+      page-break-inside: avoid !important;
+      page-break-after: auto !important;
+    }
+    body.print-auditoria #tab-auditoria .data-table th,
+    body.print-auditoria #tab-auditoria .data-table td {
+      border: 1px solid #cbd5e1 !important;
+      padding: 3px 5px !important;
+      color: #0f2a4a !important;
+      background: #fff !important;
+    }
+    body.print-auditoria #tab-auditoria .data-table th {
+      background: #e2e8f0 !important;
+      font-weight: 700 !important;
+    }
+    body.print-auditoria #tab-auditoria .aud-badge {
+      background: transparent !important;
+      color: #0f2a4a !important;
+      padding: 0 !important;
+      border: 0 !important;
+      font-weight: 700 !important;
+    }
+
+    /* Remove a pagina extra que fica em branco */
+    @page {
+      margin: 10mm;
+    }
+
+    /* FASE_20_PDF_FIX */
+    body.print-auditoria,
+    body.print-auditoria * {
+      background-image: none !important;
+      color: #0f172a !important;
+    }
+
+    /* Reset geral do body */
+    body.print-auditoria {
+      background: #fff !important;
+      color: #0f172a !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    /* Esconder QUALQUER coisa que nao seja a auditoria */
+    body.print-auditoria > *:not(.app-layout):not(#tab-auditoria),
+    body.print-auditoria .app-sidebar,
+    body.print-auditoria .app-header,
+    body.print-auditoria header,
+    body.print-auditoria nav,
+    body.print-auditoria footer,
+    body.print-auditoria .no-print,
+    body.print-auditoria .fab,
+    body.print-auditoria .fab-print,
+    body.print-auditoria .print-fab,
+    body.print-auditoria [class*="fab"],
+    body.print-auditoria [class*="floating"],
+    body.print-auditoria [class*="flutuante"],
+    body.print-auditoria button[class*="float"],
+    body.print-auditoria button[id*="float"],
+    body.print-auditoria button[id*="print"],
+    body.print-auditoria a[class*="float"],
+    body.print-auditoria .btn-imprimir-tela,
+    body.print-auditoria #btn-print-flutuante,
+    body.print-auditoria #fab-print,
+    body.print-auditoria #btn-imprimir,
+    body.print-auditoria .bar-controls,
+    body.print-auditoria .hist-toolbar,
+    body.print-auditoria .hist-chip-atalho,
+    body.print-auditoria #auditoria-cards .aud-card-icon-svg,
+    body.print-auditoria .aud-grafico-card,
+    body.print-auditoria #tab-auditoria .data-table th:last-child,
+    body.print-auditoria #tab-auditoria .data-table td:last-child {
+      display: none !important;
+      visibility: hidden !important;
+      width: 0 !important;
+      height: 0 !important;
+      overflow: hidden !important;
+    }
+
+    /* Mostra so a auditoria */
+    body.print-auditoria .tab-content:not(#tab-auditoria) {
+      display: none !important;
+    }
+    body.print-auditoria #tab-auditoria {
+      display: block !important;
+      visibility: visible !important;
+      position: static !important;
+      padding: 10px 14px !important;
+      background: #fff !important;
+      color: #0f172a !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      box-shadow: none !important;
+      border: 0 !important;
+    }
+
+    /* Cards no print */
+    body.print-auditoria #auditoria-cards {
+      display: grid !important;
+      visibility: visible !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 8px !important;
+      margin-bottom: 10px !important;
+    }
+    body.print-auditoria .aud-card-premium {
+      display: block !important;
+      visibility: visible !important;
+      padding: 8px 10px !important;
+      border: 1px solid #cbd5e1 !important;
+      background: #f8fafc !important;
+      box-shadow: none !important;
+    }
+    body.print-auditoria .aud-card-premium::before { display: none !important; }
+    body.print-auditoria .aud-card-label {
+      font-size: 7pt !important;
+      color: #475569 !important;
+      margin-bottom: 3px !important;
+    }
+    body.print-auditoria .aud-card-valor {
+      font-size: 14pt !important;
+      color: #0f2a4a !important;
+      font-weight: 800 !important;
+    }
+    body.print-auditoria .aud-card-sub {
+      font-size: 7pt !important;
+      color: #64748b !important;
+    }
+
+    /* Cabecalho */
+    body.print-auditoria #aud-print-header {
+      display: block !important;
+      visibility: visible !important;
+      margin-bottom: 10px !important;
+      padding-bottom: 8px !important;
+      border-bottom: 2px solid #0f2a4a !important;
+    }
+    body.print-auditoria #aud-print-header h2 {
+      margin: 0 0 4px !important;
+      color: #0f2a4a !important;
+      font-size: 14pt !important;
+    }
+    body.print-auditoria #aud-print-header p {
+      margin: 0 !important;
+      color: #475569 !important;
+      font-size: 9pt !important;
+    }
+
+    /* Tabela compacta */
+    body.print-auditoria #tab-auditoria .data-table {
+      display: table !important;
+      visibility: visible !important;
+      width: 100% !important;
+      border-collapse: collapse !important;
+      font-size: 8pt !important;
+    }
+    body.print-auditoria #tab-auditoria .data-table thead { display: table-header-group !important; }
+    body.print-auditoria #tab-auditoria .data-table tr {
+      page-break-inside: avoid !important;
+    }
+    body.print-auditoria #tab-auditoria .data-table th,
+    body.print-auditoria #tab-auditoria .data-table td {
+      border: 1px solid #cbd5e1 !important;
+      padding: 3px 5px !important;
+      color: #0f2a4a !important;
+      background: #fff !important;
+      visibility: visible !important;
+    }
+    body.print-auditoria #tab-auditoria .data-table th {
+      background: #e2e8f0 !important;
+      font-weight: 700 !important;
+    }
+    body.print-auditoria #tab-auditoria .aud-badge {
+      background: transparent !important;
+      color: #0f2a4a !important;
+      padding: 0 !important;
+      border: 0 !important;
+      font-weight: 700 !important;
+    }
+
+    @page { margin: 10mm; }
 </style>
   
   <style>
@@ -2535,7 +3114,36 @@
     border-color: rgba(230,237,243,0.10) !important;
   }
 </style>
-</head>
+<script src="/libs/html2pdf.bundle.min.js"></script>
+<style id="FASE_25_PRINT_FIX">
+/* FASE_25_PRINT_FIX: forca fundo branco na impressao do navegador (evita tela preta no dark mode) */
+@media print {
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    color-scheme: light !important;
+  }
+  * {
+    background-color: transparent !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  /* Preserva cores de tabelas e cabecalhos */
+  thead th, .pdf-header, .hist-print-header, .aud-print-header {
+    background: #f1f5f9 !important;
+    color: #0f2a4a !important;
+  }
+  /* Remove sombras e bordas escuras */
+  table, th, td {
+    border-color: #cbd5e1 !important;
+  }
+  /* Esconde elementos que não devem ser impressos */
+  .no-print, .ds-pdf-fab, nav, header, button, .btn-action, .action-btn {
+    display: none !important;
+  }
+}
+</style></head>
 <body>
 
   <!-- Tela de Login Inicial -->
@@ -2630,13 +3238,12 @@
       </div>
       <button class="nav-tab-btn nav-group-toggle" data-group="grupo-admin"><span>&#128274;</span><span class="nav-label">Administração</span><span class="nav-arrow">&#9654;</span></button>
       <div class="nav-submenu" id="grupo-admin">
-        <button class="nav-tab-btn" data-tab="tab-usuarios" id="nav-tab-usuarios" onclick="setTimeout(loadUsuariosDaAPI, 100)"><span>&#128101;</span><span class="nav-label">Usuários</span></button>
+        <button class="nav-tab-btn" data-tab="tab-usuarios" id="nav-tab-usuarios" onclick="setTimeout(loadUsuáriosDaAPI, 100)"><span>&#128101;</span><span class="nav-label">Usuários</span></button>
         <button class="nav-tab-btn" data-tab="tab-auditoria" id="nav-tab-auditoria" onclick="setTimeout(loadAuditoria, 200)"><span>&#128373;</span><span class="nav-label">Auditoria</span></button>
         <button class="nav-tab-btn" data-tab="tab-perfis" id="nav-tab-perfis" onclick="setTimeout(loadPerfisDaAPI, 100)"><span>&#128737;</span><span class="nav-label">Perfis</span></button>
         <button class="nav-tab-btn" data-tab="tab-backup" id="nav-tab-backup" onclick="setTimeout(loadBackupsDaAPI, 200)"><span>&#128190;</span><span class="nav-label">Backup</span></button>
         <!-- FASE_7_AUDITORIA_REMOVIDA: botao removido -->
         <button class="nav-tab-btn" id="nav-btn-atualizar" onclick="abrirModalAtualizar()"><span>&#128260;</span><span class="nav-label">Atualizar App</span></button>
-        <button class="nav-tab-btn" data-tab="tab-historico" onclick="setTimeout(loadHistoricoDaAPI, 150)"><span>&#128220;</span><span class="nav-label">Histórico</span></button>
         <button class="nav-tab-btn" data-tab="tab-configuracoes" id="nav-tab-configuracoes"><span>&#9881;&#65039;</span><span class="nav-label">Configura&ccedil;&otilde;es</span></button>
         <button class="nav-tab-btn" data-tab="tab-ajuda" id="nav-tab-ajuda"><span>&#10067;</span><span class="nav-label">Ajuda</span></button>
       </div>
@@ -3711,7 +4318,7 @@
           <div class="bar-controls-right">
             <button class="btn-action btn-action-secondary" onclick="exportarHistoricoCSV()">&#11015;&#65039; CSV</button>
             <button class="btn-action btn-action-secondary" style="background:#059669;color:#fff;" onclick="exportarHistoricoXLS()">&#128202; XLS</button>
-            <button class="btn-action btn-action-secondary" style="background:#dc2626;color:#fff;" onclick="exportarHistoricoPDF()">&#128196; PDF</button>
+            
             <button class="btn-action btn-action-primary" onclick="loadHistoricoDaAPI(true)">&#128260; Atualizar</button>
           </div>
         </div>
@@ -3783,9 +4390,7 @@
             <select class="select-month select-mes-global" id="select-mes-resumo"></select>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-secondary" onclick="window.print()">
-              <span>🖨️</span> Imprimir Relatório
-            </button>
+            
           </div>
         </div>
 
@@ -3910,15 +4515,15 @@
       <section id="tab-usuarios" class="tab-content">
         <div class="bar-controls">
           <div class="bar-controls-left">
-            <span class="label-month-select">Gestao de Usuarios:</span>
+            <span class="label-month-select">Gestao de Usuários:</span>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-primary" id="btn-add-usuario">+ Novo Usuario</button>
+            <button class="btn-action btn-action-primary" id="btn-add-usuario">+ Novo Usuário</button>
           </div>
         </div>
 
         <div class="section-title-wrap">
-          <h2 class="section-title"><span>&#128101;</span> Usuarios do Sistema</h2>
+          <h2 class="section-title"><span>&#128101;</span> Usuários do Sistema</h2>
         </div>
 
         <div class="table-container">
@@ -3938,10 +4543,10 @@
           </table>
         </div>
 
-        <!-- Modal de Usuario -->
+        <!-- Modal de Usuário -->
         <div id="modal-usuario" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(9,27,48,0.85); z-index:9999; align-items:center; justify-content:center;">
           <div class="login-card" style="max-width:520px; text-align:left;">
-            <h2 style="margin-top:0; color:#0f2a4a;" id="modal-usuario-title">Novo Usuario</h2>
+            <h2 style="margin-top:0; color:#0f2a4a;" id="modal-usuario-title">Novo Usuário</h2>
             <div style="margin-bottom:0.75rem;">
               <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Nome completo</label>
               <input type="text" id="modal-user-nome" class="login-input" style="margin-bottom:0;">
@@ -3960,7 +4565,7 @@
             </div>
             <div style="margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
               <input type="checkbox" id="modal-user-ativo" checked>
-              <label for="modal-user-ativo" style="font-size:0.875rem; font-weight:600;">Usuario ativo</label>
+              <label for="modal-user-ativo" style="font-size:0.875rem; font-weight:600;">Usuário ativo</label>
             </div>
             <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
               <button class="btn-action btn-action-secondary" id="modal-user-cancel">Cancelar</button>
@@ -4051,31 +4656,75 @@
             <span class="label-month-select">AUDITORIA DO SISTEMA:</span>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-secondary" onclick="exportarAuditoriaCSV()">&#128200; Exportar CSV</button>
-            <button class="btn-action btn-action-secondary" onclick="limparAuditoriaAntiga()">&#128465;&#65039; Limpar +90 dias</button>
+            <button class="btn-action btn-action-secondary" style="background:#059669;color:#fff;" onclick="exportarAuditoriaXLS()">&#128202; XLS</button>
+            
+            <button class="btn-action btn-action-secondary" onclick="limparAuditoriaAntiga()">&#128465;&#65039; Limpar +90d</button>
             <button class="btn-action btn-action-primary" onclick="loadAuditoria()">&#128260; Atualizar</button>
           </div>
         </div>
         <div class="section-title-wrap">
           <h2 class="section-title"><span>&#128373;</span> Auditoria do Sistema</h2>
         </div>
-        <div id="auditoria-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px;">
-          <div class="meta-card" style="padding:14px;"><div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;">Total</div><div id="aud-total" style="font-size:1.5rem;font-weight:700;color:#0f2a4a;margin-top:4px;">--</div></div>
-          <div class="meta-card" style="padding:14px;"><div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;">Tabelas</div><div id="aud-tabelas" style="font-size:1.5rem;font-weight:700;color:#0f2a4a;margin-top:4px;">--</div></div>
-          <div class="meta-card" style="padding:14px;"><div style="font-size:0.7rem;color:#64748b;text-transform:uppercase;font-weight:700;">Acoes</div><div id="aud-acoes" style="font-size:1.5rem;font-weight:700;color:#0f2a4a;margin-top:4px;">--</div></div>
+<div id="auditoria-cards"></div>
+        <div class="hist-toolbar" style="margin-bottom:14px;">
+          <div class="hist-toolbar-atalhos">
+            <button class="hist-chip-atalho" onclick="audPeriodoRapido('hoje', this)">Hoje</button>
+            <button class="hist-chip-atalho" onclick="audPeriodoRapido('7d', this)">7 dias</button>
+            <button class="hist-chip-atalho" onclick="audPeriodoRapido('30d', this)">30 dias</button>
+            <button class="hist-chip-atalho" onclick="audPeriodoRapido('mes', this)">Este mes</button>
+            <button class="hist-chip-atalho" onclick="audPeriodoRapido('limpar', this)">Limpar periodo</button>
+          </div>
+          <div class="hist-filtros-linha">
+            <div class="hist-filtro-item2">
+              <label>Tabela</label>
+              <select id="aud-filtro-tabela"><option value="">Todas</option></select>
+            </div>
+            <div class="hist-filtro-item2">
+              <label>Ação</label>
+              <select id="aud-filtro-acao">
+                <option value="">Todas</option>
+                <option value="CRIAR">&#128994; Criar</option>
+                <option value="EDITAR">&#128309; Editar</option>
+                <option value="EXCLUIR">&#128308; Excluir</option>
+                <option value="LOGIN">&#128273; Login</option>
+                <option value="LOGOUT">&#128682; Logout</option>
+              </select>
+            </div>
+            <div class="hist-filtro-item2">
+              <label>Usuário</label>
+              <select id="aud-filtro-usuario"><option value="">Todos</option></select>
+            </div>
+            <div class="hist-filtro-item2">
+              <label>De</label>
+              <input type="date" id="aud-filtro-inicio">
+            </div>
+            <div class="hist-filtro-item2">
+              <label>Ate</label>
+              <input type="date" id="aud-filtro-fim">
+            </div>
+            <div class="hist-filtro-item2 hist-filtro-busca">
+              <label>Busca</label>
+              <input type="text" id="aud-filtro-busca" placeholder="Email, detalhes...">
+            </div>
+            <div class="hist-filtro-acoes2">
+              <button class="btn-action btn-action-secondary" onclick="limparFiltrosAuditoria()">Limpar</button>
+              <button class="btn-action btn-action-primary" onclick="loadAuditoria(1)">&#128269; Filtrar</button>
+            </div>
+          </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto auto;gap:8px;margin-bottom:14px;align-items:end;">
-          <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">Tabela</label><select id="aud-filtro-tabela" class="login-input" style="width:100%;padding:8px;margin:0;"><option value="">Todas</option></select></div>
-          <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">Acao</label><select id="aud-filtro-acao" class="login-input" style="width:100%;padding:8px;margin:0;"><option value="">Todas</option></select></div>
-          <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">Inicio</label><input type="date" id="aud-filtro-inicio" class="login-input" style="width:100%;padding:8px;margin:0;"></div>
-          <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">Fim</label><input type="date" id="aud-filtro-fim" class="login-input" style="width:100%;padding:8px;margin:0;"></div>
-          <div><label style="font-size:0.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px;">Busca</label><input type="text" id="aud-filtro-busca" class="login-input" placeholder="Email, usuario..." style="width:100%;padding:8px;margin:0;"></div>
-          <button class="btn-action btn-action-primary" onclick="loadAuditoria(1)">Filtrar</button>
-          <button class="btn-action btn-action-secondary" onclick="limparFiltrosAuditoria()">Limpar</button>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <div style="display:flex;gap:6px;">
+            <button class="hist-chip-atalho ativo" id="aud-tab-tabela" onclick="audAlternarVisualizacao('tabela')">&#128202; Tabela</button>
+            <button class="hist-chip-atalho" id="aud-tab-timeline" onclick="audAlternarVisualizacao('timeline')">&#128220; Timeline</button>
+            <button class="hist-chip-atalho" id="aud-tab-historico" onclick="audAbrirHistoricoCompleto()">&#128240; Historico Completo</button>
+          </div>
         </div>
+
+        <div id="aud-visual-tabela">
         <div class="table-container">
           <table class="data-table" id="table-auditoria">
-            <thead><tr><th style="width:180px;">Data/Hora</th><th style="width:200px;">Usuario</th><th style="width:100px;">Acao</th><th style="width:150px;">Tabela</th><th>Detalhes</th><th style="width:80px;" class="col-center">IP</th><th style="width:80px;" class="col-center">Acoes</th></tr></thead>
+            <thead><tr><th style="width:180px;">Data/Hora</th><th style="width:200px;">Usuário</th><th style="width:100px;">Ação</th><th style="width:150px;">Tabela</th><th>Detalhes</th><th style="width:80px;" class="col-center">IP</th><th style="width:80px;" class="col-center">Ações</th></tr></thead>
             <tbody id="tbody-auditoria"><tr><td colspan="7" style="text-align:center;padding:1.5rem;color:#64748b;">Carregando...</td></tr></tbody>
           </table>
         </div>
@@ -4084,6 +4733,21 @@
           <div style="display:flex;gap:8px;">
             <button class="btn-action btn-action-secondary" id="aud-btn-anterior" onclick="mudarPaginaAuditoria(-1)">&larr; Anterior</button>
             <button class="btn-action btn-action-secondary" id="aud-btn-proximo" onclick="mudarPaginaAuditoria(1)">Proxima &rarr;</button>
+          </div>
+        </div>
+        </div>
+
+        <div id="aud-visual-timeline" style="display:none;">
+          <div class="timeline-resumo" id="auditoria-timeline-resumo"></div>
+          <div class="timeline" id="auditoria-timeline">
+            <div class="timeline-empty">Carregando...</div>
+          </div>
+        </div>
+
+        <div id="aud-visual-historico" style="display:none;">
+          <div id="aud-historico-container" style="margin-top:14px;">
+            <p style="color:#64748b;font-size:0.9rem;margin-bottom:12px;">Histórico completo de atividades (fonte: tabela auditoria). Abaixo estao os filtros e a linha do tempo.</p>
+            <button class="btn-action btn-action-primary" onclick="audAbrirHistoricoCompleto()">&#128240; Abrir Historico Completo</button>
           </div>
         </div>
       </section>
@@ -5127,7 +5791,7 @@ const email = document.getElementById('login-email').value;
     }
 
     async function deleteItem(tipo, id) {
-      if (!(await confirmarAcao('Deseja excluir este registro?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!(await confirmarAção('Deseja excluir este registro?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
       try {
         await apiFetch(`/${tipo}/${id}`, { method: 'DELETE' });
         loadCadastrosDaAPI();
@@ -5287,7 +5951,7 @@ const email = document.getElementById('login-email').value;
     }
 
     async function deleteAcop(id) {
-      if (!(await confirmarAcao('Remover acoplamento?', { titulo: 'Confirmar Remocao', tipo: 'warning', textoConfirmar: 'Remover', icone: '\u26A0\uFE0F' }))) return;
+      if (!(await confirmarAção('Remover acoplamento?', { titulo: 'Confirmar Remocao', tipo: 'warning', textoConfirmar: 'Remover', icone: '\u26A0\uFE0F' }))) return;
       try {
         await apiFetch(`/acoplamentos/${id}`, { method: 'DELETE' });
         loadAcoplamentosDaAPI();
@@ -5559,7 +6223,7 @@ const email = document.getElementById('login-email').value;
     }
 
     async function deleteAbastecimento(id) {
-      if (!(await confirmarAcao('Deseja excluir este registro de abastecimento?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!(await confirmarAção('Deseja excluir este registro de abastecimento?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
       try {
         await apiFetch(`/abastecimentos/${id}`, { method: 'DELETE' });
         loadAbastecimentosDaAPI();
@@ -5862,7 +6526,7 @@ const email = document.getElementById('login-email').value;
     }
 
     async function deleteLanc(id) {
-      if (!(await confirmarAcao('Deseja excluir este lançamento financeiro?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!(await confirmarAção('Deseja excluir este lançamento financeiro?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
       
       try {
         await apiFetch(`/financeiro/${id}`, { method: 'DELETE' });
@@ -6041,7 +6705,7 @@ const email = document.getElementById('login-email').value;
     }
 
     async function deleteManutencao(id) {
-      if (!(await confirmarAcao('Deseja excluir este registro de manutenção?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!(await confirmarAção('Deseja excluir este registro de manutenção?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
       try {
         await apiFetch(`/manutencoes/${id}`, { method: 'DELETE' });
         loadManutencoesDaAPI();
@@ -6117,7 +6781,7 @@ const email = document.getElementById('login-email').value;
     }
 
     async function deleteDocumento(id) {
-      if (!(await confirmarAcao('Deseja excluir este documento?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!(await confirmarAção('Deseja excluir este documento?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
       try {
         await apiFetch(`/documentos/${id}`, { method: 'DELETE' });
         loadDocumentosDaAPI();
@@ -6519,7 +7183,7 @@ const email = document.getElementById('login-email').value;
         loadAbastecimentosDaAPI();
         loadManutencoesDaAPI();
         loadDocumentosDaAPI();
-        loadUsuariosDaAPI();
+        loadUsuáriosDaAPI();
       });
     }
 
@@ -6653,14 +7317,14 @@ const email = document.getElementById('login-email').value;
     // =========================================================================
     // USUARIOS - Carregar, criar, editar, desativar (Fase 3 - Etapa 4.2)
     // =========================================================================
-    let modalUsuarioEditandoId = null;
+    let modalUsuárioEditandoId = null;
 
-    async function loadUsuariosDaAPI() {
+    async function loadUsuáriosDaAPI() {
       try {
         const res = await apiFetch('/usuarios');
         if (!res.ok) return;
         const data = await res.json();
-        renderUsuarios(data);
+        renderUsuários(data);
       } catch (err) {
         console.error('Erro ao carregar usuarios:', err);
       }
@@ -6677,7 +7341,7 @@ const email = document.getElementById('login-email').value;
       }
     }
 
-    function renderUsuarios(lista) {
+    function renderUsuários(lista) {
       const tbody = document.getElementById('tbody-usuarios');
       if (!tbody) return;
       tbody.innerHTML = '';
@@ -6694,8 +7358,8 @@ const email = document.getElementById('login-email').value;
           : '<span class="badge-neg">Inativo</span>';
 
         const btnDesativar = u.ativo
-          ? `<button class="action-btn action-btn-delete" title="Desativar usuario" onclick="desativarUsuario('${u.id}', '${u.nome}')">&#128465;&#65039;</button>`
-          : `<button class="action-btn action-btn-delete action-btn-disabled" title="Usuario ja inativo" disabled>&#128465;&#65039;</button>`;
+          ? `<button class="action-btn action-btn-delete" title="Desativar usuario" onclick="desativarUsuário('${u.id}', '${u.nome}')">&#128465;&#65039;</button>`
+          : `<button class="action-btn action-btn-delete action-btn-disabled" title="Usuário ja inativo" disabled>&#128465;&#65039;</button>`;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -6707,8 +7371,8 @@ const email = document.getElementById('login-email').value;
           <td class="col-center">${statusBadge}</td>
           <td class="col-center">
             <div class="action-group">
-              <button class="action-btn action-btn-edit" title="Editar usuario" onclick="abrirModalUsuarioEditar('${u.id}')">&#9999;&#65039;</button>
-              <button class="action-btn action-btn-key" title="Resetar senha" onclick="resetarSenhaUsuario('${u.id}', '${u.nome}')">&#128273;</button>
+              <button class="action-btn action-btn-edit" title="Editar usuario" onclick="abrirModalUsuárioEditar('${u.id}')">&#9999;&#65039;</button>
+              <button class="action-btn action-btn-key" title="Resetar senha" onclick="resetarSenhaUsuário('${u.id}', '${u.nome}')">&#128273;</button>
               ${btnDesativar}
             </div>
           </td>
@@ -6717,9 +7381,9 @@ const email = document.getElementById('login-email').value;
       });
     }
 
-    async function abrirModalUsuarioNovo() {
-      modalUsuarioEditandoId = null;
-      document.getElementById('modal-usuario-title').textContent = 'Novo Usuario';
+    async function abrirModalUsuárioNovo() {
+      modalUsuárioEditandoId = null;
+      document.getElementById('modal-usuario-title').textContent = 'Novo Usuário';
       document.getElementById('modal-user-nome').value = '';
       document.getElementById('modal-user-email').value = '';
       document.getElementById('modal-user-senha').value = '';
@@ -6736,7 +7400,7 @@ const email = document.getElementById('login-email').value;
       document.getElementById('modal-usuario').style.display = 'flex';
     }
 
-    async function abrirModalUsuarioEditar(id) {
+    async function abrirModalUsuárioEditar(id) {
       try {
         const res = await apiFetch(`/usuarios/${id}`);
         if (!res.ok) {
@@ -6745,8 +7409,8 @@ const email = document.getElementById('login-email').value;
         }
         const u = await res.json();
 
-        modalUsuarioEditandoId = id;
-        document.getElementById('modal-usuario-title').textContent = 'Editar Usuario';
+        modalUsuárioEditandoId = id;
+        document.getElementById('modal-usuario-title').textContent = 'Editar Usuário';
         document.getElementById('modal-user-nome').value = u.nome || '';
         document.getElementById('modal-user-email').value = u.email || '';
         document.getElementById('modal-user-senha').value = '';
@@ -6768,12 +7432,12 @@ const email = document.getElementById('login-email').value;
       }
     }
 
-    function fecharModalUsuario() {
+    function fecharModalUsuário() {
       document.getElementById('modal-usuario').style.display = 'none';
-      modalUsuarioEditandoId = null;
+      modalUsuárioEditandoId = null;
     }
 
-    async function salvarUsuario() {
+    async function salvarUsuário() {
       const nome = document.getElementById('modal-user-nome').value.trim();
       const email = document.getElementById('modal-user-email').value.trim();
       const senha = document.getElementById('modal-user-senha').value;
@@ -6785,15 +7449,15 @@ const email = document.getElementById('login-email').value;
         return;
       }
 
-      if (!modalUsuarioEditandoId && senha.length < 6) {
+      if (!modalUsuárioEditandoId && senha.length < 6) {
         alert('Senha deve ter no minimo 6 caracteres.');
         return;
       }
 
       try {
-        if (modalUsuarioEditandoId) {
+        if (modalUsuárioEditandoId) {
           const payload = { nome, email, perfil_id, ativo };
-          const res = await apiFetch(`/usuarios/${modalUsuarioEditandoId}`, {
+          const res = await apiFetch(`/usuarios/${modalUsuárioEditandoId}`, {
             method: 'PUT',
             body: JSON.stringify(payload)
           });
@@ -6805,13 +7469,13 @@ const email = document.getElementById('login-email').value;
           }
 
           if (senha && senha.length >= 6) {
-            await apiFetch(`/usuarios/${modalUsuarioEditandoId}/resetar-senha`, {
+            await apiFetch(`/usuarios/${modalUsuárioEditandoId}/resetar-senha`, {
               method: 'PUT',
               body: JSON.stringify({ nova_senha: senha })
             });
           }
 
-          alert('Usuario atualizado com sucesso.');
+          alert('Usuário atualizado com sucesso.');
         } else {
           const payload = { nome, email, senha, perfil_id };
           const res = await apiFetch('/usuarios', {
@@ -6825,18 +7489,18 @@ const email = document.getElementById('login-email').value;
             return;
           }
 
-          alert('Usuario criado com sucesso.');
+          alert('Usuário criado com sucesso.');
         }
 
-        fecharModalUsuario();
-        loadUsuariosDaAPI();
+        fecharModalUsuário();
+        loadUsuáriosDaAPI();
       } catch (err) {
         console.error(err);
         alert('Erro ao salvar usuario');
       }
     }
 
-    async function resetarSenhaUsuario(id, nome) {
+    async function resetarSenhaUsuário(id, nome) {
       const nova = prompt(`Nova senha para "${nome}" (minimo 6 caracteres):`);
       if (!nova || nova.length < 6) {
         if (nova) alert('Senha muito curta.');
@@ -6862,8 +7526,8 @@ const email = document.getElementById('login-email').value;
       }
     }
 
-    async function desativarUsuario(id, nome) {
-      if (!(await confirmarAcao(`Desativar o usuario "${nome}"?`, { titulo: 'Desativar', tipo: 'warning', textoConfirmar: 'Desativar', icone: '\u26A0\uFE0F' }))) return;
+    async function desativarUsuário(id, nome) {
+      if (!(await confirmarAção(`Desativar o usuario "${nome}"?`, { titulo: 'Desativar', tipo: 'warning', textoConfirmar: 'Desativar', icone: '\u26A0\uFE0F' }))) return;
 
       try {
         const res = await apiFetch(`/usuarios/${id}`, { method: 'DELETE' });
@@ -6872,7 +7536,7 @@ const email = document.getElementById('login-email').value;
           alert(err.erro || 'Erro ao desativar');
           return;
         }
-        loadUsuariosDaAPI();
+        loadUsuáriosDaAPI();
       } catch (err) {
         console.error(err);
       }
@@ -6883,7 +7547,7 @@ const email = document.getElementById('login-email').value;
     // =========================================================================
     setTimeout(() => {
       document.querySelectorAll('[data-tab="tab-usuarios"]').forEach(btn => {
-        btn.addEventListener('click', () => setTimeout(loadUsuariosDaAPI, 100));
+        btn.addEventListener('click', () => setTimeout(loadUsuáriosDaAPI, 100));
       });
       document.querySelectorAll('[data-tab="tab-perfis"]').forEach(btn => {
         btn.addEventListener('click', () => setTimeout(typeof loadPerfisDaAPI === 'function' ? loadPerfisDaAPI : (() => {}), 100));
@@ -6900,13 +7564,13 @@ const email = document.getElementById('login-email').value;
       const btnSave = document.getElementById('modal-user-save');
       const btnAdd = document.getElementById('btn-add-usuario');
 
-      if (btnCancel) btnCancel.addEventListener('click', fecharModalUsuario);
-      if (btnSave) btnSave.addEventListener('click', salvarUsuario);
-      if (btnAdd) btnAdd.addEventListener('click', abrirModalUsuarioNovo);
+      if (btnCancel) btnCancel.addEventListener('click', fecharModalUsuário);
+      if (btnSave) btnSave.addEventListener('click', salvarUsuário);
+      if (btnAdd) btnAdd.addEventListener('click', abrirModalUsuárioNovo);
 
       // Fechar modal com ESC
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') fecharModalUsuario();
+        if (e.key === 'Escape') fecharModalUsuário();
       });
 
       // FASE_5_FIX_MODAL_USER — desabilitado fechar ao clicar fora
@@ -6921,7 +7585,7 @@ const email = document.getElementById('login-email').value;
       // const modal = document.getElementById('modal-usuario');
       // if (modal) {
       //   modal.addEventListener('click', (e) => {
-      //     if (e.target === modal) fecharModalUsuario();
+      //     if (e.target === modal) fecharModalUsuário();
       //   });
       // }
     });
@@ -7168,7 +7832,7 @@ const email = document.getElementById('login-email').value;
     }
 
     async function excluirPerfil(id, nome) {
-      if (!(await confirmarAcao('Excluir o perfil "' + nome + '"?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!(await confirmarAção('Excluir o perfil "' + nome + '"?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
       try {
         var r = await apiFetch('/perfis/' + id, { method: 'DELETE' });
         if (!r.ok) { var e = await r.json(); alert(e.erro || 'Erro'); return; }
@@ -7200,10 +7864,13 @@ const email = document.getElementById('login-email').value;
           h += '</table>';
         });
         h += '</body></html>';
-        var w = window.open('', '_blank');
-        w.document.write(h);
-        w.document.close();
-        setTimeout(function() { w.print(); }, 400);
+        html2pdf().set({
+        margin: [10, 10, 10, 10],
+        filename: 'caderninho_' + new Date().toISOString().substring(0,10) + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      }).from(h).save();
       } catch (e) { alert('Erro: ' + e.message); }
     }
 
@@ -7218,10 +7885,13 @@ const email = document.getElementById('login-email').value;
       clone.querySelectorAll('tbody tr').forEach(function(tr) { if (tr.lastElementChild) tr.removeChild(tr.lastElementChild); });
       h += clone.outerHTML;
       h += '</body></html>';
-      var w = window.open('', '_blank');
-      w.document.write(h);
-      w.document.close();
-      setTimeout(function() { w.print(); }, 400);
+      html2pdf().set({
+        margin: [10, 10, 10, 10],
+        filename: 'caderninho_' + new Date().toISOString().substring(0,10) + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      }).from(h).save();
     }
 
     window.loadPerfisDaAPI = loadPerfisDaAPI;
@@ -7433,13 +8103,17 @@ const email = document.getElementById('login-email').value;
         h += "<tr><td>" + l.data + "</td><td>" + l.tipo + "</td><td>" + l.descricao + "</td><td>" + (l.categoria || "") + "</td><td>" + (l.centro_custo_nome || "") + "</td><td>" + formatBRL(l.valor) + "</td></tr>";
       });
       h += "</table></body></html>";
-      var w = window.open("", "_blank");
-      w.document.write(h); w.document.close();
-      setTimeout(function() { w.print(); }, 400);
+      html2pdf().set({
+        margin: [10, 10, 10, 10],
+        filename: 'caderninho_' + new Date().toISOString().substring(0,10) + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      }).from(h).save();
     }
 
     async function excluirLancamentoDre(id) {
-      if (!(await confirmarAcao("Excluir este lancamento?", { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!(await confirmarAção("Excluir este lancamento?", { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
       try {
         var res = await apiFetch("/lancamentos/" + id, { method: "DELETE" });
         if (!res.ok) { var err = await res.json(); alert(err.erro || "Erro ao excluir"); return; }
@@ -7599,9 +8273,13 @@ const email = document.getElementById('login-email').value;
         h += "<tr><td>" + r.posicao + "</td><td>" + r.placa + "</td><td>" + formatBRL(r.receita) + "</td><td>" + formatBRL(r.despesa) + "</td><td class='" + (r.resultado >= 0 ? "pos" : "neg") + "'>" + formatBRL(r.resultado) + "</td><td>" + formatPct(r.margem) + "</td><td>" + formatNum(r.km_rodado) + "</td><td>" + (r.kml > 0 ? formatNum(r.kml, 2) : "-") + "</td><td>" + formatBRL(r.receita_por_km) + "</td><td>" + formatBRL(r.custo_por_km) + "</td></tr>";
       });
       h += "</table></body></html>";
-      var w = window.open("", "_blank");
-      w.document.write(h); w.document.close();
-      setTimeout(function() { w.print(); }, 400);
+      html2pdf().set({
+        margin: [10, 10, 10, 10],
+        filename: 'caderninho_' + new Date().toISOString().substring(0,10) + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      }).from(h).save();
     }
 
     document.addEventListener("change", function(e) {
@@ -7799,7 +8477,7 @@ const email = document.getElementById('login-email').value;
     function editarMeta(id) { abrirModalMeta(id); }
 
     async function excluirMeta(id) {
-      if (!(await confirmarAcao("Excluir esta meta?", { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!(await confirmarAção("Excluir esta meta?", { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
       try {
         var res = await apiFetch("/metas/" + id, { method: "DELETE" });
         if (!res.ok) { var err = await res.json(); alert(err.erro || "Erro"); return; }
@@ -7833,9 +8511,13 @@ const email = document.getElementById('login-email').value;
         h += "<tr><td>" + m.placa + "</td><td>" + labelTipoMeta(m.tipo_meta) + "</td><td>" + formatarValorMeta(m.valor_meta, m.tipo_meta) + "</td><td>" + formatarValorMeta(m.valor_real, m.tipo_meta) + "</td><td>" + formatPct(m.atingimento) + "</td><td>" + m.status + "</td></tr>";
       });
       h += "</table></body></html>";
-      var w = window.open("", "_blank");
-      w.document.write(h); w.document.close();
-      setTimeout(function() { w.print(); }, 400);
+      html2pdf().set({
+        margin: [10, 10, 10, 10],
+        filename: 'caderninho_' + new Date().toISOString().substring(0,10) + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      }).from(h).save();
     }
 
     document.addEventListener("change", function(e) {
@@ -7961,7 +8643,7 @@ const email = document.getElementById('login-email').value;
     window.mostrarToast = mostrarToast;
 
     // ==== MODAL DE CONFIRMACAO PREMIUM (FASE 3A / 14b) ====
-    function confirmarAcao(mensagem, opcoes) {
+    function confirmarAção(mensagem, opcoes) {
       opcoes = opcoes || {};
       var titulo = opcoes.titulo || "Confirmar acao";
       var tipo = opcoes.tipo || "danger";
@@ -8024,13 +8706,13 @@ const email = document.getElementById('login-email').value;
         // O dialogo nativo nao retorna Promise, entao precisamos de um fallback:
         // se a mensagem for simples, chamamos o modal e retornamos true/false sincronamente NAO e possivel.
         // Solucao: manter chamadas antigas sincronizadas usando o proprio window.confirm nativo,
-        // e apenas as chamadas novas (assincronas) usam confirmarAcao().
+        // e apenas as chamadas novas (assincronas) usam confirmarAção().
         // Assim o sistema continua funcionando, mas oferecemos o modal bonito como opcao.
         return _orig.call(window, mensagem);
       };
     })();
 
-    window.confirmarAcao = confirmarAcao;
+    window.confirmarAção = confirmarAção;
 
     // ==== LOADING SPINNER NOS BOTOES (FASE 3A / 14c) ====
     (function() {
@@ -8450,7 +9132,7 @@ const email = document.getElementById('login-email').value;
     function editarLancamento(id) { abrirModalLancamento(id); }
 
     async function excluirLancamento(id) {
-      if (!(await confirmarAcao('Excluir este lancamento?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!(await confirmarAção('Excluir este lancamento?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
       try {
         var res = await apiFetch('/lancamentos/' + id, { method: 'DELETE' });
         if (!res.ok) {
@@ -8677,7 +9359,7 @@ const email = document.getElementById('login-email').value;
     function editarCategoria(id) { abrirModalCategoria(id); }
 
     async function excluirCategoria(id, nome) {
-      if (!(await confirmarAcao('Excluir a categoria "' + nome + '"?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!(await confirmarAção('Excluir a categoria "' + nome + '"?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
       try {
         var res = await apiFetch('/categorias/' + id, { method: 'DELETE' });
         if (!res.ok) {
@@ -8707,10 +9389,13 @@ const email = document.getElementById('login-email').value;
       });
       h += '</table></body></html>';
 
-      var w = window.open('', '_blank');
-      w.document.write(h);
-      w.document.close();
-      setTimeout(function() { w.print(); }, 400);
+      html2pdf().set({
+        margin: [10, 10, 10, 10],
+        filename: 'caderninho_' + new Date().toISOString().substring(0,10) + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      }).from(h).save();
     }
 
     // Auto-load nos filtros
@@ -8869,7 +9554,7 @@ const email = document.getElementById('login-email').value;
     function editarCentroCusto(id) { abrirModalCentroCusto(id); }
 
     async function excluirCentroCusto(id, nome) {
-      if (!(await confirmarAcao('Excluir o centro de custo "' + nome + '"?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
+      if (!(await confirmarAção('Excluir o centro de custo "' + nome + '"?', { titulo: 'Confirmar Exclusao', tipo: 'danger', textoConfirmar: 'Excluir', icone: '\uD83D\uDDD1\uFE0F' }))) return;
       try {
         var res = await apiFetch('/centros-custo/' + id, { method: 'DELETE' });
         if (!res.ok) {
@@ -8896,10 +9581,13 @@ const email = document.getElementById('login-email').value;
         h += '<tr><td>' + (idx + 1) + '</td><td>' + (c.codigo || '—') + '</td><td>' + c.nome + '</td><td>' + (c.descricao || '—') + '</td><td>' + (c.ordem || 0) + '</td><td>' + (c.ativo ? 'Ativo' : 'Inativo') + '</td></tr>';
       });
       h += '</table></body></html>';
-      var w = window.open('', '_blank');
-      w.document.write(h);
-      w.document.close();
-      setTimeout(function() { w.print(); }, 400);
+      html2pdf().set({
+        margin: [10, 10, 10, 10],
+        filename: 'caderninho_' + new Date().toISOString().substring(0,10) + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      }).from(h).save();
     }
 
     document.addEventListener('change', function(e) {
@@ -9077,10 +9765,13 @@ const email = document.getElementById('login-email').value;
       });
       h += '</table></body></html>';
 
-      var w = window.open('', '_blank');
-      w.document.write(h);
-      w.document.close();
-      setTimeout(function() { w.print(); }, 400);
+      html2pdf().set({
+        margin: [10, 10, 10, 10],
+        filename: 'caderninho_' + new Date().toISOString().substring(0,10) + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      }).from(h).save();
     }
 
     // Auto-load ao mudar o mes
@@ -9174,16 +9865,24 @@ const email = document.getElementById('login-email').value;
 
 
     async function carregarFiltrosHistorico() {
-      // Usuarios
+      // Usuários
       var selU = document.getElementById("hist-filtro-usuario");
       if (selU && selU.options.length <= 1) {
         try {
-          var r = await apiFetch("/historico/usuarios");
+          // FASE_21_FIX: usar /usuarios (cadastrados) em vez de /historico/usuarios
+          var r = await apiFetch("/usuarios");
           if (r.ok) {
-            var us = await r.json();
-            us.forEach(function(u) {
+            var dataU = await r.json();
+            var usuarios = Array.isArray(dataU) ? dataU : (dataU.usuarios || dataU.itens || []);
+            var vistos = {};
+            usuarios.forEach(function(u) {
+              var email = u.email || u.usuario_email;
+              var nome = u.nome || email;
+              if (!email || vistos[email]) return;
+              vistos[email] = true;
               var o = document.createElement("option");
-              o.value = u; o.textContent = u;
+              o.value = email;
+              o.textContent = nome;
               selU.appendChild(o);
             });
           }
@@ -9222,7 +9921,7 @@ const email = document.getElementById('login-email').value;
     var __histPorPagina = 50;
     var __histTodosEventos = [];
 
-    function getIconeAcao(acao) {
+    function getIconeAção(acao) {
       var a = String(acao || "").toUpperCase();
       if (a.indexOf("CRIAR") !== -1 || a.indexOf("CADASTRAR") !== -1) return "\uD83D\uDFE2";
       if (a.indexOf("EDITAR") !== -1 || a.indexOf("ATUALIZAR") !== -1) return "\uD83D\uDD35";
@@ -9335,7 +10034,7 @@ function renderHistorico(data) {
         porDia[dia].forEach(function(e) {
           var cat = classificarEvento(e.modulo, e.tipo_evento);
           var hora = e.data_evento ? new Date(e.data_evento).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--";
-          var icone = getIconeAcao(e.tipo_evento);
+          var icone = getIconeAção(e.tipo_evento);
           html += '<div class="timeline-item cat-' + cat + '">';
           html += '<div><span class="timeline-hora">' + hora + '</span><span class="timeline-acao"><span class="timeline-acao-icone">' + icone + '</span>' + (e.tipo_evento || "ACAO") + '</span>';
           html += ' <span class="timeline-badge badge-' + cat + '">' + cat + "</span></div>";
@@ -9388,7 +10087,7 @@ function renderHistorico(data) {
     }
 
     function montarLinhasHistorico() {
-      var linhas = [["Data","Hora","Usuario","Tipo","Modulo","Detalhes"]];
+      var linhas = [["Data","Hora","Usuário","Tipo","Modulo","Detalhes"]];
       (__historicoCache || []).forEach(function(e) {
         var d = e.data_evento ? new Date(e.data_evento) : null;
         linhas.push([
@@ -9460,13 +10159,13 @@ function renderHistorico(data) {
       var vIni = document.getElementById("hist-filtro-data-ini");
       var vFim = document.getElementById("hist-filtro-data-fim");
       var vUsu = document.getElementById("hist-filtro-usuario");
-      var vAcao = document.getElementById("hist-filtro-tipo");
+      var vAção = document.getElementById("hist-filtro-tipo");
       var vMod = document.getElementById("hist-filtro-modulo");
       var vTxt = document.getElementById("hist-filtro-veiculo");
       if (vIni && vIni.value) filtrosInfo.push("De: " + vIni.value);
       if (vFim && vFim.value) filtrosInfo.push("At\u00e9: " + vFim.value);
       if (vUsu && vUsu.value) filtrosInfo.push("Usu\u00e1rio: " + vUsu.value);
-      if (vAcao && vAcao.value) filtrosInfo.push("A\u00e7\u00e3o: " + vAcao.value);
+      if (vAção && vAção.value) filtrosInfo.push("A\u00e7\u00e3o: " + vAção.value);
       if (vMod && vMod.value) filtrosInfo.push("M\u00f3dulo: " + vMod.value);
       if (vTxt && vTxt.value) filtrosInfo.push("Busca: " + vTxt.value);
       var linhaFiltros = filtrosInfo.length ? "<br><span style=\"font-size:9pt;color:#475569;\">" + filtrosInfo.join(" &middot; ") + "</span>" : "";
@@ -10229,17 +10928,96 @@ function renderHistorico(data) {
     "tab-graficos": "Graficos",
     "tab-ranking": "Ranking",
     "tab-metas": "Metas",
-    "tab-usuarios": "Usuarios",
+    "tab-usuarios": "Usuários",
     "tab-perfis": "Perfis de Acesso",
     };
 
   function getSecaoAtiva() {
     var secao = document.querySelector(".tab-content.active");
     if (!secao) return null;
-    var selMes = secao.querySelector(".select-mes-global");
+
+    // FASE_41_PDF_AUDITORIA: clona a secao inteira e esconde sub-abas inativas
+    if (secao.id === 'tab-auditoria') {
+      var visTabela = document.getElementById('aud-visual-tabela');
+      var visTimeline = document.getElementById('aud-visual-timeline');
+      var visHistorico = document.getElementById('aud-visual-historico');
+
+      // Determina qual sub-aba esta ativa
+      var subAtiva = 'tabela';
+      if (visHistorico && visHistorico.style.display !== 'none' && visHistorico.offsetParent !== null) {
+        subAtiva = 'historico';
+      } else if (visTimeline && visTimeline.style.display !== 'none' && visTimeline.offsetParent !== null) {
+        subAtiva = 'timeline';
+      }
+
+      // Historico Completo: mantem como esta (100% OK)
+      if (subAtiva === 'historico') {
+        return { id: 'aud-historico', titulo: 'Auditoria - Historico Completo', mes: '', elemento: visHistorico };
+      }
+
+      // Clona a secao inteira (inclui cards, filtros, sub-abas)
+      var cloneAud = secao.cloneNode(true);
+
+      // Esconde as sub-abas que nao estao ativas
+      var cloneTabela = cloneAud.querySelector('#aud-visual-tabela');
+      var cloneTimeline = cloneAud.querySelector('#aud-visual-timeline');
+      var cloneHistorico = cloneAud.querySelector('#aud-visual-historico');
+
+      if (subAtiva !== 'tabela' && cloneTabela) cloneTabela.style.display = 'none';
+      if (subAtiva !== 'timeline' && cloneTimeline) cloneTimeline.style.display = 'none';
+      if (subAtiva !== 'historico' && cloneHistorico) cloneHistorico.style.display = 'none';
+
+      // Marca a sub-aba ativa como visivel
+      if (subAtiva === 'tabela' && cloneTabela) cloneTabela.style.display = 'block';
+      if (subAtiva === 'timeline' && cloneTimeline) cloneTimeline.style.display = 'block';
+
+      // Remove os botoes de alternancia (nao devem aparecer no PDF)
+      cloneAud.querySelectorAll('.bar-controls, .hist-toolbar, .hist-chip-atalho, .section-title-wrap, button, .btn-action, .action-btn').forEach(function(el) { el.remove(); });
+
+      // FASE_42_PDF_ESPACO_TIMELINE: remove espacos em branco no topo
+      cloneAud.querySelectorAll('.section-title-wrap, .bar-controls, .hist-toolbar').forEach(function(el) { el.style.display = 'none'; });
+      cloneAud.querySelectorAll('#auditoria-cards, .kpi-row, .charts-grid, .meta-card-grid').forEach(function(el) {
+        el.style.marginTop = '0';
+        el.style.paddingTop = '0';
+      });
+      cloneAud.style.marginTop = '0';
+      cloneAud.style.paddingTop = '0';
+      // Remove qualquer margin-top da secao
+      cloneAud.querySelectorAll('*').forEach(function(el) {
+        var mt = getComputedStyle(el).marginTop;
+        if (mt && parseInt(mt) > 20) el.style.marginTop = '0';
+      });
+
+      // FASE_42: aplica estilos inline na Timeline (fundo claro)
+      cloneAud.querySelectorAll('.timeline-item').forEach(function(el) {
+        el.style.background = '#f8fafc';
+        el.style.color = '#14171f';
+        el.style.border = '1px solid #cbd5e1';
+        el.style.pageBreakInside = 'avoid';
+        el.style.marginBottom = '6px';
+        el.style.padding = '8px 10px';
+      });
+      cloneAud.querySelectorAll('.timeline-dia').forEach(function(el) {
+        el.style.background = '#e2e8f0';
+        el.style.color = '#0f2a4a';
+        el.style.fontWeight = '700';
+        el.style.padding = '6px 10px';
+        el.style.margin = '10px 0 6px';
+      });
+      cloneAud.querySelectorAll('.timeline-hora').forEach(function(el) { el.style.color = '#475569'; });
+      cloneAud.querySelectorAll('.timeline-acao').forEach(function(el) { el.style.color = '#0f2a4a'; el.style.fontWeight = '700'; });
+      cloneAud.querySelectorAll('.timeline-meta').forEach(function(el) { el.style.color = '#475569'; });
+      cloneAud.querySelectorAll('.timeline-detalhe').forEach(function(el) { el.style.color = '#334155'; el.style.borderTop = '1px dashed #cbd5e1'; });
+      cloneAud.querySelectorAll('.timeline-badge').forEach(function(el) { el.style.background = '#e2e8f0'; el.style.color = '#334155'; el.style.border = '1px solid #cbd5e1'; });
+      cloneAud.querySelectorAll('.timeline-resumo-item').forEach(function(el) { el.style.background = '#f1f5f9'; el.style.color = '#0f2a4a'; el.style.border = '1px solid #cbd5e1'; el.style.padding = '4px 8px'; el.style.margin = '2px'; el.style.display = 'inline-block'; });
+
+      return { id: 'aud-' + subAtiva, titulo: 'Auditoria - ' + subAtiva, mes: '', elemento: cloneAud };
+    }
+
+    var selMes = secao.querySelector(".mes-global");
     return { id: secao.id, titulo: TITULOS[secao.id] || "Relatorio", mes: selMes ? selMes.value : "", elemento: secao };
   }
-  function getUsuario() {
+  function getUsuário() {
     var b = document.getElementById("current-user-badge");
     return b ? b.textContent.trim().replace(/^\u{1F464}\s*/u, "") : "N/A";
   }
@@ -10272,11 +11050,11 @@ function renderHistorico(data) {
   }
   function gerarHTML(secao, tabelaHTML) {
     var dh = new Date().toLocaleString("pt-BR");
-    var u = getUsuario();
+    var u = getUsuário();
     var p = [];
     p.push("<!DOCTYPE html><html><head><meta charset=\"UTF-8\">");
     p.push("<title>" + secao.titulo + " - Caderninho</title>");
-    p.push("<style>@page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#14171f;margin:0;font-size:11px}");
+    p.push("<style>@page{size:A4 landscape;margin:12mm}*{box-sizing:border-box}html{background:#fff}body{font-family:Arial,sans-serif;color:#14171f;background:#fff;margin:0;font-size:11px;color-scheme:light}");
     p.push(".pdf-header{display:flex;align-items:center;gap:14px;border-bottom:3px solid #0f2a4a;padding-bottom:12px;margin-bottom:16px}");
     p.push(".pdf-logo{width:46px;height:46px;background:#2563eb;color:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px}");
     p.push(".pdf-title-block h1{margin:0;font-size:18px;color:#0f2a4a}.pdf-title-block p{margin:2px 0 0;font-size:11px;color:#64748b}");
@@ -10350,7 +11128,7 @@ function renderHistorico(data) {
     p.push("<div class=\"pdf-title-block\"><h1>Caderninho de Motorista</h1><p>Gestao Integrada de Frotas e Operacoes</p></div>");
     p.push("<div class=\"pdf-meta\">");
     p.push("<div><strong>Gerado em:</strong> " + dh + "</div>");
-    p.push("<div><strong>Usuario:</strong> " + u + "</div>");
+    p.push("<div><strong>Usuário:</strong> " + u + "</div>");
     if (secao.mes) p.push("<div><strong>Mes de Referencia:</strong> " + secao.mes + "</div>");
     p.push("</div></div>");
     p.push("<h2 class=\"pdf-section\">" + secao.titulo + "</h2>");
@@ -10364,52 +11142,19 @@ function renderHistorico(data) {
       if (typeof mostrarToast === 'function') mostrarToast('Nenhuma tela ativa.', 'warning', 'Aviso');
       return;
     }
-    // FASE_7_PDF_METAS_GRAFICOS - aguarda tabelas carregarem
-    var precisaEsperar = false;
-    var seletorSkeleton = '.ds-skeleton-row, .ds-no-results';
-    if (s.elemento.querySelector(seletorSkeleton)) precisaEsperar = true;
-    // Se tem tbody vazio em tabela visivel, tambem espera
-    s.elemento.querySelectorAll('table.data-table tbody').forEach(function(tb) {
-      if (tb.children.length === 0 && tb.closest('.tab-content.active')) precisaEsperar = true;
-    });
-    if (precisaEsperar) {
-      if (typeof mostrarToast === 'function') mostrarToast('Aguardando dados...', 'info', 'PDF');
-      await new Promise(function(r) { setTimeout(r, 800); });
+    if (typeof html2pdf === 'undefined') {
+      if (typeof mostrarToast === 'function') mostrarToast('Biblioteca PDF nao carregada.', 'error', 'PDF');
+      return;
     }
-    // Clona a secao
+    if (typeof mostrarToast === 'function') mostrarToast('Gerando PDF...', 'info', 'PDF');
     var clone = s.elemento.cloneNode(true);
-    // Converte inputs em texto (preserva dados)
-    clone.querySelectorAll('input').forEach(function(inp) {
-      var tipo = (inp.getAttribute('type') || 'text').toLowerCase();
-      if (tipo === 'checkbox') {
-        var sp = document.createElement('span');
-        sp.textContent = inp.checked ? 'Sim' : 'Nao';
-        inp.parentNode.replaceChild(sp, inp);
-        return;
-      }
-      var valor = inp.value || inp.getAttribute('value') || '';
-      var span = document.createElement('span');
-      span.textContent = String(valor);
-      inp.parentNode.replaceChild(span, inp);
-    });
-    // Converte selects em texto
-    clone.querySelectorAll('select').forEach(function(sel) {
-      var opt = sel.options[sel.selectedIndex];
-      var txt = opt ? opt.textContent : '';
-      var sp = document.createElement('span');
-      sp.textContent = String(txt);
-      sel.parentNode.replaceChild(sp, sel);
-    });
-    // Remove elementos que nao fazem sentido
     var remover = ['.no-print', '.btn-action', '.action-btn', '.bar-controls', '.hist-toolbar', '.hist-paginacao', '.historico-filtros', '.section-title-wrap', 'button', 'textarea', '.ds-pdf-fab', 'nav', 'header', '.subtab-btn', '.ds-sort-icon', '.ds-skeleton-row', '.ds-no-results'];
     remover.forEach(function(sel) {
       try { clone.querySelectorAll(sel).forEach(function(el) { el.remove(); }); } catch (e) {}
     });
-    // Remove linhas escondidas
     clone.querySelectorAll('tbody tr').forEach(function(tr) {
       if (tr.style.display === 'none') tr.remove();
     });
-    // Remove coluna de Acoes
     clone.querySelectorAll('table').forEach(function(tbl) {
       var idx = -1;
       tbl.querySelectorAll('thead th').forEach(function(th, i) {
@@ -10421,53 +11166,62 @@ function renderHistorico(data) {
         });
       }
     });
-    // FASE_7_META_CARDS_FIX: ajusta SVGs
-    clone.querySelectorAll('svg').forEach(function(svg) {
-      var vb = svg.getAttribute('viewBox') || '';
-      // SVG de donut (meta-circle) tem viewBox '0 0 80 80'
-      if (vb === '0 0 80 80') {
-        // Mantém tamanho fixo pequeno
-        svg.setAttribute('width', '52');
-        svg.setAttribute('height', '52');
-        svg.style.width = '52px';
-        svg.style.height = '52px';
-        svg.style.maxWidth = '52px';
-        svg.style.flexShrink = '0';
-        // Corrige fill/stroke dos circulos
-        svg.querySelectorAll('circle').forEach(function(c) {
-          var cls = (c.getAttribute('class') || '');
-          if (cls.indexOf('bg') !== -1) {
-            c.setAttribute('fill', '#e2e8f0');
-            c.setAttribute('stroke', 'none');
-          } else if (cls.indexOf('fg') !== -1) {
-            c.setAttribute('fill', 'none');
-            c.setAttribute('stroke-width', '6');
-            c.setAttribute('stroke-linecap', 'round');
-          }
-        });
-        return;
-      }
-      // Outros SVGs (graficos): responsivos
-      svg.removeAttribute('width');
-      svg.removeAttribute('height');
-      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-      svg.style.maxWidth = '100%';
-      svg.style.height = 'auto';
-      svg.style.display = 'block';
+
+    // FASE_38_TIMELINE_INLINE: forca estilos inline em cada elemento da Timeline
+    clone.querySelectorAll('.timeline-item').forEach(function(el) {
+      el.style.background = '#f8fafc';
+      el.style.color = '#14171f';
+      el.style.border = '1px solid #cbd5e1';
+      el.style.pageBreakInside = 'avoid';
+      el.style.marginBottom = '6px';
+      el.style.padding = '8px 10px';
     });
-    var conteudo = clone.innerHTML || '';
-    var textoPlano = (clone.textContent || '').trim();
-    if (textoPlano.length < 20) {
-      if (typeof mostrarToast === 'function') mostrarToast('Esta tela nao tem conteudo para imprimir.', 'warning', 'Aviso');
-      conteudo = '<p style="color:#64748b;font-style:italic;padding:20px;text-align:center">Nenhum conteudo nesta tela.</p>';
-    }
-    var h = gerarHTML(s, conteudo);
-    var w = window.open('', '_blank');
-    w.document.write(h);
-    w.document.close();
-    w.focus();
-    setTimeout(function() { w.print(); }, 600);
-    if (typeof mostrarToast === 'function') mostrarToast('PDF gerado.', 'success', 'Exportacao');
+    clone.querySelectorAll('.timeline-dia').forEach(function(el) {
+      el.style.background = '#e2e8f0';
+      el.style.color = '#0f2a4a';
+      el.style.fontWeight = '700';
+      el.style.padding = '6px 10px';
+      el.style.margin = '10px 0 6px';
+      el.style.pageBreakAfter = 'avoid';
+    });
+    clone.querySelectorAll('.timeline-hora').forEach(function(el) { el.style.color = '#475569'; });
+    clone.querySelectorAll('.timeline-acao').forEach(function(el) { el.style.color = '#0f2a4a'; el.style.fontWeight = '700'; });
+    clone.querySelectorAll('.timeline-meta').forEach(function(el) { el.style.color = '#475569'; });
+    clone.querySelectorAll('.timeline-detalhe').forEach(function(el) { el.style.color = '#334155'; el.style.borderTop = '1px dashed #cbd5e1'; });
+    clone.querySelectorAll('.timeline-badge').forEach(function(el) { el.style.background = '#e2e8f0'; el.style.color = '#334155'; el.style.border = '1px solid #cbd5e1'; });
+    clone.querySelectorAll('.timeline-resumo-item').forEach(function(el) { el.style.background = '#f1f5f9'; el.style.color = '#0f2a4a'; el.style.border = '1px solid #cbd5e1'; el.style.padding = '4px 8px'; el.style.margin = '2px'; el.style.display = 'inline-block'; });
+    clone.querySelectorAll('.timeline-resumo-dot').forEach(function(el) { el.style.display = 'inline-block'; el.style.width = '8px'; el.style.height = '8px'; el.style.borderRadius = '50%'; el.style.marginRight = '4px'; });
+    // Forca fundo branco no container da timeline
+    clone.querySelectorAll('.timeline, .timeline-resumo').forEach(function(el) { el.style.background = '#ffffff'; });
+
+    var opt = {
+      margin: [10, 10, 10, 10],
+      filename: 'caderninho_' + new Date().toISOString().substring(0,10) + '.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    };
+    html2pdf().set(opt).from(clone).save().then(function() {
+      // FASE_42_PDF_ESPACO_TIMELINE: limpa objetos temporarios
+      try {
+        if (clone && clone.parentNode) clone.parentNode.removeChild(clone);
+        if (typeof URL !== 'undefined' && URL.revokeObjectURL) {
+          if (window.__pdfBlobUrl) { URL.revokeObjectURL(window.__pdfBlobUrl); window.__pdfBlobUrl = null; }
+        }
+        // FASE_42: limpa todos os blobs pendentes
+        if (window.__pdfBlobs && window.__pdfBlobs.length) {
+          window.__pdfBlobs.forEach(function(b) { try { URL.revokeObjectURL(b); } catch (e) {} });
+          window.__pdfBlobs = [];
+        }
+      } catch (e) {}
+      if (typeof mostrarToast === 'function') mostrarToast('PDF gerado.', 'success', 'Exportacao');
+    }).catch(function(e) {
+      try {
+        if (clone && clone.parentNode) clone.parentNode.removeChild(clone);
+      } catch (e2) {}
+      console.error('[PDF] Erro:', e);
+      if (typeof mostrarToast === 'function') mostrarToast('Erro ao gerar PDF: ' + e.message, 'error', 'PDF');
+    });
   }
 
   // --------------------- BOTAO ARRASTAVEL ---------------------
@@ -11880,7 +12634,7 @@ function renderHistorico(data) {
 
   function gerarHTMLRelatorio(titulo, subtitulo, conteudoHTML, cfg) {
     var dh = new Date().toLocaleString("pt-BR");
-    var u = (typeof getUsuario === "function") ? getUsuario() : "Sistema";
+    var u = (typeof getUsuário === "function") ? getUsuário() : "Sistema";
     var meta = montarCabecalhoEmpresa(cfg || {});
     var p = [];
     p.push('<!DOCTYPE html><html><head><meta charset="UTF-8">');
@@ -12111,11 +12865,13 @@ function renderHistorico(data) {
         if (typeof mostrarToast === 'function') mostrarToast('Tipo de relatório desconhecido.', 'error', 'Erro');
         return;
       }
-      var w = window.open('', '_blank');
-      w.document.write(html);
-      w.document.close();
-      w.focus();
-      setTimeout(function() { w.print(); }, 500);
+      html2pdf().set({
+        margin: [10, 10, 10, 10],
+        filename: 'caderninho_' + new Date().toISOString().substring(0,10) + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      }).from(html).save();
       if (typeof mostrarToast === 'function') mostrarToast('Relatório gerado!', 'success', 'PDF');
     } catch (err) {
       console.error('Erro ao gerar relatorio:', err);
@@ -12752,10 +13508,15 @@ function renderHistorico(data) {
 
         var original = txt ? txt.textContent : "";
 
+        // FASE_14_FIX_DUPLO_CLIQUE - NAO bloqueia o onclick, apenas adiciona efeito visual
         btn.addEventListener("click", function() {
-          if (btn.disabled) return;
-          btn.classList.add("loading");
-          if (txt) txt.textContent = "Entrando...";
+          // Apenas adiciona o efeito visual. Nao bloqueia o clique.
+          setTimeout(function() {
+            if (document.activeElement === btn || btn.classList.contains("loading")) {
+              btn.classList.add("loading");
+              if (txt) txt.textContent = "Entrando...";
+            }
+          }, 0);
         });
 
         setInterval(function() {
@@ -12795,11 +13556,11 @@ function renderHistorico(data) {
   <!-- FASE_15_AUDITORIA_UI_MODAL -->
   <div id="modal-auditoria-diff" class="aud-modal-diff">
     <div class="aud-modal-diff-conteudo">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <h2 style="margin:0;color:#0f2a4a;font-size:1.2rem;">Detalhes da Alteracao</h2>
-        <button onclick="fecharModalDiffAuditoria()" style="background:none;border:0;font-size:1.5rem;cursor:pointer;color:#64748b;">&times;</button>
+      <div class="aud-modal-header">
+        <h2 class="aud-modal-titulo">&#128269; Detalhes da Alteração</h2>
+        <button class="aud-modal-fechar" onclick="fecharModalDiffAuditoria()">&times;</button>
       </div>
-      <div id="aud-diff-meta" style="font-size:0.85rem;color:#64748b;margin-bottom:12px;"></div>
+      <div id="aud-diff-meta" class="aud-diff-meta"></div>
       <div class="aud-diff-grid">
         <div class="aud-diff-col antes"><div class="aud-diff-titulo antes">Antes</div><div id="aud-diff-antes">--</div></div>
         <div class="aud-diff-col depois"><div class="aud-diff-titulo depois">Depois</div><div id="aud-diff-depois">--</div></div>
@@ -12820,6 +13581,16 @@ function renderHistorico(data) {
         if (a === "EXCLUIR" || a === "DELETE") return "aud-badge-excluir";
         if (a === "LOGIN" || a === "LOGOUT") return "aud-badge-login";
         return "aud-badge-outro";
+      }
+
+      function emojiAção(acao) {
+        var a = (acao || "").toUpperCase();
+        if (a === "CRIAR" || a === "CREATE") return "\uD83D\uDFE2";
+        if (a === "EDITAR" || a === "UPDATE") return "\uD83D\uDD35";
+        if (a === "EXCLUIR" || a === "DELETE") return "\uD83D\uDD34";
+        if (a === "LOGIN") return "\uD83D\uDD11";
+        if (a === "LOGOUT") return "\uD83D\uDEAA";
+        return "";
       }
 
       function fmtData(d) {
@@ -12853,6 +13624,8 @@ function renderHistorico(data) {
         if (i && i.value) params.set("data_inicio", i.value);
         if (f && f.value) params.set("data_fim", f.value);
         if (b && b.value) params.set("busca", b.value);
+        var u = document.getElementById("aud-filtro-usuario");
+        if (u && u.value) params.set("usuario_email", u.value);
 
         try {
           var res = await apiFetch("/auditoria?" + params.toString());
@@ -12876,6 +13649,28 @@ function renderHistorico(data) {
             d.acoes.forEach(function(x) { var o = document.createElement("option"); o.value = x; o.textContent = x; selA.appendChild(o); });
           }
 
+          // FASE_20_FILTRO_USUARIO - so emails unicos de usuarios cadastrados
+          var selU = document.getElementById("aud-filtro-usuario");
+          if (selU && selU.options.length <= 1) {
+            try {
+              var resU = await apiFetch("/usuarios");
+              if (resU && resU.ok) {
+                var dataU = await resU.json();
+                var usuarios = Array.isArray(dataU) ? dataU : (dataU.usuarios || dataU.itens || []);
+                var vistos = {};
+                usuarios.forEach(function(u) {
+                  var email = u.email || u.usuario_email;
+                  if (!email || vistos[email]) return;
+                  vistos[email] = true;
+                  var o = document.createElement("option");
+                  o.value = email;
+                  o.textContent = (u.nome ? u.nome + " <" + email + ">" : email);
+                  selU.appendChild(o);
+                });
+              }
+            } catch (eU) { console.warn("[AUD] Erro usuarios:", eU); }
+          }
+
           if (!d.itens || d.itens.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:#64748b;">Nenhum registro.</td></tr>';
           } else {
@@ -12885,7 +13680,7 @@ function renderHistorico(data) {
               return '<tr>' +
                 '<td style="font-size:0.78rem;">' + esc(fmtData(it.created_at)) + '</td>' +
                 '<td>' + esc(it.usuario_email || it.usuario_nome || "-") + '</td>' +
-                '<td><span class="aud-badge ' + badgeClasse(it.acao) + '">' + esc(it.acao || "-") + '</span></td>' +
+                '<td><span class="aud-badge ' + badgeClasse(it.acao) + '">' + emojiAção(it.acao) + ' ' + esc(it.acao || "-") + '</span></td>' +
                 '<td><code style="font-size:0.78rem;">' + esc(it.tabela || "-") + '</code></td>' +
                 '<td style="font-size:0.78rem;color:#475569;">' + esc((it.detalhes || "").substring(0, 100)) + '</td>' +
                 '<td class="col-center" style="font-size:0.72rem;font-family:monospace;">' + esc(it.ip || "-") + '</td>' +
@@ -12920,18 +13715,83 @@ function renderHistorico(data) {
         window.loadAuditoria(1);
       };
 
-      window.verDiffAuditoria = function(id) {
+      window.verDiffAuditoria = function(id) { /* FASE_19_DIFF_HUMANO */
         var d = window.__auditoriaDados;
         if (!d) return;
         var item = (d.itens || []).find(function(x) { return x.id === id; });
         if (!item) return;
         var modal = document.getElementById("modal-auditoria-diff");
         var meta = document.getElementById("aud-diff-meta");
-        var antes = document.getElementById("aud-diff-antes");
-        var depois = document.getElementById("aud-diff-depois");
-        if (meta) meta.innerHTML = '<strong>Tabela:</strong> ' + esc(item.tabela) + ' | <strong>Acao:</strong> ' + esc(item.acao) + ' | <strong>Data:</strong> ' + esc(fmtData(item.created_at)) + ' | <strong>Usuario:</strong> ' + esc(item.usuario_email || item.usuario_nome);
-        if (antes) antes.textContent = item.valor_anterior ? JSON.stringify(item.valor_anterior, null, 2) : "(sem valor anterior)";
-        if (depois) depois.textContent = item.valor_novo ? JSON.stringify(item.valor_novo, null, 2) : "(sem valor novo)";
+        var antesEl = document.getElementById("aud-diff-antes");
+        var depoisEl = document.getElementById("aud-diff-depois");
+
+        if (meta) {
+          var usuarioFinal = item.usuario_email || item.usuario_nome || 'Sistema';
+          meta.innerHTML =
+            '<div class="aud-diff-meta-item"><span class="icone">📋</span><strong>Tabela:</strong> <span>' + esc(item.tabela || '-') + '</span></div>' +
+            '<div class="aud-diff-meta-item"><span class="icone">⚡</span><strong>Ação:</strong> <span>' + esc(item.acao || '-') + '</span></div>' +
+            '<div class="aud-diff-meta-item"><span class="icone">🕐</span><strong>Data:</strong> <span>' + esc(fmtData(item.created_at)) + '</span></div>' +
+            '<div class="aud-diff-meta-item"><span class="icone">👤</span><strong>Usuário:</strong> <span>' + esc(usuarioFinal) + '</span></div>';
+        }
+
+        var a = item.valor_anterior || {};
+        var b = item.valor_novo || {};
+        var todos = {};
+        Object.keys(a).forEach(function(k) { todos[k] = true; });
+        Object.keys(b).forEach(function(k) { todos[k] = true; });
+
+        var ignorar = { id: 1, created_at: 1, updated_at: 1, created_by: 1, updated_by: 1 };
+        var mudancas = [];
+
+        Object.keys(todos).forEach(function(campo) {
+          if (ignorar[campo]) return;
+          var va = a[campo];
+          var vb = b[campo];
+          // FASE_50_DIFF_PREMIUM: normaliza null/undefined/"" como equivalentes
+          var vaNorm = (va === null || va === undefined || va === "") ? "" : va;
+          var vbNorm = (vb === null || vb === undefined || vb === "") ? "" : vb;
+          if (JSON.stringify(vaNorm) !== JSON.stringify(vbNorm)) {
+            mudancas.push({ campo: campo, antes: va, depois: vb });
+          }
+        });
+
+        function humanizar(campo) {
+          return campo.replace(/_/g, ' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+        }
+        function formatar(v) {
+          if (v === null || v === undefined || v === "") return "(vazio)";
+          if (typeof v === "boolean") return v ? "Sim" : "Não";
+          if (typeof v === "object") return JSON.stringify(v);
+          var s = String(v);
+          if (/^\d{4}-\d{2}-\d{2}T/.test(s)) {
+            try { return new Date(s).toLocaleString("pt-BR"); } catch(e) { return s; }
+          }
+          return s;
+        }
+
+        if (mudancas.length === 0) {
+          var vazio = '<div class="aud-diff-vazio">Nenhum campo foi alterado.</div>';
+          if (antesEl) antesEl.innerHTML = vazio;
+          if (depoisEl) depoisEl.innerHTML = vazio;
+        } else {
+          // FASE_50_DIFF_PREMIUM: card ANTES so com valores antigos
+          var htmlAntes = mudancas.map(function(m) {
+            return '<div class="aud-diff-item">' +
+              '<div class="aud-diff-campo">' + esc(humanizar(m.campo)) + '</div>' +
+              '<div class="aud-diff-valor antes">' + esc(formatar(m.antes)) + '</div>' +
+            '</div>';
+          }).join("");
+          // FASE_50_DIFF_PREMIUM: card DEPOIS so com valores novos
+          var htmlDepois = mudancas.map(function(m) {
+            return '<div class="aud-diff-item">' +
+              '<div class="aud-diff-campo">' + esc(humanizar(m.campo)) + '</div>' +
+              '<div class="aud-diff-valor depois">' + esc(formatar(m.depois)) + '</div>' +
+            '</div>';
+          }).join("");
+          if (antesEl) antesEl.innerHTML = htmlAntes;
+          if (depoisEl) depoisEl.innerHTML = htmlDepois;
+        }
+
         if (modal) modal.classList.add("aberto");
       };
 
@@ -12943,7 +13803,7 @@ function renderHistorico(data) {
       window.exportarAuditoriaCSV = function() {
         var d = window.__auditoriaDados;
         if (!d || !d.itens) return;
-        var linhas = [["Data","Usuario","Acao","Tabela","Detalhes","IP"]];
+        var linhas = [["Data","Usuário","Ação","Tabela","Detalhes","IP"]];
         d.itens.forEach(function(it) {
           linhas.push([fmtData(it.created_at), it.usuario_email || it.usuario_nome || "", it.acao || "", it.tabela || "", (it.detalhes || "").replace(/[\r\n;]/g, " "), it.ip || ""]);
         });
@@ -12964,6 +13824,268 @@ function renderHistorico(data) {
           else alert("Erro: " + (d.erro || "desconhecido"));
         } catch (e) { alert("Erro: " + e.message); }
       };
+
+      // ============================================================
+      // FASE_15_AUDITORIA_UPGRADE - funcoes extras
+      // ============================================================
+      window.audPeriodoRapido = function(tipo, el) {
+        var hoje = new Date();
+        var ini = document.getElementById("aud-filtro-inicio");
+        var fim = document.getElementById("aud-filtro-fim");
+        if (!ini || !fim) return;
+        document.querySelectorAll("#tab-auditoria .hist-chip-atalho").forEach(function(c) { c.classList.remove("ativo"); });
+        if (el) el.classList.add("ativo");
+        if (tipo === "hoje") {
+          ini.value = hoje.toISOString().substring(0,10);
+          fim.value = hoje.toISOString().substring(0,10);
+        } else if (tipo === "7d") {
+          var d = new Date(); d.setDate(d.getDate() - 7);
+          ini.value = d.toISOString().substring(0,10);
+          fim.value = hoje.toISOString().substring(0,10);
+        } else if (tipo === "30d") {
+          var d2 = new Date(); d2.setDate(d2.getDate() - 30);
+          ini.value = d2.toISOString().substring(0,10);
+          fim.value = hoje.toISOString().substring(0,10);
+        } else if (tipo === "mes") {
+          var d3 = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+          ini.value = d3.toISOString().substring(0,10);
+          fim.value = hoje.toISOString().substring(0,10);
+        } else {
+          ini.value = "";
+          fim.value = "";
+        }
+        window.loadAuditoria(1);
+      };
+
+      window.audAlternarVisualizacao = function(tipo) {
+        var tabela = document.getElementById("aud-visual-tabela");
+        var timeline = document.getElementById("aud-visual-timeline");
+        var historico = document.getElementById("aud-visual-historico");
+        var btnT = document.getElementById("aud-tab-tabela");
+        var btnL = document.getElementById("aud-tab-timeline");
+        var btnH = document.getElementById("aud-tab-historico");
+
+        // Esconde todos
+        if (tabela) tabela.style.display = "none";
+        if (timeline) timeline.style.display = "none";
+        if (historico) historico.style.display = "none";
+        if (btnT) btnT.classList.remove("ativo");
+        if (btnL) btnL.classList.remove("ativo");
+        if (btnH) btnH.classList.remove("ativo");
+
+        if (tipo === "timeline") {
+          if (timeline) timeline.style.display = "block";
+          if (btnL) btnL.classList.add("ativo");
+          window.audRenderTimeline();
+        } else if (tipo === "historico") {
+          if (historico) historico.style.display = "block";
+          if (btnH) btnH.classList.add("ativo");
+        } else {
+          if (tabela) tabela.style.display = "block";
+          if (btnT) btnT.classList.add("ativo");
+        }
+      };
+
+window.audAbrirHistoricoCompleto = function() { /* FASE_19_HIST */
+        // 1) Ativa a tab-historico (aciona o sistema de tabs)
+        document.querySelectorAll(".tab-content").forEach(function(el) { el.classList.remove("active"); });
+        var tab = document.getElementById("tab-historico");
+        if (tab) tab.classList.add("active");
+        document.querySelectorAll(".nav-tab-btn").forEach(function(b) { b.classList.remove("active"); });
+        var btnNav = document.getElementById("nav-tab-historico");
+        if (btnNav) btnNav.classList.add("active");
+
+        // 2) Carrega os dados
+        if (typeof loadHistoricoDaAPI === "function") {
+          loadHistoricoDaAPI(true);
+        } else if (typeof window.loadHistoricoDaAPI === "function") {
+          window.loadHistoricoDaAPI(true);
+        }
+
+        // 3) Rola pra cima
+        window.scrollTo(0, 0);
+      };
+
+      // FASE_18_CARDS_GRAFICOS
+      window.renderAuditoriaCards = function() {
+        var d = window.__auditoriaDados;
+        var container = document.getElementById("auditoria-cards");
+        if (!container) return;
+        var total = d && d.total ? d.total : 0;
+        var tabelas = (d && d.tabelas) ? d.tabelas.length : 0;
+        var acoes = (d && d.acoes) ? d.acoes.length : 0;
+
+        container.style.cssText = "display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px;";
+        container.innerHTML =
+          '<div class="aud-card-premium aud-card-total"><div class="aud-card-icon-svg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="aud-card-label">Total de Registros</div><div class="aud-card-valor">' + total + '</div><div class="aud-card-sub">Ações registradas</div></div>' +
+          '<div class="aud-card-premium aud-card-tabelas"><div class="aud-card-icon-svg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div><div class="aud-card-label">Tabelas Monitoradas</div><div class="aud-card-valor">' + tabelas + '</div><div class="aud-card-sub">Com triggers ativos</div></div>' +
+          '<div class="aud-card-premium aud-card-acoes"><div class="aud-card-icon-svg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="aud-card-label">Tipos de Ação</div><div class="aud-card-valor">' + acoes + '</div><div class="aud-card-sub">Criar, Editar, Excluir, Login</div></div>';
+
+        window.renderAuditoriaGraficos();
+      };
+
+      window.renderAuditoriaGraficos = function() {
+        var d = window.__auditoriaDados;
+        if (!d || !d.itens) return;
+        var container = document.getElementById("auditoria-graficos");
+        if (!container) {
+          container = document.createElement("div");
+          container.id = "auditoria-graficos";
+          container.className = "aud-graficos-grid";
+          var cards = document.getElementById("auditoria-cards");
+          if (cards && cards.parentNode) cards.parentNode.insertBefore(container, cards.nextSibling);
+        }
+        var porAção = {};
+        var porUsuário = {};
+        d.itens.forEach(function(it) {
+          var a = it.acao || "OUTRO";
+          porAção[a] = (porAção[a] || 0) + 1;
+          var u = it.usuario_email || it.usuario_nome || "Sistema";
+          porUsuário[u] = (porUsuário[u] || 0) + 1;
+        });
+        var coresAção = { "CRIAR": "#16a34a", "EDITAR": "#2563eb", "EXCLUIR": "#dc2626", "LOGIN": "#8b5cf6", "LOGOUT": "#f59e0b" };
+        function corDe(a) { return coresAção[a] || "#64748b"; }
+        var listaUsuários = Object.keys(porUsuário).map(function(u) { return { nome: u, qtd: porUsuário[u] }; }).sort(function(a,b){ return b.qtd - a.qtd; }).slice(0, 6);
+        var maxUsuário = listaUsuários.length > 0 ? listaUsuários[0].qtd : 1;
+        var totalGeral = 0;
+        Object.keys(porAção).forEach(function(a) { totalGeral += porAção[a]; });
+        var raio = 40, circ = 2 * Math.PI * raio, offset = 0;
+        var svg = '<svg class="aud-donut" width="110" height="110" viewBox="0 0 110 110">';
+        svg += '<circle cx="55" cy="55" r="' + raio + '" fill="none" stroke="#e2e8f0" stroke-width="16"/>';
+        Object.keys(porAção).forEach(function(a) {
+          var v = porAção[a];
+          var frac = totalGeral > 0 ? v / totalGeral : 0;
+          var dash = (frac * circ).toFixed(2) + " " + circ.toFixed(2);
+          var rot = -90 + (offset / circ * 360);
+          svg += '<circle cx="55" cy="55" r="' + raio + '" fill="none" stroke="' + corDe(a) + '" stroke-width="16" stroke-dasharray="' + dash + '" transform="rotate(' + rot + ' 55 55)"/>';
+          offset += frac * circ;
+        });
+        svg += '<text x="55" y="52" text-anchor="middle" font-size="16" font-weight="800" fill="#0f172a">' + totalGeral + '</text>';
+        svg += '<text x="55" y="66" text-anchor="middle" font-size="8" fill="#64748b">ações</text>';
+        svg += '</svg>';
+        var legenda = '<div class="aud-legenda">';
+        Object.keys(porAção).forEach(function(a) {
+          var v = porAção[a];
+          var pct = totalGeral > 0 ? Math.round(v / totalGeral * 100) : 0;
+          legenda += '<div class="aud-legenda-item"><span><span class="aud-legenda-cor" style="background:' + corDe(a) + '"></span>' + a + '</span><strong>' + v + ' <span style="color:#94a3b8;font-weight:400;">(' + pct + '%)</span></strong></div>';
+        });
+        legenda += '</div>';
+        var barras = '<div style="width:100%">';
+        listaUsuários.forEach(function(u) {
+          var pct = Math.round(u.qtd / maxUsuário * 100);
+          var nome = u.nome.length > 30 ? u.nome.substring(0, 28) + "..." : u.nome;
+          barras += '<div class="aud-bar-wrap"><div class="aud-bar-label"><span>' + esc(nome) + '</span><strong>' + u.qtd + '</strong></div><div class="aud-bar-track"><div class="aud-bar-fill" style="width:' + pct + '%"></div></div></div>';
+        });
+        barras += '</div>';
+        container.innerHTML = '<div class="aud-grafico-card"><h3 class="aud-grafico-titulo">📊 Distribuição por Ação</h3><div class="aud-grafico-body">' + svg + legenda + '</div></div><div class="aud-grafico-card"><h3 class="aud-grafico-titulo">👥 Top Usuários</h3>' + barras + '</div>';
+      };
+
+      (function() {
+        var _loadOrig = window.loadAuditoria;
+        if (typeof _loadOrig === "function" && !window.__audCardsHooked) {
+          window.loadAuditoria = async function(p) {
+            await _loadOrig.apply(this, arguments);
+            if (typeof window.renderAuditoriaCards === "function") window.renderAuditoriaCards();
+          };
+          window.__audCardsHooked = true;
+        }
+      })();
+
+      window.audRenderTimeline = function() {
+        var d = window.__auditoriaDados;
+        var el = document.getElementById("auditoria-timeline");
+        if (!el) return;
+        if (!d || !d.itens || d.itens.length === 0) {
+          el.innerHTML = '<div class="timeline-empty">Nenhum registro.</div>';
+          return;
+        }
+        // Agrupa por dia
+        var porDia = {};
+        d.itens.forEach(function(it) {
+          var dia = (it.created_at || "").substring(0, 10);
+          if (!porDia[dia]) porDia[dia] = [];
+          porDia[dia].push(it);
+        });
+        var html = "";
+        Object.keys(porDia).sort().reverse().forEach(function(dia) {
+          html += '<div class="timeline-dia">' + esc(new Date(dia + "T12:00:00").toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })) + '</div>';
+          porDia[dia].forEach(function(it) {
+            var hora = (it.created_at || "").substring(11, 16);
+            html += '<div class="timeline-item ' + badgeClasse(it.acao) + '">' +
+              '<div class="timeline-hora">' + esc(hora) + '</div>' +
+              '<div class="timeline-acao">' + emojiAção(it.acao) + ' ' + esc(it.acao || "-") + '</div>' +
+              '<div class="timeline-meta">' + esc(it.usuario_email || it.usuario_nome || "-") + ' &middot; ' + esc(it.tabela || "-") + '</div>' +
+              '<div class="timeline-detalhe">' + esc((it.detalhes || "").substring(0, 200)) + '</div>' +
+            '</div>';
+          });
+        });
+        el.innerHTML = html;
+      };
+
+      window.exportarAuditoriaXLS = function() {
+        if (!window.__auditoriaDados || !window.__auditoriaDados.itens || window.__auditoriaDados.itens.length === 0) {
+          alert("Nada para exportar."); return;
+        }
+        var itens = window.__auditoriaDados.itens;
+        var linhas = [["Data","Usuário","Ação","Tabela","Detalhes","IP"]];
+        itens.forEach(function(it) {
+          linhas.push([fmtData(it.created_at), it.usuario_email || it.usuario_nome || "", it.acao || "", it.tabela || "", (it.detalhes || "").replace(/[\r\n;]/g, " "), it.ip || ""]);
+        });
+        var xls = linhas.map(function(l) {
+          return l.map(function(c) {
+            var s = String(c == null ? "" : c);
+            if (s.indexOf(";") !== -1 || s.indexOf("\n") !== -1 || s.indexOf('"') !== -1) s = '"' + s.replace(/"/g, '""') + '"';
+            return s;
+          }).join(";");
+        }).join("\r\n");
+        var blob = new Blob(["\uFEFF" + xls], { type: "application/vnd.ms-excel;charset=utf-8;" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url; a.download = "auditoria_" + new Date().toISOString().substring(0,10) + ".xls";
+        document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+      };
+
+      window.exportarAuditoriaPDF = function() {
+        if (!window.__auditoriaDados || !window.__auditoriaDados.itens || window.__auditoriaDados.itens.length === 0) {
+          alert("Nada para imprimir."); return;
+        }
+        var secAud = document.getElementById("tab-auditoria");
+        if (secAud) secAud.classList.add("active");
+
+        // Cria cabecalho de impressao
+        var cab = document.getElementById("aud-print-header");
+        if (!cab) {
+          cab = document.createElement("div");
+          cab.id = "aud-print-header";
+          var tbl = document.getElementById("table-auditoria");
+          if (tbl && tbl.parentNode) tbl.parentNode.insertBefore(cab, tbl);
+        }
+        var agora = new Date().toLocaleString("pt-BR");
+        var filtrosInfo = [];
+        var vIni = document.getElementById("aud-filtro-inicio");
+        var vFim = document.getElementById("aud-filtro-fim");
+        var vUsu = document.getElementById("aud-filtro-usuario");
+        var vAção = document.getElementById("aud-filtro-acao");
+        var vTab = document.getElementById("aud-filtro-tabela");
+        if (vIni && vIni.value) filtrosInfo.push("De: " + vIni.value);
+        if (vFim && vFim.value) filtrosInfo.push("Ate: " + vFim.value);
+        if (vUsu && vUsu.value) filtrosInfo.push("Usuário: " + vUsu.value);
+        if (vAção && vAção.value) filtrosInfo.push("Ação: " + vAção.value);
+        if (vTab && vTab.value) filtrosInfo.push("Tabela: " + vTab.value);
+        var linhaFiltros = filtrosInfo.length ? "<br><span style=\"font-size:9pt;color:#475569;\">" + filtrosInfo.join(" &middot; ") + "</span>" : "";
+        cab.innerHTML = '<h2>Caderninho de Frota &mdash; Auditoria do Sistema</h2>' +
+          '<p>Gerado em ' + agora + ' &middot; Total de ' + window.__auditoriaDados.itens.length + ' registro(s)' + linhaFiltros + '</p>';
+
+        document.body.classList.add("print-auditoria");
+        window.addEventListener("afterprint", function _rm() {
+          document.body.classList.remove("print-auditoria");
+          window.removeEventListener("afterprint", _rm);
+        });
+        setTimeout(function() { window.print(); }, 200);
+      };
+
+      // Popula os selects de tabela/acao no load inicial (apos o loadAuditoria)
+
     })();
   </script>
   <!-- /FASE_15_AUDITORIA_UI_SCRIPT -->

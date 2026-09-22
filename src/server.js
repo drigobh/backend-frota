@@ -1,4 +1,4 @@
-﻿// =========================================================================
+// =========================================================================
 // CADERNINHO DE MOTORISTA - SERVIDOR PRINCIPAL
 // Stack: Fastify + PostgreSQL (Neon) + Render
 // =========================================================================
@@ -201,11 +201,28 @@ const { runAsUser: _runAsUser } = require('./database');
 fastify.decorate('comAuditoria', function(handler) {
   return function(request, reply) {
     if (request.user && request.user.email) {
-      return _runAsUser(request.user, () => handler(request, reply));
+      // FASE_48_AUDITORIA_IP_FIX: garante que o IP seja sempre definido
+      var ipFinal = request.ip || request.raw?.socket?.remoteAddress || request.headers['x-forwarded-for'] || '127.0.0.1';
+      if (ipFinal && ipFinal.indexOf(',') >= 0) ipFinal = ipFinal.split(',')[0].trim();
+      var userComIp = Object.assign({}, request.user, { ip: ipFinal });
+      return _runAsUser(userComIp, () => handler(request, reply));
     }
     return handler(request, reply);
   };
 });
+
+// FASE_45_AUDITORIA_GLOBAL: aplica comAuditoria em TODAS as rotas /api/*
+fastify.addHook('onRoute', (routeOptions) => {
+  if (routeOptions.url && routeOptions.url.startsWith('/api/') && routeOptions.handler) {
+    if (!routeOptions.handler.__comAuditoria) {
+      var original = routeOptions.handler;
+      var envolvido = fastify.comAuditoria(original);
+      envolvido.__comAuditoria = true;
+      routeOptions.handler = envolvido;
+    }
+  }
+});
+
 
 // =========================================================================
 // ARQUIVOS ESTÃTICOS (Frontend)
@@ -549,9 +566,12 @@ async function registrarAuditoria(request, reply, payload) {
     }
 
     var db = require('./database');
+    // FASE_49_AUDITORIA_IP_REGISTRAR: inclui IP no INSERT
+    var ipFinal = request.ip || (request.raw && request.raw.socket && request.raw.socket.remoteAddress) || (request.headers && request.headers['x-forwarded-for']) || '127.0.0.1';
+    if (ipFinal && ipFinal.indexOf(',') >= 0) ipFinal = ipFinal.split(',')[0].trim();
     await db.query(
-      'INSERT INTO auditoria (usuario_nome, usuario, usuario_email, acao, entidade, modulo, tabela, detalhes, descricao) VALUES ($1, $1, $2, $3, $4, $4, $4, $5, $5)',
-      [usuario_nome, usuario_email, acao, modulo, detalhes]
+      'INSERT INTO auditoria (usuario_nome, usuario, usuario_email, acao, entidade, modulo, tabela, detalhes, descricao, ip) VALUES ($1, $1, $2, $3, $4, $4, $4, $5, $5, $6)',
+      [usuario_nome, usuario_email, acao, modulo, detalhes, ipFinal]
     );
   } catch (err) {
     console.error('[AUDITORIA] Erro ao registrar:', err.message);
@@ -837,7 +857,11 @@ async function fazerBackupSeNecessario() {
   }
 }
 
-await fazerBackupSeNecessario();
+// FASE_16_BOOT_NONBLOCK - nao bloqueia o boot esperando o backup
+  // Roda em background. Se o Neon estiver lento, o servidor sobe mesmo assim.
+  fazerBackupSeNecessario().catch(function (e) {
+    console.error('[BACKUP] Erro em background (nao fatal):', e && e.message);
+  });
 
 console.log('[BOOT] Chamando fastify.listen...');
     await fastify.listen({ port: Number(PORT), host: HOST });
