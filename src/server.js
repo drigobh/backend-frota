@@ -328,24 +328,34 @@ fastify.put("/api/configuracoes", { preHandler: [fastify.autenticar] }, fastify.
 
 // ROTA PRINCIPAL - Serve o index.html
 // =========================================================================
-fastify.get('/', (req, reply) => {
-    // FASE_4_NO_CACHE_HTML - X-HTML-No-Cache
-    reply.header('Cache-Control', 'no-cache, no-store, must-revalidate'); // FASE_14_NO_CACHE_HTML
+// FASE_65_VERSAO_SERVIDOR: injeta a versao do banco no HTML antes de servir
+fastify.get('/', async (req, reply) => {
     reply.header('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
     reply.header('Pragma', 'no-cache');
     reply.header('Expires', '0');
 
-  const filePath = path.join(__dirname, '../public/Cad Moto.html');
-  if (fs.existsSync(filePath)) {
-    return reply.type('text/html; charset=utf-8').header('Content-Type', 'text/html; charset=utf-8').send(fs.readFileSync(filePath));
-  }
+    var html = '';
+    const filePath = path.join(__dirname, '../public/Cad Moto.html');
+    const indexPath = path.join(__dirname, '../public/index.html');
+    if (fs.existsSync(filePath)) {
+      html = fs.readFileSync(filePath, 'utf8');
+    } else if (fs.existsSync(indexPath)) {
+      html = fs.readFileSync(indexPath, 'utf8');
+    } else {
+      return reply.status(404).send({ erro: 'Arquivo HTML principal nao encontrado.' });
+    }
 
-  const indexPath = path.join(__dirname, '../public/index.html');
-  if (fs.existsSync(indexPath)) {
-    return reply.type('text/html; charset=utf-8').header('Content-Type', 'text/html; charset=utf-8').send(fs.readFileSync(indexPath));
-  }
+    // Buscar a versao do banco
+    try {
+      const { rows } = await db.query("SELECT valor FROM configuracoes WHERE chave = 'versao_sistema' LIMIT 1");
+      const versao = rows.length > 0 ? rows[0].valor : 'v1977-?';
+      html = html.replace(/\{\{VERSAO_SISTEMA\}\}/g, versao);
+    } catch (e) {
+      console.error('[FASE_65] Erro ao buscar versao:', e.message);
+      html = html.replace(/\{\{VERSAO_SISTEMA\}\}/g, 'v1977-?');
+    }
 
-  reply.status(404).send({ erro: 'Arquivo HTML principal não encontrado.' });
+    return reply.type('text/html; charset=utf-8').send(html);
 });
 
 // =========================================================================
