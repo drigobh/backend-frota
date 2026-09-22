@@ -230,28 +230,9 @@ fastify.addHook('onRoute', (routeOptions) => {
 fastify.register(require('@fastify/static'), {
   root: path.join(__dirname, '../public'),
   prefix: '/',
-  // NAO serve index.html pelo static — deixar a rota / cuidar disso
-  index: false,
-  setHeaders: function (res, filepath) {
-    // FASE_60_STATIC_CONTENT_TYPE: usa setHeader (API correta do Node)
-    if (filepath.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-    }
-
-    var ext = filepath.substring(filepath.lastIndexOf('.'));
-    var tipos = {
-      '.json': 'application/json; charset=utf-8',
-      '.js':   'application/javascript; charset=utf-8',
-      '.css':  'text/css; charset=utf-8',
-      '.svg':  'image/svg+xml; charset=utf-8',
-      '.min.js': 'application/javascript; charset=utf-8'
-    };
-    if (tipos[ext]) {
-      res.setHeader('Content-Type', tipos[ext]);
-    }
-  }
+  index: false
+  // FASE_63_STATIC_FIX_CRASH: removido setHeaders (causava crash no @fastify/static)
+  // O Fastify define Content-Type automaticamente
 });
 
 // =========================================================================
