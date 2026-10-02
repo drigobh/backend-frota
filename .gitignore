@@ -23,3 +23,28 @@ log-servidor.txt
 
 # Testes temporarios
 _teste_*.js
+
+# ==========================================================================
+# FASE_FIX_FAXINA — Adicionado em 02/10/2026
+# ==========================================================================
+# Scripts temporarios de correcao (rodam 1x e sao descartados)
+scripts/
+
+# Backups com sufixo .bak2
+*.bak2
+
+# Backups antigos do server.js
+*.PRE_FIX*
+
+# Backups e corrompidos de HTML/JS/CSS na pasta public/
+public/*_BACKUP_*.html
+public/*_BACKUP_*.js
+public/*_BACKUP_*.css
+public/*_CORROMPIDO_*.html
+public/*_CORROMPIDO_*.js
+public/*_CORROMPIDO_*.css
+
+# Lixo de sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini

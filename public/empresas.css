@@ -1,7 +1,7 @@
-﻿* { box-sizing: border-box; margin: 0; padding: 0; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 body { font-family: 'Inter', system-ui, sans-serif; background: #0a0e1a; color: #e2e8f0; min-height: 100vh; }
-html[data-theme="light"] body { background: #f1f5f9; color: #0f2a4a; }
+/* Tema claro movido para o final do arquivo */
 
 .emp-container { padding: 16px 20px; max-width: 1300px; margin: 0 auto; }
 
@@ -84,3 +84,44 @@ html[data-theme="light"] .emp-field input,
 html[data-theme="light"] .emp-field select { background: #fff; border-color: #cbd5e1; color: #0f2a4a; }
 html[data-theme="light"] .emp-modal-footer { background: #f8fafc; border-color: #e2e8f0; }
 html[data-theme="light"] .btn-secondary { background: #f1f5f9; color: #0f2a4a; border-color: #cbd5e1; }
+
+/* ============================================================
+   FASE_20_FIX_TEMA_CLARO — Aplicado APÓS o body (ganha na ordem)
+   ============================================================ */
+html[data-theme="light"] body {
+  background: #f1f5f9 !important;
+  color: #0f2a4a !important;
+}
+html[data-theme="light"] .emp-title h1,
+html[data-theme="light"] .kpi-value,
+html[data-theme="light"] .emp-card-title,
+html[data-theme="light"] .emp-section-header h2 { color: #0f2a4a !important; }
+html[data-theme="light"] .kpi-card,
+html[data-theme="light"] .emp-card { background: #ffffff !important; border-color: rgba(148,163,184,0.3) !important; }
+html[data-theme="light"] .kpi-label,
+html[data-theme="light"] .emp-card-sub,
+html[data-theme="light"] .emp-card-info strong { color: #64748b !important; }
+html[data-theme="light"] .emp-card-info { color: #475569 !important; }
+html[data-theme="light"] .emp-modal-card { background: #ffffff !important; }
+html[data-theme="light"] .emp-modal-body { background: #ffffff !important; }
+html[data-theme="light"] .emp-field label { color: #64748b !important; }
+html[data-theme="light"] .emp-field input,
+html[data-theme="light"] .emp-field select { background: #ffffff !important; border-color: #cbd5e1 !important; color: #0f2a4a !important; }
+html[data-theme="light"] .emp-modal-footer { background: #f8fafc !important; border-color: #e2e8f0 !important; }
+html[data-theme="light"] .btn-secondary { background: #f1f5f9 !important; color: #0f2a4a !important; border-color: #cbd5e1 !important; }
+
+/* ============================================================
+   FASE_20_FIX_CARDS_COMPACTOS — Cards menores, mais por linha
+   ============================================================ */
+.emp-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)) !important; gap: 0.4rem !important; }
+.emp-card { padding: 0.45rem 0.6rem !important; }
+.emp-card-title { font-size: 0.78rem !important; margin-bottom: 0.05rem !important; }
+.emp-card-sub { font-size: 0.62rem !important; margin-bottom: 0.25rem !important; }
+.emp-card-info { gap: 0.1rem !important; margin-bottom: 0.25rem !important; font-size: 0.65rem !important; }
+.emp-card-actions { padding-top: 0.3rem !important; gap: 0.25rem !important; }
+.emp-card-actions button { padding: 0.22rem 0.45rem !important; font-size: 0.6rem !important; }
+
+/* Em telas grandes, 4 cards por linha */
+@media (min-width: 1100px) {
+  .emp-grid { grid-template-columns: repeat(4, 1fr) !important; }
+}

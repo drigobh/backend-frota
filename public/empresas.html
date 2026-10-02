@@ -1,10 +1,22 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Empresas e Filiais</title>
+<script>
+  // FASE_20_FIX_TEMA: aplica ANTES do CSS carregar
+  (function() {
+    try {
+      var t = localStorage.getItem('theme') || ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
 <link rel="stylesheet" href="/empresas.css">
+
 </head>
 <body>
 
@@ -20,7 +32,7 @@
     <div class="emp-actions">
       <button class="btn-primary" onclick="abrirModalEmpresa()">+ Nova Empresa</button>
       <button class="btn-secondary" onclick="abrirModalFilial()">+ Nova Filial</button>
-        <button id="emp-btn-xml" class="btn-secondary" onclick="exportarEmpresasXML()" style="background:#059669;color:#fff;border-color:#059669;">&#128190; Exportar XML</button>
+        <button id="emp-btn-xml" class="btn-secondary" onclick="exportarEmpresasXLS()" style="background:#059669;color:#fff;border-color:#059669;">&#128202; Exportar XLS</button>
     </div>
   </div>
 
@@ -67,7 +79,7 @@
   </div>
 </div>
 
-<button id="emp-pdf-btn" class="emp-pdf-fab" title="Exportar PDF" onclick="exportarEmpresasPDF()">&#128196;</button>
+<!-- Botao PDF flutuante removido (nao deve aparecer nesta tela) -->
 
 <!-- MODAL Empresa -->
 <div class="emp-modal-overlay" id="emp-modal-empresa">
@@ -131,7 +143,7 @@
   </div>
 </div>
 
-<script src="/libs/html2pdf.bundle.min.js"></script>
-<script src="/empresas.js"></script>
+<script src="/libs/html2pdf.bundle.min.js" defer></script>
+<script src="/empresas.js" defer></script>
 </body>
 </html>

@@ -306,6 +306,65 @@ function escapeXml(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;');
 }
 
+
+function exportarEmpresasXLS() {
+  try {
+    // Cabecalho XLS (HTML table format - Excel abre nativamente)
+    var xls = '<html xmlns:x="urn:schemas-microsoft-com:office:excel">';
+    xls += '<head><meta charset="UTF-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>';
+    xls += '<x:Name>Empresas</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>';
+    xls += '</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>';
+    
+    // Tabela Empresas
+    xls += '<table border="1"><tr><th colspan="5" style="background:#2563eb;color:#fff;">EMPRESAS</th></tr>';
+    xls += '<tr style="background:#f1f5f9;font-weight:bold;"><td>ID</td><td>Razao Social</td><td>CNPJ</td><td>Ativo</td><td>Data Cadastro</td></tr>';
+    __empresasCache.forEach(function(e) {
+      xls += '<tr>';
+      xls += '<td>' + escapeXml(e.id) + '</td>';
+      xls += '<td>' + escapeXml(e.razao_social) + '</td>';
+      xls += '<td>' + escapeXml(e.cnpj || '') + '</td>';
+      xls += '<td>' + (e.ativo ? 'Sim' : 'Nao') + '</td>';
+      xls += '<td>' + escapeXml(e.created_at || '') + '</td>';
+      xls += '</tr>';
+    });
+    xls += '</table><br>';
+    
+    // Tabela Filiais
+    xls += '<table border="1"><tr><th colspan="6" style="background:#059669;color:#fff;">FILIAIS</th></tr>';
+    xls += '<tr style="background:#f1f5f9;font-weight:bold;"><td>ID</td><td>Nome</td><td>CNPJ</td><td>Empresa</td><td>Ativo</td><td>Data Cadastro</td></tr>';
+    __filiaisCache.forEach(function(f) {
+      xls += '<tr>';
+      xls += '<td>' + escapeXml(f.id) + '</td>';
+      xls += '<td>' + escapeXml(f.nome) + '</td>';
+      xls += '<td>' + escapeXml(f.cnpj || '') + '</td>';
+      xls += '<td>' + escapeXml(f.empresa_nome || '') + '</td>';
+      xls += '<td>' + (f.ativo ? 'Sim' : 'Nao') + '</td>';
+      xls += '<td>' + escapeXml(f.created_at || '') + '</td>';
+      xls += '</tr>';
+    });
+    xls += '</table></body></html>';
+    
+    // Download
+    var blob = new Blob(['\uFEFF' + xls], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'empresas_' + new Date().toISOString().substring(0,10) + '.xls';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    console.log('[XLS] Exportado com sucesso');
+  } catch (e) {
+    console.error('[XLS] Erro:', e);
+    alert('Erro ao exportar XLS: ' + e.message);
+  }
+}
+
+window.exportarEmpresasXLS = exportarEmpresasXLS;
+
+
 window.exportarEmpresasXML = exportarEmpresasXML;
 
 window.exportarEmpresasPDF = exportarEmpresasPDF;
@@ -315,5 +374,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const theme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', theme);
   } catch (e) {}
-  carregarTudo();
+
+  // FASE_FIX_TOKEN_GUARD: so carrega se estiver logado
+  if (localStorage.getItem('token')) {
+    carregarTudo();
+  } else {
+    console.log('[EMPRESAS] Sem token — aguardando login antes de carregar dados.');
+  }
 });

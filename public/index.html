@@ -5180,7 +5180,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
     
   <!-- TAB: EMPRESAS -->
   <section id="tab-empresas" class="tab-content">
-    <iframe src="/empresas.html" style="width:100%;height:calc(100vh - 120px);border:none;background:#0f172a;display:block;"></iframe>
+    <iframe src="/empresas.html" style="width:100%;height:calc(100vh - 120px);border:none;background:transparent;display:block;"></iframe>
   </section>
 </main>
 
@@ -7935,7 +7935,9 @@ const email = document.getElementById('login-email').value;
     var __dreDadosAtuais = null;
 
     async function carregarPlacasDre() {
-      var sel = document.getElementById("dre-filtro-placa");
+      // FASE_FIX_GUARD_401: pula se nao estiver logado
+  if (!localStorage.getItem("token")) return;
+  var sel = document.getElementById("dre-filtro-placa");
       if (!sel) return;
       if (__drePlacasCache && __drePlacasCache.length > 0) { popularPlacasDre(sel); return; }
       try {
@@ -7956,7 +7958,9 @@ const email = document.getElementById('login-email').value;
     }
 
     async function carregarCategoriasDre() {
-      var sel = document.getElementById("dre-filtro-categoria");
+      // FASE_FIX_GUARD_401: pula se nao estiver logado
+  if (!localStorage.getItem("token")) return;
+  var sel = document.getElementById("dre-filtro-categoria");
       if (!sel) return;
       if (__dreCategoriasCache && __dreCategoriasCache.length > 0) { popularCategoriasDre(sel); return; }
       try {
@@ -8860,7 +8864,9 @@ const email = document.getElementById('login-email').value;
 
 
     async function carregarFiltrosLancamentos() {
-      // Categorias
+      // FASE_FIX_GUARD_401: pula se nao estiver logado
+  if (!localStorage.getItem("token")) return;
+  // Categorias
       if (!__categoriasCache) {
         try {
           var r = await apiFetch('/lancamentos/categorias');
@@ -12052,7 +12058,9 @@ function renderHistorico(data) {
     };
 
     async function loadConfiguracoes() {
-      try {
+      // FASE_FIX_GUARD_401: pula se nao estiver logado
+  if (!localStorage.getItem("token")) return;
+  try {
         const res = await apiFetch("/configuracoes");
         if (!res.ok) return;
         const config = await res.json();
@@ -13432,8 +13440,59 @@ function renderHistorico(data) {
       }
 
       // Roda no boot e a cada 30s (caso mude em runtime)
-      setTimeout(atualizarVersaoDinamica, 1000);
-      setInterval(atualizarVersaoDinamica, 30000);
+      // FASE_FIX_VERSAO_CACHE: 1x no boot + cache de 1h
+const VERSAO_CACHE_KEY = '__versao_sistema_cache';
+const VERSAO_CACHE_TTL = 60 * 60 * 1000;
+
+function pegarVersaoDoCache() {
+  try {
+    const raw = localStorage.getItem(VERSAO_CACHE_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (Date.now() - obj.ts > VERSAO_CACHE_TTL) return null;
+    return obj.valor;
+  } catch (e) { return null; }
+}
+
+function salvarVersaoNoCache(valor) {
+  try {
+    localStorage.setItem(VERSAO_CACHE_KEY, JSON.stringify({ valor, ts: Date.now() }));
+  } catch (e) {}
+}
+
+function aplicarVersaoNaUI(valor) {
+  if (!valor) return;
+  const meta = document.querySelector('meta[name="versao-sistema"]');
+  if (meta) meta.setAttribute("content", valor);
+  document.querySelectorAll("[data-versao-sistema]").forEach(function(el) {
+    el.textContent = valor;
+  });
+  const elLogin = document.getElementById("login-versao");
+  if (elLogin) elLogin.textContent = valor;
+  const elAjuda = document.getElementById("ajuda-versao-valor");
+  if (elAjuda) elAjuda.textContent = valor;
+}
+
+async function atualizarVersaoDinamicaComCache() {
+  const cached = pegarVersaoDoCache();
+  if (cached) {
+    aplicarVersaoNaUI(cached);
+    return;
+  }
+  try {
+    const res = await fetch("/api/versao");
+    if (!res.ok) return;
+    const cfg = await res.json();
+    if (cfg && cfg.versao) {
+      aplicarVersaoNaUI(cfg.versao);
+      salvarVersaoNoCache(cfg.versao);
+    }
+  } catch (e) {
+    console.warn("[FASE_13] Erro ao atualizar versao:", e);
+  }
+}
+
+setTimeout(atualizarVersaoDinamicaComCache, 1000);
     })();
   </script>
   <!-- /FASE_13_VERSION_DINAMICA_SCRIPT -->

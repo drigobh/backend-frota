@@ -178,8 +178,32 @@ fastify.register(rateLimit, {
 
 // JWT — Autenticação por token
 // =========================================================================
+// FASE_FIX_JWT_HARDENING: valida JWT_SECRET antes de inicializar
+(function validarJwtSecret() {
+  const secret = process.env.JWT_SECRET;
+  const FALLBACK_ANTIGO = 'fallback-secret-trocar-em-producao';
+  const MIN_LENGTH = 32;
+
+  if (!secret) {
+    console.error('❌ [BOOT] JWT_SECRET nao esta definido nas variaveis de ambiente.');
+    console.error('   Configure JWT_SECRET no painel do Render (Environment Variables).');
+    process.exit(1);
+  }
+  if (secret === FALLBACK_ANTIGO) {
+    console.error('❌ [BOOT] JWT_SECRET esta usando o valor FALLBACK publico do codigo.');
+    console.error('   Isso e uma falha de seguranca: qualquer pessoa pode forjar tokens.');
+    process.exit(1);
+  }
+  if (secret.length < MIN_LENGTH) {
+    console.error('❌ [BOOT] JWT_SECRET muito curto (' + secret.length + ' caracteres).');
+    console.error('   Minimo recomendado: ' + MIN_LENGTH + ' caracteres.');
+    process.exit(1);
+  }
+  console.log('✅ [BOOT] JWT_SECRET validado (' + secret.length + ' caracteres).');
+})();
+
 fastify.register(require('@fastify/jwt'), {
-  secret: process.env.JWT_SECRET || 'fallback-secret-trocar-em-producao',
+  secret: process.env.JWT_SECRET, // FASE_FIX_JWT_HARDENING: sem fallback
   sign: { expiresIn: '8h' },
 });
 
@@ -788,7 +812,10 @@ async function limparAuditoriaSeNecessario() {
   }
 }
 
-await limparAuditoriaSeNecessario();
+// FASE_FIX_LIMPEZA_BACKGROUND: nao bloqueia o boot
+limparAuditoriaSeNecessario().catch(function(e) {
+  console.error('[LIMPEZA] Erro em background (nao fatal):', e && e.message);
+});
 
 // =========================================================================
 // FASE_9_AUTO_BACKUP - Backup automatico diario (verificado no boot)
