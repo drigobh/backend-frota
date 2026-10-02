@@ -88,17 +88,8 @@ async function routes(fastify, options) {
       await db.query('UPDATE usuarios SET ultimo_login = CURRENT_TIMESTAMP WHERE id = $1', [user.id]);
 
       const payload = { id: user.id, email: user.email, nome: user.nome, perfil: user.perfil || 'Operador' };
-      let token;
-      if (fastify.jwt && typeof fastify.jwt.sign === 'function') {
-        token = fastify.jwt.sign(payload);
-      } else {
-        try {
-          const jwt = require('jsonwebtoken');
-          token = jwt.sign(payload, process.env.JWT_SECRET || 'secret');
-        } catch (e) {
-          token = crypto.randomBytes(32).toString('hex');
-        }
-      }
+      // [FIX_02] Sem fallback: confia apenas no fastify.jwt (registrado em server.js)
+      const token = fastify.jwt.sign(payload);
 
       await gravarLogAcesso(db, Object.assign({}, sessao, {
         usuario_id: user.id, email_tentado: emailLimpo, sucesso: true, motivo_falha: null

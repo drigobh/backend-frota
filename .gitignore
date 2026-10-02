@@ -48,3 +48,7 @@ public/*_CORROMPIDO_*.css
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Backups numerados (bak1, bak2, bak3...)
+*.bak[0-9]
+*.bak[0-9][0-9]

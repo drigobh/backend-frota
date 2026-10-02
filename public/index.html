@@ -7488,13 +7488,22 @@ const email = document.getElementById('login-email').value;
             return;
           }
 
-          if (senha && senha.length >= 6) {
-            await apiFetch(`/usuarios/${modalUsuárioEditandoId}/resetar-senha`, {
-              method: 'PUT',
-              body: JSON.stringify({ nova_senha: senha })
-            });
+          // FASE_FIX_VALIDACAO_SENHA: nao mostra "sucesso" se a senha for invalida
+          if (senha) {
+            if (senha.length < 6) {
+              alert('A senha deve ter no minimo 6 caracteres. A troca de senha foi cancelada, mas os demais dados foram salvos.');
+            } else {
+              const resSenha = await apiFetch(`/usuarios/${modalUsuárioEditandoId}/resetar-senha`, {
+                method: 'PUT',
+                body: JSON.stringify({ nova_senha: senha })
+              });
+              if (!resSenha.ok) {
+                const errSenha = await resSenha.json();
+                alert('Erro ao trocar senha: ' + (errSenha.erro || 'desconhecido'));
+                return;
+              }
+            }
           }
-
           alert('Usuário atualizado com sucesso.');
         } else {
           const payload = { nome, email, senha, perfil_id };

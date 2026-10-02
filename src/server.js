@@ -293,7 +293,10 @@ ROTAS.forEach((caminho) => {
   try {
     fastify.register(require(caminho));
   } catch (err) {
-    console.error(`⚠️  [BOOT] Falha ao carregar rota ${caminho}:`, err.message);
+    console.error(`❌ [BOOT] Erro FATAL ao carregar rota ${caminho}:`, err.message);
+    console.error(err.stack);
+    // [FIX_03] Fail-fast: melhor falhar o boot do que rodar quebrado
+    process.exit(1);
   }
 });
 
