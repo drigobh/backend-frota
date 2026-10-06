@@ -55,3 +55,12 @@ desktop.ini
 
 # Backups com sufixo .bak + numeracao (bak07a, bak14b_v5, etc)
 *.bak*
+
+# ==========================================================================
+# Credenciais (service accounts, chaves JSON)
+# ==========================================================================
+secrets/
+*service-account*.json
+*gserviceaccount*.json
+*credentials*.json
+
