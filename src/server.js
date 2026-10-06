@@ -878,7 +878,21 @@ async function fazerBackupSeNecessario() {
       [nome, 'automatico', buffer.length, buffer, 'sistema', 'verde']
     );
 
+
     console.log('[BACKUP] OK Backup salvo no Neon: ' + nome + ' (' + buffer.length + ' bytes)');
+
+    // [FIX_18c] Upload pro Google Drive (backup externo)
+    try {
+      const { uploadBackupParaDrive } = require('./googleDrive');
+      const r = await uploadBackupParaDrive(buffer, nome, 'application/json');
+      if (r.ok) {
+        console.log('[BACKUP] Upload pro Drive OK: ' + r.fileId);
+      } else {
+        console.warn('[BACKUP] Falha no upload pro Drive: ' + r.erro);
+      }
+    } catch (e) {
+      console.error('[BACKUP] Erro Drive:', e.message);
+    }
 
     // 5. Retencao: mantem ultimos 7 automaticos
     await db.query(
