@@ -824,31 +824,32 @@ limparAuditoriaSeNecessario().catch(function(e) {
 // =========================================================================
 // FASE_9_AUTO_BACKUP - Backup automatico diario (verificado no boot)
 // =========================================================================
+// =========================================================================
+// [FIX_18a] FASE_9_AUTO_BACKUP - Backup automatico diario (salva no Neon)
+// =========================================================================
 async function fazerBackupSeNecessario() {
   try {
-    const bpath = require('path');
-    const bfs = require('fs');
-    const pastaBackups = bpath.resolve(__dirname, '..', 'backups');
-    if (!bfs.existsSync(pastaBackups)) bfs.mkdirSync(pastaBackups, { recursive: true });
+    // 1. Verifica se tem backup recente NA TABELA (nao mais em pasta local)
+    const ultimoRes = await db.query(
+      "SELECT criado_em FROM backups_arquivos WHERE tipo IN ('automatico', 'json') ORDER BY criado_em DESC LIMIT 1"
+    );
 
-    const arquivos = bfs.readdirSync(pastaBackups)
-      .filter(f => f.startsWith('backup_') && f.endsWith('.json'))
-      .map(f => ({ nome: f, mtime: bfs.statSync(bpath.join(pastaBackups, f)).mtime }))
-      .sort((a, b) => b.mtime - a.mtime);
-
-    if (arquivos.length > 0) {
-      const ultimo = arquivos[0].mtime;
-      const horasDesde = (Date.now() - new Date(ultimo).getTime()) / 3600000;
+    if (ultimoRes.rows.length > 0) {
+      const ultimo = new Date(ultimoRes.rows[0].criado_em);
+      const horasDesde = (Date.now() - ultimo.getTime()) / 3600000;
       if (horasDesde < 24) {
         console.log('[BACKUP] Ultimo backup: ' + Math.floor(horasDesde) + 'h atras. Pulando.');
         return;
       }
     }
 
-    console.log('[BACKUP] Gerando backup automatico...');
+    console.log('[BACKUP] Gerando backup automatico (salva no Neon)...');
+
+    // 2. Busca todas as tabelas
     const tabelas = await db.query(
       "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE' ORDER BY table_name"
     );
+
     const dados = {};
     for (const row of tabelas.rows) {
       const t = row.table_name;
@@ -859,27 +860,52 @@ async function fazerBackupSeNecessario() {
         dados[t] = { erro: e.message };
       }
     }
+
+    // 3. Monta payload
     const agora = new Date().toISOString().replace(/[:.]/g, '-');
-    const nome = 'backup_' + agora + '.json';
+    const nome = 'backup_auto_' + agora + '.json';
     const payload = {
-      versao: 'v1977-backup-auto',
+      versao: 'v1977-backup-auto-neon',
       gerado_em: new Date().toISOString(),
       total_tabelas: tabelas.rows.length,
       dados: dados
     };
-    bfs.writeFileSync(bpath.join(pastaBackups, nome), JSON.stringify(payload), 'utf8');
-    console.log('[BACKUP] OK Backup salvo: ' + nome);
+    const buffer = Buffer.from(JSON.stringify(payload), 'utf8');
 
-    const todos = bfs.readdirSync(pastaBackups)
-      .filter(f => f.startsWith('backup_') && f.endsWith('.json'))
-      .map(f => ({ nome: f, mtime: bfs.statSync(bpath.join(pastaBackups, f)).mtime }))
-      .sort((a, b) => b.mtime - a.mtime);
-    todos.slice(7).forEach(x => { try { bfs.unlinkSync(bpath.join(pastaBackups, x.nome)); } catch (e) {} });
+    // 4. Salva na tabela backups_arquivos
+    await db.query(
+      "INSERT INTO backups_arquivos (nome, tipo, tamanho, conteudo, usuario, status) VALUES ($1, $2, $3, $4, $5, $6)",
+      [nome, 'automatico', buffer.length, buffer, 'sistema', 'verde']
+    );
+
+    console.log('[BACKUP] OK Backup salvo no Neon: ' + nome + ' (' + buffer.length + ' bytes)');
+
+    // 5. Retencao: mantem ultimos 7 automaticos
+    await db.query(
+      "DELETE FROM backups_arquivos WHERE id IN (SELECT id FROM backups_arquivos WHERE tipo = 'automatico' ORDER BY criado_em DESC OFFSET 7)"
+    );
   } catch (e) {
     console.error('[BACKUP] Erro (nao fatal):', e.message);
+    // [FIX_18b] Alerta por email
+    try {
+      const { enviarEmailAlertaBackup } = require('./email');
+      if (typeof enviarEmailAlertaBackup === 'function') {
+        await enviarEmailAlertaBackup(e);
+      }
+    } catch (emailErr) {
+      console.error('[BACKUP] Falha ao enviar alerta por email:', emailErr.message);
+    }
   }
 }
 
+// =========================================================================
+// [FIX_18a] Cron diario: roda a cada 24h (independente do boot)
+// =========================================================================
+setInterval(function () {
+  fazerBackupSeNecessario().catch(function (e) {
+    console.error('[BACKUP-CRON] Falha no cron diario:', e && e.message);
+  });
+}, 24 * 60 * 60 * 1000);
 // FASE_16_BOOT_NONBLOCK - nao bloqueia o boot esperando o backup
   // Roda em background. Se o Neon estiver lento, o servidor sobe mesmo assim.
   fazerBackupSeNecessario().catch(function (e) {

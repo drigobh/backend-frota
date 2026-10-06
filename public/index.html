@@ -4836,7 +4836,18 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
         </div>
 
         <div class="section-title-wrap">
-          <h2 class="section-title"><span>&#128190;</span> Backups do Sistema</h2>
+          <!-- [FIX_18d] Badge de alerta (aparece só se último backup > 48h) -->
+        <div id="backup-alerta" style="display:none; background:#fef2f2; border-left:4px solid #dc2626; padding:12px 16px; border-radius:8px; margin-bottom:12px; font-size:0.85rem; color:#991b1b;">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+            <div>
+              ⚠️ <strong>Último backup há <span id="backup-alerta-dias">-</span>!</strong>
+              <span style="color:#7f1d1d; margin-left:8px;">Recomendamos gerar um novo backup.</span>
+            </div>
+            <button type="button" onclick="forcarBackupAgora()" style="background:#dc2626; color:#fff; border:none; padding:6px 14px; border-radius:6px; font-size:0.8rem; font-weight:600; cursor:pointer;">Gerar backup agora</button>
+          </div>
+        </div>
+
+        <h2 class="section-title"><span>&#128190;</span> Backups do Sistema</h2>
         </div>
 
         <!-- Cards compactos -->
@@ -13193,6 +13204,12 @@ function renderHistorico(data) {
       if (elUlt && ultimo) {
         elUlt.textContent = new Date(ultimo.criado_em).toLocaleDateString('pt-BR');
         if (elUltInfo) elUltInfo.textContent = new Date(ultimo.criado_em).toLocaleTimeString('pt-BR') + ' - ' + formatBytes(ultimo.tamanho);
+        // [FIX_18d] Aplica cor e texto relativo
+        try {
+          var _status = _calcularStatusBackup(ultimo.criado_em);
+          if (elUlt) elUlt.style.color = _status.cor;
+          _atualizarAlertaBackup(_status.horas);
+        } catch (_e) { console.warn('[FIX_18d] Erro ao aplicar status:', _e); }
       } else if (elUlt) { elUlt.textContent = '--'; if (elUltInfo) elUltInfo.textContent = 'Nenhum'; }
       var elComp = document.getElementById('card-bkp-completo');
       var elCompInfo = document.getElementById('card-bkp-completo-info');
@@ -14630,6 +14647,61 @@ window.validarCpfLocal = validarCpfLocal;
 window.mascaraCPF = mascaraCPF;
 // ============================================================
 // [/FIX_14c]
+// ============================================================
+
+
+// ============================================================
+// [FIX_18d] Métricas visuais de backup
+// ============================================================
+
+function _calcularStatusBackup(criado_em) {
+  if (!criado_em) return { cor: '#94a3b8', texto: '--', horas: null, alerta: false };
+  var horas = (Date.now() - new Date(criado_em).getTime()) / 3600000;
+  var texto;
+  if (horas < 1) texto = 'agora mesmo';
+  else if (horas < 24) texto = 'há ' + Math.floor(horas) + ' hora' + (Math.floor(horas) > 1 ? 's' : '');
+  else {
+    var dias = Math.floor(horas / 24);
+    texto = 'há ' + dias + ' dia' + (dias > 1 ? 's' : '');
+  }
+  var cor, alerta = false;
+  if (horas < 24) cor = '#10b981';
+  else if (horas < 48) cor = '#f59e0b';
+  else { cor = '#dc2626'; alerta = true; }
+  return { cor: cor, texto: texto, horas: horas, alerta: alerta };
+}
+
+function _atualizarAlertaBackup(horas) {
+  var alerta = document.getElementById('backup-alerta');
+  var alertaDias = document.getElementById('backup-alerta-dias');
+  if (!alerta) return;
+  if (horas !== null && horas > 48) {
+    var dias = Math.floor(horas / 24);
+    if (alertaDias) alertaDias.textContent = dias + ' dia' + (dias > 1 ? 's' : '');
+    alerta.style.display = 'block';
+  } else {
+    alerta.style.display = 'none';
+  }
+}
+
+function forcarBackupAgora() {
+  var btn = document.querySelector('#backup-alerta button');
+  if (btn) { btn.disabled = true; btn.textContent = 'Gerando...'; }
+  apiFetch('/backup/gerar', { method: 'POST' }).then(function(res) {
+    if (!res.ok) return res.json().then(function(e) { throw new Error(e.erro || 'Erro'); });
+    return res.json();
+  }).then(function() {
+    if (typeof mostrarToast === 'function') mostrarToast('✅ Backup gerado com sucesso!', 'success');
+    setTimeout(function() { location.reload(); }, 1500);
+  }).catch(function(err) {
+    alert('Erro ao gerar backup: ' + err.message);
+    if (btn) { btn.disabled = false; btn.textContent = 'Gerar backup agora'; }
+  });
+}
+
+window.forcarBackupAgora = forcarBackupAgora;
+// ============================================================
+// [/FIX_18d]
 // ============================================================
 
 </script>
