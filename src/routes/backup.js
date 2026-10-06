@@ -13,8 +13,19 @@ async function listarTabelas() {
   return r.rows.map(x => x.table_name);
 }
 
+// [FIX_18c-6] Tabelas que NAO devem ser incluidas em backups
+// Motivo: backups_arquivos eh recursiva (backup dentro de backup)
+//         senha_reset_tokens sao temporarios (nao faz sentido persistir)
+const TABELAS_EXCLUIDAS = ['backups_arquivos', 'senha_reset_tokens'];
+
 async function exportarTudo() {
-  const tabelas = await listarTabelas();
+  const tabelasTodas = await listarTabelas();
+  // [FIX_18c-6] Filtra tabelas excluidas
+  const tabelas = tabelasTodas.filter(function(t) {
+    return !TABELAS_EXCLUIDAS.includes(t);
+  });
+  console.log('[BACKUP] Exportando ' + tabelas.length + '/' + tabelasTodas.length + ' tabelas (excluidas: ' + (tabelasTodas.length - tabelas.length) + ')');
+
   const dados = {};
   const contagem = {};
   for (const t of tabelas) {
