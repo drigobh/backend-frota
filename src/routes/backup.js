@@ -191,6 +191,19 @@ module.exports = async function (fastify, options) {
         [nome, 'json', tamanho, buffer, (req.user && req.user.email) || 'sistema', val.status, JSON.stringify(val.detalhes)]
       );
 
+      // [FIX_18c-7] Upload pro Google Drive (backup manual agora eh pequeno ~1 MB)
+      try {
+        const { uploadBackupParaDrive } = require('../googleDrive');
+        const rDrive = await uploadBackupParaDrive(buffer, nome, 'application/json');
+        if (rDrive.ok) {
+          console.log('[BACKUP] Upload pro Drive OK (manual): ' + rDrive.fileId);
+        } else {
+          console.warn('[BACKUP] Falha no upload pro Drive (manual): ' + rDrive.erro);
+        }
+      } catch (eDrive) {
+        console.error('[BACKUP] Erro Drive (manual):', eDrive.message);
+      }
+
       // Limpa antigos (mantem 7)
       await db.query("SELECT limpar_backups_antigos(7)");
 
