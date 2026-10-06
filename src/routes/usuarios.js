@@ -1,5 +1,6 @@
 const db = require('../database');
 const bcrypt = require('bcrypt');
+const { validarCPF, limparCPF, formatarCPF } = require('../validarCPF'); // [FIX_14b]
 
 async function hashSenha(senha) {
   return bcrypt.hash(String(senha), 10);
@@ -66,7 +67,7 @@ async function routes(fastify, options) {
     try {
       await ensureUsuariosETabelas();
       const res = await db.query(`
-        SELECT u.id, u.nome, u.email, u.perfil_id, COALESCE(p.nome, u.perfil, 'Administrador') as perfil, COALESCE(u.ativo, true) as ativo, u.ultimo_login, u.created_at
+        SELECT u.id, u.nome, u.email, u.perfil_id, u.cpf, u.matricula, COALESCE(p.nome, u.perfil, 'Administrador') as perfil, COALESCE(u.ativo, true) as ativo, u.ultimo_login, u.created_at
         FROM usuarios u
         LEFT JOIN perfis p ON u.perfil_id::text = p.id::text
         ORDER BY u.id ASC
@@ -83,7 +84,7 @@ async function routes(fastify, options) {
     try {
       await ensureUsuariosETabelas();
       const res = await db.query(`
-        SELECT u.id, u.nome, u.email, u.perfil_id, COALESCE(p.nome, u.perfil, 'Administrador') as perfil, COALESCE(u.ativo, true) as ativo, u.ultimo_login, u.created_at
+        SELECT u.id, u.nome, u.email, u.perfil_id, u.cpf, u.matricula, COALESCE(p.nome, u.perfil, 'Administrador') as perfil, COALESCE(u.ativo, true) as ativo, u.ultimo_login, u.created_at
         FROM usuarios u
         LEFT JOIN perfis p ON u.perfil_id::text = p.id::text
         WHERE u.id::text = $1::text
@@ -96,9 +97,34 @@ async function routes(fastify, options) {
   });
 
   fastify.post('/api/usuarios', { preHandler: [fastify.autenticar] }, fastify.comAuditoria(async (req, reply) => {
-    const { nome, email, senha, perfil_id, ativo = true } = req.body || {};
+    const { nome, email, senha, perfil_id, ativo = true, cpf, matricula } = req.body || {};
     if (!nome || !email) return reply.code(400).send({ erro: 'Nome e e-mail sÃƒÂ£o obrigatÃƒÂ³rios.' });
     
+    // [FIX_14b] Validar CPF (se preenchido)
+    let cpfLimpo = null;
+    if (cpf && String(cpf).trim() !== '') {
+      const v = validarCPF(cpf);
+      if (!v.ok) return reply.code(400).send({ erro: 'CPF invalido: ' + v.erro });
+      cpfLimpo = v.cpfLimpo;
+    }
+
+    // [FIX_14b] Validar matricula
+    const matriculaLimpa = matricula ? String(matricula).trim() : null;
+
+    // [FIX_14b] Verificar duplicatas
+    if (cpfLimpo) {
+      const dup = await db.query('SELECT id, nome FROM usuarios WHERE cpf = $1', [cpfLimpo]);
+      if (dup.rows.length > 0) {
+        return reply.code(400).send({ erro: 'CPF ja cadastrado para: ' + dup.rows[0].nome });
+      }
+    }
+    if (matriculaLimpa) {
+      const dup = await db.query('SELECT id, nome FROM usuarios WHERE matricula = $1', [matriculaLimpa]);
+      if (dup.rows.length > 0) {
+        return reply.code(400).send({ erro: 'Matricula ja cadastrada para: ' + dup.rows[0].nome });
+      }
+    }
+
     const senhaFinal = senha || '123456';
     const senhaHash = await hashSenha(senhaFinal);
 
@@ -111,10 +137,10 @@ async function routes(fastify, options) {
       }
 
       const res = await db.query(`
-        INSERT INTO usuarios (nome, email, senha_hash, perfil_id, perfil, ativo)
-        VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING id, nome, email, perfil_id, perfil, ativo, ultimo_login, created_at
-      `, [nome, email.toLowerCase().trim(), senhaHash, perfil_id ? String(perfil_id) : null, perfilNome, ativo]);
+        INSERT INTO usuarios (nome, email, senha_hash, perfil_id, perfil, ativo, cpf, matricula)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING id, nome, email, perfil_id, perfil, ativo, cpf, matricula, ultimo_login, created_at
+      `, [nome, email.toLowerCase().trim(), senhaHash, perfil_id ? String(perfil_id) : null, perfilNome, ativo, cpfLimpo, matriculaLimpa]);
 
       return reply.code(201).send(res.rows[0]);
     } catch (err) {
@@ -127,7 +153,7 @@ async function routes(fastify, options) {
 
   fastify.put('/api/usuarios/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { id } = req.params;
-    const { nome, email, perfil_id, ativo } = req.body || {};
+    const { nome, email, perfil_id, ativo, cpf, matricula } = req.body || {};
     try {
       await ensureUsuariosETabelas();
       let perfilNome = null;
@@ -137,6 +163,27 @@ async function routes(fastify, options) {
       }
 
       // FASE_6_AUDITORIA - envolve em runAsUser para triggers capturarem quem fez
+      // [FIX_14b] Validar CPF (se preenchido)
+      let cpfLimpo = null;
+      if (cpf && String(cpf).trim() !== '') {
+        const v = validarCPF(cpf);
+        if (!v.ok) return reply.code(400).send({ erro: 'CPF invalido: ' + v.erro });
+        cpfLimpo = v.cpfLimpo;
+        const dup = await db.query('SELECT id, nome FROM usuarios WHERE cpf = $1 AND id::text <> $2::text', [cpfLimpo, String(id)]);
+        if (dup.rows.length > 0) {
+          return reply.code(400).send({ erro: 'CPF ja cadastrado para: ' + dup.rows[0].nome });
+        }
+      }
+
+      // [FIX_14b] Validar matricula
+      const matriculaLimpa = matricula ? String(matricula).trim() : null;
+      if (matriculaLimpa) {
+        const dup = await db.query('SELECT id, nome FROM usuarios WHERE matricula = $1 AND id::text <> $2::text', [matriculaLimpa, String(id)]);
+        if (dup.rows.length > 0) {
+          return reply.code(400).send({ erro: 'Matricula ja cadastrada para: ' + dup.rows[0].nome });
+        }
+      }
+
       const res = await db.runAsUser(req.user, async () => {
         return await db.query(`
         UPDATE usuarios
@@ -144,10 +191,12 @@ async function routes(fastify, options) {
             email = COALESCE($2, email),
             perfil_id = COALESCE($3, perfil_id),
             perfil = COALESCE($4, perfil),
-            ativo = COALESCE($5, ativo)
+            ativo = COALESCE($5, ativo),
+            cpf = COALESCE($7, cpf),
+            matricula = COALESCE($8, matricula)
         WHERE id::text = $6::text
-        RETURNING id, nome, email, perfil_id, perfil, ativo, ultimo_login, created_at
-      `, [nome, email ? email.toLowerCase().trim() : null, perfil_id ? String(perfil_id) : null, perfilNome, ativo, id]);
+        RETURNING id, nome, email, perfil_id, perfil, ativo, cpf, matricula, ultimo_login, created_at
+      `, [nome, email ? email.toLowerCase().trim() : null, perfil_id ? String(perfil_id) : null, perfilNome, ativo, id, cpfLimpo, matriculaLimpa]);
       });
 
       if (res.rows.length === 0) return reply.code(404).send({ erro: 'UsuÃƒÂ¡rio nÃƒÂ£o encontrado' });
@@ -173,12 +222,69 @@ async function routes(fastify, options) {
     }
   });
 
+  // [FIX_12] DELETE — EXCLUI de verdade (com salvaguardas)
   fastify.delete('/api/usuarios/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { id } = req.params;
     try {
       await ensureUsuariosETabelas();
-      await db.query('UPDATE usuarios SET ativo = false WHERE id::text = $1::text', [id]);
-      return reply.send({ mensagem: 'UsuÃƒÂ¡rio desativado com sucesso!' });
+      if (String(req.user.id) === String(id)) {
+        return reply.code(400).send({ erro: 'Voce nao pode excluir o proprio usuario.' });
+      }
+      const check = await db.query(
+        "SELECT COUNT(*) as n FROM usuarios WHERE ativo = true AND perfil = 'Administrador' AND id::text <> $1::text",
+        [String(id)]
+      );
+      if (parseInt(check.rows[0].n, 10) === 0) {
+        return reply.code(400).send({ erro: 'Nao e possivel excluir o ultimo administrador ativo.' });
+      }
+      const res = await db.query(
+        'DELETE FROM usuarios WHERE id::text = $1::text RETURNING id',
+        [String(id)]
+      );
+      if (res.rows.length === 0) {
+        return reply.code(404).send({ erro: 'Usuario nao encontrado.' });
+      }
+      return reply.send({ mensagem: 'Usuario excluido com sucesso!' });
+    } catch (err) {
+      if (err.code === '23503') {
+        return reply.code(409).send({
+          erro: 'Nao e possivel excluir: existem registros vinculados. Inative o usuario.'
+        });
+      }
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+
+  // [FIX_12] PUT /inativar — marca ativo = false
+  fastify.put('/api/usuarios/:id/inativar', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+    const { id } = req.params;
+    try {
+      await ensureUsuariosETabelas();
+      if (String(req.user.id) === String(id)) {
+        return reply.code(400).send({ erro: 'Voce nao pode inativar o proprio usuario.' });
+      }
+      const res = await db.query(
+        'UPDATE usuarios SET ativo = false WHERE id::text = $1::text RETURNING id',
+        [String(id)]
+      );
+      if (res.rows.length === 0) return reply.code(404).send({ erro: 'Usuario nao encontrado.' });
+      return reply.send({ mensagem: 'Usuario inativado com sucesso!' });
+    } catch (err) {
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+
+  // [FIX_12] PUT /reativar — marca ativo = true
+  fastify.put('/api/usuarios/:id/reativar', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+    const { id } = req.params;
+    try {
+      await ensureUsuariosETabelas();
+      const res = await db.query(
+        'UPDATE usuarios SET ativo = true WHERE id::text = $1::text RETURNING id',
+        [String(id)]
+      );
+      if (res.rows.length === 0) return reply.code(404).send({ erro: 'Usuario nao encontrado.' });
+      return reply.send({ mensagem: 'Usuario reativado com sucesso!' });
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
     }

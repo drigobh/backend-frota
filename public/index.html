@@ -3157,6 +3157,36 @@
 body.tab-empresas-ativa .ds-pdf-fab { display: none !important; }
 body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 </style>
+<style>
+/* [FIX_07a] Modal Trocar Senha */
+#trocar-senha-overlay { display:none; position:fixed; inset:0; background:rgba(9,27,48,0.65); z-index:99999; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(3px); }
+#trocar-senha-overlay.open { display:flex; animation:trocarFadeIn 0.2s ease; }
+#trocar-senha-modal { background:#fff; border-radius:14px; max-width:520px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.35); overflow:hidden; }
+[data-theme="dark"] #trocar-senha-modal { background:#1e293b; color:#e2e8f0; }
+.trocar-senha-header { padding:20px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; }
+[data-theme="dark"] .trocar-senha-header { border-bottom-color:#334155; }
+.trocar-senha-header h2 { margin:0; font-size:1.1rem; color:#0f2a4a; }
+[data-theme="dark"] .trocar-senha-header h2 { color:#e2e8f0; }
+.trocar-senha-body { padding:20px 24px; }
+.trocar-senha-field { margin-bottom:14px; }
+.trocar-senha-field label { display:block; font-size:0.8rem; font-weight:600; margin-bottom:4px; color:#334155; }
+[data-theme="dark"] .trocar-senha-field label { color:#cbd5e1; }
+.trocar-senha-field input { width:100%; padding:10px 12px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.9rem; box-sizing:border-box; }
+[data-theme="dark"] .trocar-senha-field input { background:#0f172a; border-color:#334155; color:#e2e8f0; }
+.trocar-senha-regras { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px; margin-top:16px; font-size:0.8rem; }
+[data-theme="dark"] .trocar-senha-regras { background:#0f172a; border-color:#334155; }
+.trocar-senha-regras .regra { display:flex; align-items:flex-start; gap:8px; padding:3px 0; color:#ef4444; transition:color 0.15s; }
+.trocar-senha-regras .regra.ok { color:#10b981; }
+.trocar-senha-regras .regra .icon { flex-shrink:0; font-weight:700; }
+.trocar-senha-footer { padding:16px 24px; background:#f9fafb; display:flex; justify-content:flex-end; gap:10px; border-top:1px solid #e2e8f0; }
+[data-theme="dark"] .trocar-senha-footer { background:#0f172a; border-top-color:#334155; }
+.trocar-senha-btn { padding:9px 18px; border-radius:8px; font-size:0.85rem; font-weight:600; cursor:pointer; border:none; transition:opacity 0.15s; }
+.trocar-senha-btn.cancelar { background:#e2e8f0; color:#334155; }
+[data-theme="dark"] .trocar-senha-btn.cancelar { background:#334155; color:#e2e8f0; }
+.trocar-senha-btn.confirmar { background:#1f6feb; color:#fff; }
+.trocar-senha-btn.confirmar:disabled { opacity:0.5; cursor:not-allowed; }
+@keyframes trocarFadeIn { from { opacity:0; } to { opacity:1; } }
+</style>
 </head>
 <body>
 
@@ -3275,7 +3305,8 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
       <div class="header-actions">
         <div class="user-badge" id="current-user-badge">👤 Conectado</div>
         <!-- FASE_3A_THEME_HEADER --><button class="theme-toggle-btn" data-theme-toggle type="button" title="Alternar tema"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-label">Escuro</span></button>
-        <button class="header-btn" onclick="fazerLogout()" title="Sair do sistema">
+                <!-- FASE_3A_THEME_HEADER --><button class="header-btn" type="button" onclick="abrirModalTrocarSenha()" title="Trocar minha senha">🔑 Trocar Senha</button>
+<button class="header-btn" onclick="fazerLogout()" title="Sair do sistema">
           Sair
         </button>
         <!-- FASE_8_DROPDOWN_RELATORIOS -->
@@ -4559,8 +4590,8 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
         </div>
 
         <!-- Modal de Usuário -->
-        <div id="modal-usuario" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(9,27,48,0.85); z-index:9999; align-items:center; justify-content:center;">
-          <div class="login-card" style="max-width:520px; text-align:left;">
+        <div id="modal-usuario" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(9,27,48,0.85); z-index:9999; align-items:center; justify-content:center; overflow-y:auto; padding:20px 0;">
+          <div class="login-card" style="max-width:520px; text-align:left; max-height:90vh; overflow-y:auto; padding-bottom:20px;">
             <h2 style="margin-top:0; color:#0f2a4a;" id="modal-usuario-title">Novo Usuário</h2>
             <div style="margin-bottom:0.75rem;">
               <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Nome completo</label>
@@ -4572,8 +4603,32 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             </div>
             <div style="margin-bottom:0.75rem;">
               <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Senha <span id="modal-user-senha-hint" style="color:#64748b; font-weight:400;"></span></label>
-              <input type="password" id="modal-user-senha" class="login-input" style="margin-bottom:0;">
+              <div style="position:relative;">
+                <input type="password" id="modal-user-senha" class="login-input" style="margin-bottom:0;">
+                <button type="button" onclick="toggleVerSenha('modal-user-senha', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;">👁️</button>
+              </div>
+              <div id="modal-user-senha-regras" style="display:none; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px; margin-top:8px; font-size:0.75rem;">
+                <div class="regra" data-regra="tamanho" style="color:#ef4444; padding:2px 0;">❌ Mínimo 6 caracteres</div>
+                <div class="regra" data-regra="sem_acento" style="color:#ef4444; padding:2px 0;">❌ Sem acentos</div>
+                <div class="regra" data-regra="sem_login" style="color:#ef4444; padding:2px 0;">❌ Sem o login do cadastro</div>
+                <div class="regra" data-regra="sem_sequencia" style="color:#ef4444; padding:2px 0;">❌ Sem números em sequência</div>
+                <div class="regra" data-regra="tem_maiuscula" style="color:#ef4444; padding:2px 0;">❌ Ao menos 1 maiúscula</div>
+                <div class="regra" data-regra="tem_minuscula" style="color:#ef4444; padding:2px 0;">❌ Ao menos 1 minúscula</div>
+                <div class="regra" data-regra="tem_numero" style="color:#ef4444; padding:2px 0;">❌ Ao menos 1 número</div>
+                <div class="regra" data-regra="tem_especial" style="color:#ef4444; padding:2px 0;">❌ Ao menos 1 caractere especial (!@#$%)</div>
+              </div>
             </div>
+            <!-- [FIX_14c] Campos CPF e Matrícula -->
+            <div style="margin-bottom:0.75rem;">
+              <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">CPF <span style="color:#64748b; font-weight:400;">(opcional)</span></label>
+              <input type="text" id="modal-user-cpf" class="login-input" placeholder="000.000.000-00" maxlength="14" style="margin-bottom:0;">
+              <div id="modal-user-cpf-status" style="font-size:0.75rem; margin-top:4px; min-height:16px;"></div>
+            </div>
+            <div style="margin-bottom:0.75rem;">
+              <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Matrícula <span style="color:#64748b; font-weight:400;">(opcional)</span></label>
+              <input type="text" id="modal-user-matricula" class="login-input" placeholder="Ex: FUNC-001" maxlength="50" style="margin-bottom:0;">
+            </div>
+            <!-- /[FIX_14c] -->
             <div style="margin-bottom:0.75rem;">
               <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Perfil de acesso</label>
               <select id="modal-user-perfil" class="login-input" style="margin-bottom:0;"></select>
@@ -7377,9 +7432,11 @@ const email = document.getElementById('login-email').value;
           ? '<span class="badge-pos">Ativo</span>'
           : '<span class="badge-neg">Inativo</span>';
 
-        const btnDesativar = u.ativo
-          ? `<button class="action-btn action-btn-delete" title="Desativar usuario" onclick="desativarUsuário('${u.id}', '${u.nome}')">&#128465;&#65039;</button>`
-          : `<button class="action-btn action-btn-delete action-btn-disabled" title="Usuário ja inativo" disabled>&#128465;&#65039;</button>`;
+        const btnToggleAtivo = u.ativo
+          ? `<button class="action-btn action-btn-key" title="Inativar usuario" onclick="inativarUsuário('${u.id}', '${u.nome}')">🚫</button>`
+          : `<button class="action-btn action-btn-reativar" title="Reativar usuario" onclick="reativarUsuário('${u.id}', '${u.nome}')">✅</button>`;
+
+        const btnExcluir = `<button class="action-btn action-btn-delete" title="Excluir usuario" onclick="excluirUsuário('${u.id}', '${u.nome}')">&#128465;&#65039;</button>`;
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -7392,8 +7449,9 @@ const email = document.getElementById('login-email').value;
           <td class="col-center">
             <div class="action-group">
               <button class="action-btn action-btn-edit" title="Editar usuario" onclick="abrirModalUsuárioEditar('${u.id}')">&#9999;&#65039;</button>
-              <button class="action-btn action-btn-key" title="Resetar senha" onclick="resetarSenhaUsuário('${u.id}', '${u.nome}')">&#128273;</button>
-              ${btnDesativar}
+                            <!-- [FIX_11] Botao "Resetar senha" removido. Use "🔑 Trocar Senha" no header. -->
+              ${btnToggleAtivo}
+              ${btnExcluir}
             </div>
           </td>
         `;
@@ -7411,6 +7469,14 @@ const email = document.getElementById('login-email').value;
       document.getElementById('modal-user-ativo').checked = true;
 
       const perfis = await loadPerfisParaSelect();
+
+      // [FIX_14c] Limpa CPF e Matrícula
+      var elCpfNovo = document.getElementById('modal-user-cpf');
+      if (elCpfNovo) elCpfNovo.value = '';
+      var elMatNovo = document.getElementById('modal-user-matricula');
+      if (elMatNovo) elMatNovo.value = '';
+      var elStatusNovo = document.getElementById('modal-user-cpf-status');
+      if (elStatusNovo) elStatusNovo.textContent = '';
       const sel = document.getElementById('modal-user-perfil');
       sel.innerHTML = '<option value="">-- Selecione --</option>';
       perfis.filter(p => p.ativo).forEach(p => {
@@ -7436,6 +7502,22 @@ const email = document.getElementById('login-email').value;
         document.getElementById('modal-user-senha').value = '';
         document.getElementById('modal-user-senha-hint').textContent = '(deixe em branco para nao alterar)';
         document.getElementById('modal-user-ativo').checked = u.ativo;
+        // [FIX_14c] Preenche CPF e Matrícula
+        var elCpfEd = document.getElementById('modal-user-cpf');
+        if (elCpfEd) elCpfEd.value = u.cpf || '';
+        var elMatEd = document.getElementById('modal-user-matricula');
+        if (elMatEd) elMatEd.value = u.matricula || '';
+        var elStatusEd = document.getElementById('modal-user-cpf-status');
+        if (elStatusEd) {
+          if (u.cpf) {
+            var vCpf = validarCpfLocal(u.cpf);
+            elStatusEd.textContent = vCpf.ok ? '✅ CPF válido' : '❌ ' + vCpf.erro;
+            elStatusEd.style.color = vCpf.ok ? '#10b981' : '#ef4444';
+          } else {
+            elStatusEd.textContent = '';
+          }
+        }
+
 
         const perfis = await loadPerfisParaSelect();
         const sel = document.getElementById('modal-user-perfil');
@@ -7464,6 +7546,10 @@ const email = document.getElementById('login-email').value;
       const perfil_id = document.getElementById('modal-user-perfil').value;
       const ativo = document.getElementById('modal-user-ativo').checked;
 
+      // [FIX_14c] CPF e Matrícula
+      const cpf = (document.getElementById('modal-user-cpf') ? document.getElementById('modal-user-cpf').value : '').trim();
+      const matricula = (document.getElementById('modal-user-matricula') ? document.getElementById('modal-user-matricula').value : '').trim();
+
       if (!nome || !email || !perfil_id) {
         alert('Preencha nome, email e perfil.');
         return;
@@ -7476,7 +7562,7 @@ const email = document.getElementById('login-email').value;
 
       try {
         if (modalUsuárioEditandoId) {
-          const payload = { nome, email, perfil_id, ativo };
+          const payload = { nome, email, perfil_id, ativo, cpf, matricula }; // [FIX_14c]
           const res = await apiFetch(`/usuarios/${modalUsuárioEditandoId}`, {
             method: 'PUT',
             body: JSON.stringify(payload)
@@ -7506,7 +7592,7 @@ const email = document.getElementById('login-email').value;
           }
           alert('Usuário atualizado com sucesso.');
         } else {
-          const payload = { nome, email, senha, perfil_id };
+          const payload = { nome, email, senha, perfil_id, cpf, matricula }; // [FIX_14c]
           const res = await apiFetch('/usuarios', {
             method: 'POST',
             body: JSON.stringify(payload)
@@ -7529,6 +7615,7 @@ const email = document.getElementById('login-email').value;
       }
     }
 
+    // [FIX_11] Funcao mantida para uso futuro. Botao removido da tabela.
     async function resetarSenhaUsuário(id, nome) {
       const nova = prompt(`Nova senha para "${nome}" (minimo 6 caracteres):`);
       if (!nova || nova.length < 6) {
@@ -7555,21 +7642,76 @@ const email = document.getElementById('login-email').value;
       }
     }
 
-    async function desativarUsuário(id, nome) {
-      if (!(await confirmarAção(`Desativar o usuario "${nome}"?`, { titulo: 'Desativar', tipo: 'warning', textoConfirmar: 'Desativar', icone: '\u26A0\uFE0F' }))) return;
+    // ============================================================
+    // [FIX_13] Ações de usuário: inativar, reativar, excluir
+    // ============================================================
 
+    async function inativarUsuário(id, nome) {
+      if (!(await confirmarAção(`Inativar o usuário "${nome}"?`, {
+        titulo: 'Inativar', tipo: 'warning', textoConfirmar: 'Inativar', icone: '🚫'
+      }))) return;
       try {
-        const res = await apiFetch(`/usuarios/${id}`, { method: 'DELETE' });
+        const res = await apiFetch(`/usuarios/${id}/inativar`, { method: 'PUT' });
         if (!res.ok) {
           const err = await res.json();
-          alert(err.erro || 'Erro ao desativar');
+          alert(err.erro || 'Erro ao inativar');
           return;
         }
         loadUsuáriosDaAPI();
       } catch (err) {
         console.error(err);
+        alert('Erro de rede: ' + err.message);
       }
     }
+
+    async function reativarUsuário(id, nome) {
+      if (!(await confirmarAção(`Reativar o usuário "${nome}"?`, {
+        titulo: 'Reativar', tipo: 'info', textoConfirmar: 'Reativar', icone: '✅'
+      }))) return;
+      try {
+        const res = await apiFetch(`/usuarios/${id}/reativar`, { method: 'PUT' });
+        if (!res.ok) {
+          const err = await res.json();
+          alert(err.erro || 'Erro ao reativar');
+          return;
+        }
+        loadUsuáriosDaAPI();
+      } catch (err) {
+        console.error(err);
+        alert('Erro de rede: ' + err.message);
+      }
+    }
+
+    async function excluirUsuário(id, nome) {
+      // Confirmação 1: modal
+      const ok1 = await confirmarAção(`⚠️ EXCLUIR permanentemente o usuário "${nome}"?\n\nEsta ação NÃO pode ser desfeita.`, {
+        titulo: 'Excluir Usuário', tipo: 'warning', textoConfirmar: 'Continuar', icone: '⚠️'
+      });
+      if (!ok1) return;
+
+      // Confirmação 2: digitar o nome
+      const digitado = prompt(`Para confirmar a exclusão, digite o nome exato:\n\n"${nome}"`);
+      if (digitado === null) return;
+      if (String(digitado).trim() !== String(nome).trim()) {
+        alert('Nome não confere. Exclusão cancelada.');
+        return;
+      }
+
+      try {
+        const res = await apiFetch(`/usuarios/${id}`, { method: 'DELETE' });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          alert(data.erro || 'Erro ao excluir');
+          return;
+        }
+        alert('✅ Usuário excluído com sucesso.');
+        loadUsuáriosDaAPI();
+      } catch (err) {
+        console.error(err);
+        alert('Erro de rede: ' + err.message);
+      }
+    }
+
     // FIX_USUARIOS_LOAD_APLICADO
     // =========================================================================
     // Binds diretos para as telas de Administracao
@@ -14217,6 +14359,319 @@ window.audAbrirHistoricoCompleto = function() { /* FASE_19_HIST */
   
   setInterval(atualizarClasseFlutuante, 1000);
 })();
+
+
+
+
+// ============================================================
+// [FIX_08] Modal Trocar Senha — Logica v2
+// Correcoes: regra min 6, listener robusto, botao ver senha
+// ============================================================
+
+function validarSenhaLocal(senha, email) {
+  senha = senha || '';
+  email = email || '';
+  var login = (email.split('@')[0] || '').toLowerCase();
+  var seq = ['012','123','234','345','456','567','678','789','890','987','876','765','654','543','432','321','210'];
+
+  return {
+    tamanho:       senha.length >= 6,
+    sem_acento:    !/[áàâãäéèêëíìîïóòôõöúùûüçñÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇÑ]/.test(senha),
+    sem_login:     !(login && login.length >= 3 && senha.toLowerCase().indexOf(login) !== -1),
+    sem_sequencia: !seq.some(function(s) { return senha.indexOf(s) !== -1; }),
+    tem_maiuscula: /[A-Z]/.test(senha),
+    tem_minuscula: /[a-z]/.test(senha),
+    tem_numero:    /[0-9]/.test(senha),
+    tem_especial:  /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(senha)
+  };
+}
+
+function toggleVerSenha(inputId, btn) {
+  var input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (btn) btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    if (btn) btn.textContent = '👁️';
+  }
+}
+
+function abrirModalTrocarSenha() {
+  var overlay = document.getElementById('trocar-senha-overlay');
+  if (!overlay) return;
+
+  document.getElementById('trocar-senha-atual').value = '';
+  document.getElementById('trocar-senha-nova').value = '';
+  document.getElementById('trocar-senha-confirmacao').value = '';
+
+  // Reset tipo de input (todos password)
+  ['trocar-senha-atual','trocar-senha-nova','trocar-senha-confirmacao'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.type = 'password';
+  });
+
+  var btn = document.getElementById('btn-trocar-senha-confirmar');
+  if (btn) btn.disabled = true;
+
+  atualizarRegrasTrocarSenha();
+  overlay.classList.add('open');
+
+  setTimeout(function() {
+    var inp = document.getElementById('trocar-senha-atual');
+    if (inp) inp.focus();
+  }, 100);
+}
+
+function fecharModalTrocarSenha() {
+  var overlay = document.getElementById('trocar-senha-overlay');
+  if (overlay) overlay.classList.remove('open');
+}
+
+function atualizarRegrasTrocarSenha() {
+  var nova = document.getElementById('trocar-senha-nova');
+  var conf = document.getElementById('trocar-senha-confirmacao');
+  var btn  = document.getElementById('btn-trocar-senha-confirmar');
+  if (!nova || !btn) return;
+
+  var email = (window.state && window.state.user && window.state.user.email) || '';
+  var r = validarSenhaLocal(nova.value, email);
+
+  var container = document.getElementById('trocar-senha-regras');
+  if (container) {
+    Object.keys(r).forEach(function(k) {
+      var el = container.querySelector('[data-regra="' + k + '"]');
+      if (!el) return;
+      var ok = r[k];
+      el.classList.toggle('ok', ok);
+      var icon = el.querySelector('.icon');
+      if (icon) icon.textContent = ok ? '✅' : '❌';
+    });
+  }
+
+  var todas = Object.keys(r).every(function(k) { return r[k]; });
+  var confere = nova.value !== '' && nova.value === conf.value;
+  btn.disabled = !(todas && confere);
+}
+
+function enviarTrocaSenha() {
+  var atual = document.getElementById('trocar-senha-atual').value;
+  var nova  = document.getElementById('trocar-senha-nova').value;
+  var conf  = document.getElementById('trocar-senha-confirmacao').value;
+  var btn   = document.getElementById('btn-trocar-senha-confirmar');
+
+  if (!atual || !nova || !conf) { alert('Preencha todos os campos.'); return; }
+  if (nova !== conf) { alert('A nova senha e a confirmacao nao coincidem.'); return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando...'; }
+
+  fetch('/api/auth/trocar-senha', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+    },
+    body: JSON.stringify({ senha_atual: atual, nova_senha: nova, confirmacao: conf })
+  })
+  .then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }); })
+  .then(function(r) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Trocar Senha'; }
+    if (!r.ok) { alert('Erro: ' + (r.data.erro || 'desconhecido')); return; }
+    alert('✅ Senha alterada com sucesso!');
+    fecharModalTrocarSenha();
+  })
+  .catch(function(err) {
+    if (btn) { btn.disabled = false; btn.textContent = 'Trocar Senha'; }
+    alert('Erro de rede: ' + err.message);
+  });
+}
+
+// Registra listeners APOS o DOM estar pronto
+function _inicializarModalTrocarSenha() {
+  var nova = document.getElementById('trocar-senha-nova');
+  var conf = document.getElementById('trocar-senha-confirmacao');
+  var atual = document.getElementById('trocar-senha-atual');
+
+  if (!nova) { console.warn('[FIX_08] modal-trocar-senha nao encontrado no DOM'); return; }
+
+  nova.addEventListener('input', atualizarRegrasTrocarSenha);
+  if (conf) conf.addEventListener('input', atualizarRegrasTrocarSenha);
+  if (atual) atual.addEventListener('input', atualizarRegrasTrocarSenha);
+
+  console.log('[FIX_08] Listeners do modal Trocar Senha registrados');
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _inicializarModalTrocarSenha);
+} else {
+  _inicializarModalTrocarSenha();
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var overlay = document.getElementById('trocar-senha-overlay');
+    if (overlay && overlay.classList.contains('open')) fecharModalTrocarSenha();
+  }
+});
+
+window.abrirModalTrocarSenha = abrirModalTrocarSenha;
+window.fecharModalTrocarSenha = fecharModalTrocarSenha;
+window.enviarTrocaSenha = enviarTrocaSenha;
+window.atualizarRegrasTrocarSenha = atualizarRegrasTrocarSenha;
+window.toggleVerSenha = toggleVerSenha;
+// ============================================================
+// [/FIX_08]
+// ============================================================
+
+
+// ============================================================
+// [FIX_10] Validador de senha no modal Novo/Editar Usuário
+// ============================================================
+
+function atualizarRegrasModalUsuario() {
+  var el = document.getElementById('modal-user-senha');
+  var painel = document.getElementById('modal-user-senha-regras');
+  if (!el || !painel) return;
+
+  var email = document.getElementById('modal-user-email') ? document.getElementById('modal-user-email').value : '';
+  var r = validarSenhaLocal(el.value, email);
+
+  if (el.value.length === 0) {
+    painel.style.display = 'none';
+    return;
+  }
+  painel.style.display = 'block';
+
+  Object.keys(r).forEach(function(k) {
+    var item = painel.querySelector('[data-regra="' + k + '"]');
+    if (!item) return;
+    var ok = r[k];
+    item.style.color = ok ? '#10b981' : '#ef4444';
+    item.textContent = (ok ? '✅' : '❌') + ' ' + item.textContent.replace(/^[✅❌]s*/, '');
+  });
+}
+
+function _initModalUsuarioSenha() {
+  var el = document.getElementById('modal-user-senha');
+  var emailEl = document.getElementById('modal-user-email');
+  if (!el) { console.warn('[FIX_10] modal-user-senha nao encontrado'); return; }
+  el.addEventListener('input', atualizarRegrasModalUsuario);
+  if (emailEl) emailEl.addEventListener('input', atualizarRegrasModalUsuario);
+  console.log('[FIX_10] Listener do modal-user-senha registrado');
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', _initModalUsuarioSenha);
+} else {
+  _initModalUsuarioSenha();
+}
+
+window.atualizarRegrasModalUsuario = atualizarRegrasModalUsuario;
+// ============================================================
+// [/FIX_10]
+// ============================================================
+
+
+// ============================================================
+// [FIX_14c] Máscara e validação de CPF no modal de usuário
+// ============================================================
+
+function mascaraCPF(v) {
+  v = String(v || '').replace(/\D/g, '').slice(0, 11);
+  if (v.length <= 3) return v;
+  if (v.length <= 6) return v.slice(0,3) + '.' + v.slice(3);
+  if (v.length <= 9) return v.slice(0,3) + '.' + v.slice(3,6) + '.' + v.slice(6);
+  return v.slice(0,3) + '.' + v.slice(3,6) + '.' + v.slice(6,9) + '-' + v.slice(9);
+}
+
+function validarCpfLocal(cpf) {
+  var c = String(cpf || '').replace(/\D/g, '');
+  if (c.length !== 11) return { ok: false, erro: 'CPF deve ter 11 digitos' };
+  if (/^(\d)\1{10}$/.test(c)) return { ok: false, erro: 'CPF invalido (digitos repetidos)' };
+  var soma = 0;
+  for (var i = 0; i < 9; i++) soma += parseInt(c[i]) * (10 - i);
+  var r1 = (soma * 10) % 11; if (r1 === 10) r1 = 0;
+  if (r1 !== parseInt(c[9])) return { ok: false, erro: 'CPF invalido (1o digito)' };
+  soma = 0;
+  for (var j = 0; j < 10; j++) soma += parseInt(c[j]) * (11 - j);
+  var r2 = (soma * 10) % 11; if (r2 === 10) r2 = 0;
+  if (r2 !== parseInt(c[10])) return { ok: false, erro: 'CPF invalido (2o digito)' };
+  return { ok: true };
+}
+
+(function initCpfMask() {
+  function bind() {
+    var el = document.getElementById('modal-user-cpf');
+    if (!el || el.dataset.maskBound) return;
+    el.dataset.maskBound = '1';
+    el.addEventListener('input', function() {
+      var pos = el.selectionStart;
+      var antes = el.value.length;
+      el.value = mascaraCPF(el.value);
+      var depois = el.value.length;
+      pos = pos + (depois - antes);
+      try { el.setSelectionRange(pos, pos); } catch (e) {}
+      var status = document.getElementById('modal-user-cpf-status');
+      if (status) {
+        if (!el.value) { status.textContent = ''; return; }
+        var v = validarCpfLocal(el.value);
+        status.textContent = v.ok ? '✅ CPF válido' : '❌ ' + v.erro;
+        status.style.color = v.ok ? '#10b981' : '#ef4444';
+      }
+    });
+    console.log('[FIX_14c] Listener do modal-user-cpf registrado');
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+  else bind();
+})();
+
+window.validarCpfLocal = validarCpfLocal;
+window.mascaraCPF = mascaraCPF;
+// ============================================================
+// [/FIX_14c]
+// ============================================================
+
 </script>
+
+<!-- [FIX_07a] Modal Trocar Senha -->
+<div id="trocar-senha-overlay">
+  <div id="trocar-senha-modal">
+    <div class="trocar-senha-header">
+      <h2>🔒 Trocar Senha</h2>
+      <button type="button" class="trocar-senha-btn cancelar" onclick="fecharModalTrocarSenha()" style="padding:4px 10px;">×</button>
+    </div>
+    <div class="trocar-senha-body">
+      <div class="trocar-senha-field">
+        <label for="trocar-senha-atual">Senha atual</label>
+        <div style="position:relative;"><input type="password" id="trocar-senha-atual" autocomplete="current-password"><button type="button" onclick="toggleVerSenha('trocar-senha-atual', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;">👁️</button></div>
+      </div>
+      <div class="trocar-senha-field">
+        <label for="trocar-senha-nova">Nova senha</label>
+        <div style="position:relative;"><input type="password" id="trocar-senha-nova" autocomplete="new-password"><button type="button" onclick="toggleVerSenha('trocar-senha-nova', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;">👁️</button></div>
+      </div>
+      <div class="trocar-senha-field">
+        <label for="trocar-senha-confirmacao">Confirmação da senha</label>
+        <div style="position:relative;"><input type="password" id="trocar-senha-confirmacao" autocomplete="new-password"><button type="button" onclick="toggleVerSenha('trocar-senha-confirmacao', this)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1rem;">👁️</button></div>
+      </div>
+      <div class="trocar-senha-regras" id="trocar-senha-regras">
+        <div class="regra" data-regra="tamanho"><span class="icon">❌</span><span>A senha deverá possuir no mínimo 6 e no máximo 10 caracteres</span></div>
+        <div class="regra" data-regra="sem_acento"><span class="icon">❌</span><span>Não deverá conter palavras acentuadas</span></div>
+        <div class="regra" data-regra="sem_login"><span class="icon">❌</span><span>Não deverá conter o login do seu cadastro</span></div>
+        <div class="regra" data-regra="sem_sequencia"><span class="icon">❌</span><span>Não deverá conter números em sequência. Ex.: 123, 4321, 987, etc...</span></div>
+        <div class="regra" data-regra="tem_maiuscula"><span class="icon">❌</span><span>Ao menos uma letra maiúscula</span></div>
+        <div class="regra" data-regra="tem_minuscula"><span class="icon">❌</span><span>Ao menos uma letra minúscula</span></div>
+        <div class="regra" data-regra="tem_numero"><span class="icon">❌</span><span>Ao menos um número</span></div>
+        <div class="regra" data-regra="tem_especial"><span class="icon">❌</span><span>Ao menos um carácter especial (!@#$%)</span></div>
+      </div>
+    </div>
+    <div class="trocar-senha-footer">
+      <button type="button" class="trocar-senha-btn cancelar" onclick="fecharModalTrocarSenha()">Cancelar</button>
+      <button type="button" class="trocar-senha-btn confirmar" id="btn-trocar-senha-confirmar" onclick="enviarTrocaSenha()" disabled>Trocar Senha</button>
+    </div>
+  </div>
+</div>
+<!-- /[FIX_07a] Modal Trocar Senha -->
+
 </body>
 </html>

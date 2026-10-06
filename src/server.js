@@ -287,6 +287,7 @@ const ROTAS = [
   './routes/alertas',
   './routes/historico',
   './routes/backup', // FASE_9_BACKUP
+  './routes/trocar_senha', // [FIX_06b_v2]
 ];
 
 ROTAS.forEach((caminho) => {
