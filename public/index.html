@@ -13209,6 +13209,13 @@ function renderHistorico(data) {
           var _status = _calcularStatusBackup(ultimo.criado_em);
           if (elUlt) elUlt.style.color = _status.cor;
           _atualizarAlertaBackup(_status.horas);
+          // [FIX_18d_v3] Também considera o completo
+          if (ultimoCompleto) {
+            var _stC = _calcularStatusBackup(ultimoCompleto.criado_em);
+            if (_stC.alerta && (!_status || _stC.horas > _status.horas)) {
+              _atualizarAlertaBackup(_stC.horas);
+            }
+          }
         } catch (_e) { console.warn('[FIX_18d] Erro ao aplicar status:', _e); }
       } else if (elUlt) { elUlt.textContent = '--'; if (elUltInfo) elUltInfo.textContent = 'Nenhum'; }
       var elComp = document.getElementById('card-bkp-completo');
@@ -13216,12 +13223,24 @@ function renderHistorico(data) {
       if (elComp && ultimoCompleto) {
         elComp.textContent = new Date(ultimoCompleto.criado_em).toLocaleDateString('pt-BR');
         if (elCompInfo) elCompInfo.textContent = formatBytes(ultimoCompleto.tamanho);
+        // [FIX_18d_v3] Cor + texto relativo no KPI Completo
+        try {
+          var _stComp = _calcularStatusBackup(ultimoCompleto.criado_em);
+          if (elComp) elComp.style.color = _stComp.cor;
+          if (elCompInfo) elCompInfo.textContent = _stComp.texto + ' - ' + formatBytes(ultimoCompleto.tamanho);
+        } catch (_e) { console.warn('[FIX_18d_v3] Erro comp:', _e); }
       } else if (elComp) { elComp.textContent = '--'; if (elCompInfo) elCompInfo.textContent = 'Nenhum'; }
       var elRes = document.getElementById('card-bkp-restore');
       var elResInfo = document.getElementById('card-bkp-restore-info');
       if (elRes && preRestore) {
         elRes.textContent = new Date(preRestore.criado_em).toLocaleDateString('pt-BR');
         if (elResInfo) elResInfo.textContent = new Date(preRestore.criado_em).toLocaleTimeString('pt-BR');
+        // [FIX_18d_v3] Cor + texto relativo no KPI Restauração
+        try {
+          var _stRes = _calcularStatusBackup(preRestore.criado_em);
+          if (elRes) elRes.style.color = _stRes.cor;
+          if (elResInfo) elResInfo.textContent = _stRes.texto;
+        } catch (_e) { console.warn('[FIX_18d_v3] Erro restore:', _e); }
       } else if (elRes) { elRes.textContent = '--'; if (elResInfo) elResInfo.textContent = 'Nunca'; }
     } catch (e) { console.error('Erro cards:', e); }
 
