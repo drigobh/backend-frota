@@ -48,7 +48,11 @@ async function routes(fastify, options) {
       // Agora o admin passa pelo fluxo normal (senha bcrypt validada).
       //
       // 2. DEMAIS USUÁRIOS
-      const res = await db.query('SELECT * FROM usuarios WHERE LOWER(email) = $1', [emailLimpo]);
+      // [FIX_02] Bloqueia login de usuario excluido (soft delete)
+      const res = await db.query(
+        'SELECT * FROM usuarios WHERE LOWER(email) = $1 AND deleted_at IS NULL',
+        [emailLimpo]
+      );
       if (res.rows.length === 0) {
         await gravarLogAcesso(db, Object.assign({}, sessao, {
           email_tentado: emailLimpo, sucesso: false, motivo_falha: 'usuario_nao_encontrado'
@@ -90,9 +94,29 @@ async function routes(fastify, options) {
 
       const payload = { id: user.id, email: user.email, nome: user.nome, perfil: user.perfil || 'Operador' };
 
-      // [FIX_25] Verifica se usuario tem 2FA ativo
-      const check2fa = await db.query('SELECT totp_ativo FROM usuarios WHERE id::text = $1::text', [String(user.id)]);
+      // [FIX_29b] Verifica 2FA obrigatorio + ativo
+      const check2fa = await db.query('SELECT totp_ativo, totp_obrigatorio FROM usuarios WHERE id::text = $1::text', [String(user.id)]);
       const tem2faAtivo = check2fa.rows[0] && check2fa.rows[0].totp_ativo === true;
+      const tem2faObrig = check2fa.rows[0] && check2fa.rows[0].totp_obrigatorio === true;
+
+      // [FIX_29c-5] Se obrigatorio MAS nao ativou -> emite JWT com flag "precisa_ativar_2fa"
+      // O JWT e valido pra chamar /api/auth/2fa/setup, mas o frontend NAO deixa entrar
+      // ate o usuario ativar o 2FA.
+      if (tem2faObrig && !tem2faAtivo) {
+        const payloadComFlag = Object.assign({}, payload, { precisa_ativar_2fa: true });
+        const token = fastify.jwt.sign(payloadComFlag);
+
+        await gravarLogAcesso(db, Object.assign({}, sessao, {
+          usuario_id: user.id, email_tentado: emailLimpo, sucesso: true, motivo_falha: 'precisa_ativar_2fa'
+        }));
+
+        return reply.send({
+          requer_2fa_setup: true,
+          token: token,
+          usuario: payloadComFlag,
+          mensagem: '2FA obrigatorio. Ative antes de entrar.',
+        });
+      }
 
       if (tem2faAtivo) {
         // Nao emite JWT final. Emite token TEMPORARIO (5 min) so pra validar o 2FA.
@@ -166,7 +190,8 @@ async function routes(fastify, options) {
     }
 
     try {
-      const r = await db.query('SELECT id, nome, email, perfil, totp_secret, totp_ativo, ativo FROM usuarios WHERE id::text = $1::text', [String(decoded.id)]);
+      // [FIX_29b-2] Inclui flags de RBAC no SELECT
+      const r = await db.query('SELECT id, nome, email, perfil, totp_secret, totp_ativo, totp_obrigatorio, permite_desativar_2fa, ativo FROM usuarios WHERE id::text = $1::text', [String(decoded.id)]);
       if (r.rows.length === 0) return reply.code(404).send({ erro: 'Usuario nao encontrado.' });
       const user = r.rows[0];
 
@@ -188,7 +213,14 @@ async function routes(fastify, options) {
         return reply.code(400).send({ erro: 'Codigo invalido. Tente novamente.' });
       }
 
-      const payload = { id: user.id, email: user.email, nome: user.nome, perfil: user.perfil || 'Operador' };
+      const payload = {
+        id: user.id,
+        email: user.email,
+        nome: user.nome,
+        perfil: user.perfil || 'Operador',
+        totp_obrigatorio: user.totp_obrigatorio === true,
+        permite_desativar_2fa: user.permite_desativar_2fa === true,
+      };
       const token = fastify.jwt.sign(payload);
 
       try {
