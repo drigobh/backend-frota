@@ -2,6 +2,7 @@ const db = require('../database');
 const { capturarSessaoInfo, gravarLogAcesso } = require('../session'); // FASE_13_SESSAO
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const speakeasy = require('speakeasy'); // [FIX_25]
 
 async function hashSenha(senha) {
   return bcrypt.hash(String(senha), 10);
@@ -88,7 +89,30 @@ async function routes(fastify, options) {
       await db.query('UPDATE usuarios SET ultimo_login = CURRENT_TIMESTAMP WHERE id = $1', [user.id]);
 
       const payload = { id: user.id, email: user.email, nome: user.nome, perfil: user.perfil || 'Operador' };
-      // [FIX_02] Sem fallback: confia apenas no fastify.jwt (registrado em server.js)
+
+      // [FIX_25] Verifica se usuario tem 2FA ativo
+      const check2fa = await db.query('SELECT totp_ativo FROM usuarios WHERE id::text = $1::text', [String(user.id)]);
+      const tem2faAtivo = check2fa.rows[0] && check2fa.rows[0].totp_ativo === true;
+
+      if (tem2faAtivo) {
+        // Nao emite JWT final. Emite token TEMPORARIO (5 min) so pra validar o 2FA.
+        const tokenTemp = fastify.jwt.sign(
+          { id: user.id, fase: 'aguardando_2fa' },
+          { expiresIn: '5m' }
+        );
+
+        await gravarLogAcesso(db, Object.assign({}, sessao, {
+          usuario_id: user.id, email_tentado: emailLimpo, sucesso: true, motivo_falha: 'aguardando_2fa'
+        }));
+
+        return reply.send({
+          requer_2fa: true,
+          token_temp: tokenTemp,
+          mensagem: 'Digite o codigo de 6 digitos do seu autenticador.',
+        });
+      }
+
+      // 2FA desativado - emite JWT normal
       const token = fastify.jwt.sign(payload);
 
       await gravarLogAcesso(db, Object.assign({}, sessao, {
@@ -119,6 +143,68 @@ async function routes(fastify, options) {
   // ============================================================
   // FIM FASE_13_SESSAO
   // ============================================================
+
+  // =========================================================================
+  // [FIX_25] POST /api/login/2fa - valida codigo TOTP e emite JWT final
+  // =========================================================================
+  fastify.post('/api/login/2fa', async (req, reply) => {
+    const { token_temp, codigo } = req.body || {};
+
+    if (!token_temp || !codigo) {
+      return reply.code(400).send({ erro: 'Token temporario e codigo sao obrigatorios.' });
+    }
+
+    let decoded;
+    try {
+      decoded = fastify.jwt.verify(token_temp);
+    } catch (e) {
+      return reply.code(401).send({ erro: 'Token temporario invalido ou expirado. Faca login novamente.' });
+    }
+
+    if (decoded.fase !== 'aguardando_2fa') {
+      return reply.code(400).send({ erro: 'Token com fase incorreta.' });
+    }
+
+    try {
+      const r = await db.query('SELECT id, nome, email, perfil, totp_secret, totp_ativo, ativo FROM usuarios WHERE id::text = $1::text', [String(decoded.id)]);
+      if (r.rows.length === 0) return reply.code(404).send({ erro: 'Usuario nao encontrado.' });
+      const user = r.rows[0];
+
+      if (user.ativo === false) {
+        return reply.code(401).send({ erro: 'Usuario inativo.' });
+      }
+      if (user.totp_ativo !== true || !user.totp_secret) {
+        return reply.code(400).send({ erro: '2FA nao esta configurado para este usuario.' });
+      }
+
+      const valido = speakeasy.totp.verify({
+        secret: user.totp_secret,
+        encoding: 'base32',
+        token: String(codigo),
+        window: 1,
+      });
+
+      if (!valido) {
+        return reply.code(400).send({ erro: 'Codigo invalido. Tente novamente.' });
+      }
+
+      const payload = { id: user.id, email: user.email, nome: user.nome, perfil: user.perfil || 'Operador' };
+      const token = fastify.jwt.sign(payload);
+
+      try {
+        const sessao = await capturarSessaoInfo(req);
+        await gravarLogAcesso(db, Object.assign({}, sessao, {
+          usuario_id: user.id, email_tentado: user.email, sucesso: true, motivo_falha: null
+        }));
+      } catch (e) { /* silencioso */ }
+
+      return reply.send({ token, usuario: payload });
+    } catch (err) {
+      console.error('[login/2fa] Erro:', err);
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+
 }
 
 module.exports = routes;
