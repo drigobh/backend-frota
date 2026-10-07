@@ -64,3 +64,5 @@ secrets/
 *gserviceaccount*.json
 *credentials*.json
 
+
+*.pre-fix*
