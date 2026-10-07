@@ -1,3 +1,4 @@
+require('dotenv').config();
 // =========================================================================
 // CADERNINHO DE MOTORISTA - SERVIDOR PRINCIPAL
 // Stack: Fastify + PostgreSQL (Neon) + Render
@@ -54,7 +55,6 @@ const rateLimit = require('@fastify/rate-limit');
 const helmet = require('@fastify/helmet'); // FASE_3B_HELMET // FASE_3B_RATE_LIMIT
 const path = require('path');
 const fs = require('fs');
-require('dotenv').config();
 const db = require('./database');
 
 // =========================================================================
