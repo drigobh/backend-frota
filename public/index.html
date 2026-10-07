@@ -5575,6 +5575,17 @@ const email = document.getElementById('login-email').value;
         document.getElementById('login-screen').style.display = 'none';
         
         initApp();
+
+// [FIX_22] Recarrega o iframe de empresas (que carregou antes do login)
+try {
+  var _iframeEmp = document.querySelector('iframe[src*="empresas.html"]');
+  if (_iframeEmp) {
+    console.log('[FIX_22] Recarregando iframe de empresas...');
+    _iframeEmp.contentWindow.location.reload();
+  }
+} catch (e) {
+  console.warn('[FIX_22] Erro ao recarregar iframe:', e.message);
+}
       } catch (err) {
         alert('Erro: ' + err.message);
       }
