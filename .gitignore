@@ -66,3 +66,11 @@ secrets/
 
 
 *.pre-fix*
+
+public/index*.bak*
+public/index_*BACKUP*.html
+public/index_CORROMPIDO_*.html
+public/empresas_*.bak
+
+public/index_MANUAL_BACKUP_*.html
+public/empresas_BACKUP_*
