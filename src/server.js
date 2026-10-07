@@ -79,7 +79,7 @@ console.log('-------------------------------------------------------------------
 const ALLOWED_ORIGINS = [
   'https://backend-frota-72ni.onrender.com',
   'http://localhost:3000',
-  'http://127.0.0.1:3000',      // â† ADICIONADO (Chrome usa esse)
+  'http://127.0.0.1:3000',      // ← ADICIONADO (Chrome usa esse)
   'http://localhost:5500',
   'http://127.0.0.1:5500',
 ];
@@ -249,7 +249,7 @@ fastify.addHook('onRoute', (routeOptions) => {
 
 
 // =========================================================================
-// ARQUIVOS ESTÃTICOS (Frontend)
+// ARQUIVOS ESTÁTICOS (Frontend)
 // =========================================================================
 fastify.register(require('@fastify/static'), {
   root: path.join(__dirname, '../public'),
@@ -945,12 +945,9 @@ console.log('-------------------------------------------------------------------
     console.log('');
   } catch (err) {
     clearTimeout(watchdog);
-    console.error('âŒ [BOOT] Erro ao iniciar servidor:', err);
+    console.error('❌ [BOOT] Erro ao iniciar servidor:', err);
     process.exit(1);
   }
 };
 
 start();
-
-
-
