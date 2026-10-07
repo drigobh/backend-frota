@@ -1,49 +1,45 @@
 /**
- * FASE_5_GMAIL_SMTP - Envio de email via Gmail SMTP (Nodemailer)
- * Permite envio para qualquer destinatario.
+ * [FIX_23] Envio de emails via Resend API.
+ * Substitui Gmail SMTP (Nodemailer).
+ *
+ * Variaveis de ambiente:
+ *   RESEND_API_KEY - chave da API Resend
+ *   EMAIL_FROM     - remetente (default: Caderninho <onboarding@resend.dev>)
+ *   APP_URL        - URL do sistema (para link de recuperacao)
  */
 
-const nodemailer = require("nodemailer");
+const { Resend } = require('resend');
 
-let _transporter = null;
-function getTransporter() {
-  if (_transporter) return _transporter;
+let _resend = null;
+function getResend() {
+  if (_resend) return _resend;
 
-  const host = process.env.EMAIL_HOST || "smtp.gmail.com";
-  const port = parseInt(process.env.EMAIL_PORT || "587", 10);
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_PASS;
-
-  if (!user || !pass) {
-    console.warn("[email] EMAIL_USER ou EMAIL_PASS nao configurados.");
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn('[email] RESEND_API_KEY nao configurado.');
     return null;
   }
 
-  /* FASE_12_TIMEOUTS_SMTP - evita travamento infinito no envio */
-  _transporter = nodemailer.createTransport({
-    host: host,
-    port: port,
-    secure: false,
-    auth: { user: user, pass: pass },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 30000,
-  });
-
-  return _transporter;
+  try {
+    _resend = new Resend(apiKey);
+    return _resend;
+  } catch (e) {
+    console.error('[email] Erro ao criar cliente Resend:', e.message);
+    return null;
+  }
 }
 
-const FROM = process.env.EMAIL_FROM || process.env.EMAIL_USER;
-const APP_URL = process.env.APP_URL || "https://backend-frota-72ni.onrender.com";
+const FROM = process.env.EMAIL_FROM || 'Caderninho de Frota <onboarding@resend.dev>';
+const APP_URL = process.env.APP_URL || 'https://backend-frota-72ni.onrender.com';
 
 async function enviarEmailRecuperacaoSenha(para, nome, token) {
-  const transporter = getTransporter();
-  if (!transporter) {
-    return { ok: false, erro: "EMAIL_USER/EMAIL_PASS nao configurados" };
+  const resend = getResend();
+  if (!resend) {
+    return { ok: false, erro: 'RESEND_API_KEY nao configurado' };
   }
 
-  const link = APP_URL + "/reset?token=" + encodeURIComponent(token);
-  const nomeSeguro = nome || "usuario";
+  const link = APP_URL + '/reset?token=' + encodeURIComponent(token);
+  const nomeSeguro = nome || 'usuario';
 
   const html = `<!DOCTYPE html>
 <html>
@@ -80,30 +76,31 @@ async function enviarEmailRecuperacaoSenha(para, nome, token) {
 </html>`;
 
   try {
-    const info = await transporter.sendMail({
+    const result = await resend.emails.send({
       from: FROM,
       to: para,
-      subject: "Recuperacao de senha - Caderninho de Frota",
+      subject: 'Recuperacao de senha - Caderninho de Frota',
       html: html,
     });
 
-    console.log("[email] Enviado para " + para + " - ID: " + info.messageId);
-    return { ok: true, id: info.messageId };
+    if (result.error) {
+      console.error('[email] Resend erro:', result.error.message || JSON.stringify(result.error));
+      return { ok: false, erro: result.error.message || 'Erro Resend' };
+    }
+
+    const id = result.data && result.data.id;
+    console.log('[email] Enviado (Resend) para ' + para + ' - ID: ' + id);
+    return { ok: true, id: id };
   } catch (err) {
-    console.error("[email] Erro:", err.message);
+    console.error('[email] Erro:', err.message);
     return { ok: false, erro: err.message };
   }
 }
 
-
-
-// =========================================================================
-// [FIX_18b] Alerta por email quando backup automatico falha
-// =========================================================================
 async function enviarEmailAlertaBackup(erro) {
-  const transporter = getTransporter();
-  if (!transporter) {
-    console.warn('[email] Nao foi possivel enviar alerta de backup: EMAIL_USER/PASS nao configurados.');
+  const resend = getResend();
+  if (!resend) {
+    console.warn('[email] Nao foi possivel enviar alerta de backup: RESEND_API_KEY nao configurado.');
     return { ok: false, erro: 'email nao configurado' };
   }
 
@@ -146,19 +143,25 @@ async function enviarEmailAlertaBackup(erro) {
 </html>`;
 
   try {
-    const info = await transporter.sendMail({
+    const result = await resend.emails.send({
       from: FROM,
       to: adminEmail,
       subject: '[ALERTA] Falha no backup automatico - Caderninho de Frota',
       html: html,
     });
-    console.log('[email] Alerta de backup enviado para ' + adminEmail + ' - ID: ' + info.messageId);
-    return { ok: true, id: info.messageId };
+
+    if (result.error) {
+      console.error('[email] Resend erro (alerta):', result.error.message || JSON.stringify(result.error));
+      return { ok: false, erro: result.error.message || 'Erro Resend' };
+    }
+
+    const id = result.data && result.data.id;
+    console.log('[email] Alerta de backup enviado (Resend) para ' + adminEmail + ' - ID: ' + id);
+    return { ok: true, id: id };
   } catch (err) {
     console.error('[email] Falha ao enviar alerta de backup:', err.message);
     return { ok: false, erro: err.message };
   }
 }
-
 
 module.exports = { enviarEmailRecuperacaoSenha, enviarEmailAlertaBackup };
