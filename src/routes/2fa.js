@@ -11,7 +11,33 @@
 
 const db = require('../database');
 const speakeasy = require('speakeasy');
+const crypto = require('crypto');
 const QRCode = require('qrcode');
+
+
+// =========================================================================
+// [FIX_31b] Helper: gera 10 recovery codes + hash bcrypt
+// =========================================================================
+function gerarRecoveryCodes() {
+  const codes = [];
+  for (let i = 0; i < 10; i++) {
+    // Formato: XXXX-XXXX-XXXX (12 chars hex + 2 hifens)
+    const raw = crypto.randomBytes(6).toString('hex').toUpperCase();
+    const formatado = raw.slice(0, 4) + '-' + raw.slice(4, 8) + '-' + raw.slice(8, 12);
+    codes.push(formatado);
+  }
+  return codes;
+}
+
+async function hashRecoveryCodes(codes) {
+  const bcrypt = require('bcrypt');
+  const resultado = [];
+  for (const code of codes) {
+    const hash = await bcrypt.hash(code, 10);
+    resultado.push({ hash, usado: false, usado_em: null });
+  }
+  return resultado;
+}
 
 async function routes(fastify, options) {
 
@@ -97,13 +123,21 @@ async function routes(fastify, options) {
         return reply.code(400).send({ erro: 'Codigo invalido. Verifique o horario do celular e tente novamente.' });
       }
 
-      // Ativa 2FA
+      // [FIX_31b] Gera 10 recovery codes
+      const recoveryCodes = gerarRecoveryCodes();
+      const recoveryCodesHash = await hashRecoveryCodes(recoveryCodes);
+
+      // Ativa 2FA + salva recovery codes
       await db.query(
-        "UPDATE usuarios SET totp_ativo = true, totp_ativo_em = NOW() WHERE id::text = $1::text",
-        [String(userId)]
+        "UPDATE usuarios SET totp_ativo = true, totp_ativo_em = NOW(), recovery_codes = $2::jsonb, recovery_codes_at = NOW() WHERE id::text = $1::text",
+        [String(userId), JSON.stringify(recoveryCodesHash)]
       );
 
-      return reply.send({ ok: true, mensagem: '2FA ativado com sucesso!' });
+      return reply.send({
+        ok: true,
+        mensagem: '2FA ativado com sucesso!',
+        recovery_codes: recoveryCodes,
+      });
     } catch (err) {
       console.error('[2fa/verificar] Erro:', err);
       return reply.code(500).send({ erro: err.message });

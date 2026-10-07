@@ -37,7 +37,7 @@ async function routes(fastify, options) {
       await ensurePerfis();
       const res = await db.query(`
         SELECT 
-          p.id, p.nome, p.descricao, p.ativo, p.eh_sistema, p.created_at,
+          p.id, p.nome, p.descricao, p.ativo, p.eh_sistema, p.totp_obrigatorio, p.created_at,
           COALESCE(COUNT(pp.permissao_id), 0)::int AS total_permissoes,
           (SELECT COUNT(*)::int FROM permissoes) AS total_permissoes_sistema
         FROM perfis p
@@ -107,8 +107,7 @@ async function routes(fastify, options) {
   // CRIAR PERFIL (com permissoes opcionais)
   // ==========================================================================
   fastify.post('/api/perfis', { preHandler: [fastify.autenticar] }, async (req, reply) => {
-    const { nome, descricao, ativo = true, permissoes = [] } = req.body || {};
-    if (!nome) return reply.code(400).send({ erro: 'Nome do perfil e obrigatorio.' });
+    const { nome, descricao, ativo = true, permissoes = [], totp_obrigatorio = false } = req.body || {}; if (!nome) return reply.code(400).send({ erro: 'Nome do perfil e obrigatorio.' });
 
     const client = await db.pool.connect();
     try {
@@ -116,9 +115,8 @@ async function routes(fastify, options) {
       await client.query('BEGIN');
 
       const res = await client.query(
-        'INSERT INTO perfis (nome, descricao, ativo, eh_sistema) VALUES ($1, $2, $3, false) RETURNING *',
-        [nome, descricao || '', ativo]
-      );
+        'INSERT INTO perfis (nome, descricao, ativo, eh_sistema, totp_obrigatorio) VALUES ($1, $2, $3, false, $4) RETURNING *',
+        [nome, descricao || '', ativo, totp_obrigatorio === true] );
       const perfil = res.rows[0];
 
       if (permissoes.length > 0) {
@@ -147,13 +145,11 @@ async function routes(fastify, options) {
   // ==========================================================================
   fastify.put('/api/perfis/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { id } = req.params;
-    const { nome, descricao, ativo } = req.body || {};
-    try {
+    const { nome, descricao, ativo, totp_obrigatorio } = req.body || {}; try {
       await ensurePerfis();
       const res = await db.query(
-        'UPDATE perfis SET nome = COALESCE($1, nome), descricao = COALESCE($2, descricao), ativo = COALESCE($3, ativo) WHERE id = $4 RETURNING *',
-        [nome, descricao, ativo, id]
-      );
+        'UPDATE perfis SET nome = COALESCE($1, nome), descricao = COALESCE($2, descricao), ativo = COALESCE($3, ativo), totp_obrigatorio = COALESCE($5, totp_obrigatorio) WHERE id = $4 RETURNING *',
+        [nome, descricao, ativo, id, totp_obrigatorio] );
       if (res.rows.length === 0) return reply.code(404).send({ erro: 'Perfil nao encontrado.' });
       return reply.send(res.rows[0]);
     } catch (err) {

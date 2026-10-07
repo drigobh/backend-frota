@@ -3230,6 +3230,21 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 .login-2fa-back:hover { color:#ffffff; }
 #login-form.hidden { display:none; }
 </style>
+<style>
+/* [FIX_29c-4] Bloco setup 2FA no login */
+#login-2fa-setup-block { display:none; }
+#login-2fa-setup-block.visible { display:block; }
+#login-2fa-setup-block .setup-title { color:#ffffff; font-size:1.05rem; font-weight:700; margin:0 0 0.5rem; text-align:center; }
+#login-2fa-setup-block .setup-subtitle { color:#cbd5e1; font-size:0.8rem; margin:0 0 1rem; text-align:center; line-height:1.5; }
+#login-2fa-setup-block .setup-qr { display:flex; justify-content:center; margin:12px 0; }
+#login-2fa-setup-block .setup-qr img { max-width:180px; width:100%; background:#fff; padding:8px; border-radius:8px; }
+#login-2fa-setup-block .setup-secret { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:6px; padding:8px 10px; margin:10px 0; font-family:monospace; font-size:0.7rem; word-break:break-all; color:#cbd5e1; text-align:center; }
+#login-2fa-setup-block .setup-label { color:#cbd5e1; font-size:0.8rem; margin:12px 0 6px; text-align:center; }
+#login-2fa-codigo-setup { letter-spacing:8px; text-align:center; font-family:monospace; font-size:1.3rem; }
+#login-2fa-setup-block .setup-actions { display:flex; flex-direction:column; gap:8px; margin-top:1rem; }
+#login-form.hidden-setup { display:none; }
+#login-2fa-block.hidden-setup { display:none; }
+</style>
 </head>
 <body>
 
@@ -3282,6 +3297,32 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
         </div>
       </div>
       <!-- /[FIX_27] Bloco 2FA -->
+
+      <!-- [FIX_29c-4] Bloco setup 2FA (obrigatorio) -->
+      <div id="login-2fa-setup-block">
+        <h2 class="setup-title">🔐 Ative o 2FA antes de entrar</h2>
+        <p class="setup-subtitle">Este perfil exige autenticacao em 2 fatores.<br>Escaneie o QR Code com o Google Authenticator:</p>
+        <div class="setup-qr" id="setup-qr-wrap">
+          <img id="setup-qr-img" src="" alt="QR Code 2FA">
+        </div>
+        <p class="setup-label">Ou digite este codigo manualmente:</p>
+        <div class="setup-secret" id="setup-secret">carregando...</div>
+        <p class="setup-label">Digite o codigo de 6 digitos que o app mostra:</p>
+        <div class="login-new-input-wrap" style="margin-bottom:0.75rem;">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </span>
+          <input type="text" id="login-2fa-codigo-setup" class="login-new-input" placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
+        </div>
+        <div class="setup-actions">
+          <button type="button" class="login-btn-new" id="btn-setup-2fa" onclick="ativar2FASetup()">
+            <span id="btn-setup-2fa-txt">Ativar 2FA e Entrar</span>
+          </button>
+          <button type="button" class="login-2fa-back" onclick="voltarLoginSetup()">← Sair da conta</button>
+        </div>
+      </div>
+      <!-- /[FIX_29c-4] -->
+
 
 
       <hr class="login-divider">
@@ -4696,6 +4737,18 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
               <label style="font-size:0.8rem; font-weight:600; display:block; margin-bottom:4px;">Perfil de acesso</label>
               <select id="modal-user-perfil" class="login-input" style="margin-bottom:0;"></select>
             </div>
+            <div id="modal-user-2fa-wrap" style="display:none; margin-bottom:0.75rem; padding:10px 12px; background:#fffbeb; border:1px solid #fde68a; border-radius:8px;">
+              <div style="font-size:0.8rem; color:#78350f; margin-bottom:8px;">
+                <strong>⚠️ Este perfil exige 2FA</strong><br>
+                O usuario precisara ativar a autenticacao em 2 fatores no primeiro login.
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" id="modal-user-permite-desativar">
+                <label for="modal-user-permite-desativar" style="margin:0; cursor:pointer; font-size:0.8rem; color:#78350f;">Permitir que este usuario desative o 2FA</label>
+              </div>
+            </div>
+            <div style="margin-bottom:0.75rem; display:none;">
+            </div>
             <div style="margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
               <input type="checkbox" id="modal-user-ativo" checked>
               <label for="modal-user-ativo" style="font-size:0.875rem; font-weight:600;">Usuário ativo</label>
@@ -4763,6 +4816,10 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             <div class="modal-field" style="display:flex; align-items:center; gap:8px;">
               <input type="checkbox" id="modal-perfil-ativo" checked>
               <label for="modal-perfil-ativo" style="margin:0; cursor:pointer;">Perfil ativo</label>
+            </div>
+            <div class="modal-field" style="display:flex; align-items:center; gap:8px;">
+              <input type="checkbox" id="modal-perfil-totp">
+              <label for="modal-perfil-totp" style="margin:0; cursor:pointer;">Exigir 2FA para usuarios deste perfil</label>
             </div>
             <div class="modal-field">
               <label>Permissoes de Acesso (marque os menus e acoes liberados)</label>
@@ -5632,6 +5689,16 @@ const email = document.getElementById('login-email').value;
         if (!res.ok) {
           throw new Error(data.erro || 'Falha no login');
         }
+        // [FIX_29c-4] Verifica se backend pediu SETUP obrigatorio de 2FA
+        if (data.requer_2fa_setup === true) {
+          console.log('[FIX_29c-4] Backend exigiu SETUP de 2FA. Mostrando bloco de ativacao...');
+          _tokenTempSetup2FA = data.token;
+          _mostrarBlocoSetup2FA();
+          setTimeout(iniciarSetup2FA, 300);
+          window.__loginEmAndamento = false;
+          return;
+        }
+
         // [FIX_27] Verifica se backend pediu 2FA
         if (data.requer_2fa === true) {
           console.log('[FIX_27] Backend pediu 2FA. Mostrando bloco de codigo...');
@@ -5667,9 +5734,54 @@ try {
   }
 }
     function fazerLogout() {
-      localStorage.removeItem('token');
-      state.user = null;
-      document.getElementById('login-screen').style.display = 'flex';
+      // [FIX_28] Reset completo do estado de login
+      try {
+        // 1. Limpa tokens/sessao
+        localStorage.removeItem('token');
+        if (window.state) window.state.user = null;
+
+        // 2. Zera o token temporario de 2FA
+        if (typeof _tokenTemp2FA !== 'undefined') {
+          try { _tokenTemp2FA = null; } catch (e) {}
+        }
+
+        // 3. Reseta bloco 2FA (esconde)
+        var bloco2fa = document.getElementById('login-2fa-block');
+        if (bloco2fa) bloco2fa.classList.remove('visible');
+
+        // 4. Mostra bloco principal de login
+        var blocoMain = document.getElementById('login-form');
+        if (blocoMain) blocoMain.classList.remove('hidden');
+
+        // 5. Limpa inputs do login
+        var elEmail = document.getElementById('login-email');
+        if (elEmail) elEmail.value = '';
+        var elSenha = document.getElementById('login-senha');
+        if (elSenha) elSenha.value = '';
+        var elCod2FA = document.getElementById('login-2fa-codigo');
+        if (elCod2FA) elCod2FA.value = '';
+
+        // 6. Reseta botao "Confirmar Codigo"
+        var btn2FA = document.getElementById('btn-login-2fa');
+        var btn2FATxt = document.getElementById('btn-login-2fa-txt');
+        if (btn2FA) btn2FA.disabled = false;
+        if (btn2FATxt) btn2FATxt.textContent = 'Confirmar Codigo';
+
+        // 7. Reset flag do login em andamento
+        window.__loginEmAndamento = false;
+
+        // 8. Mostra a tela de login
+        var loginScreen = document.getElementById('login-screen');
+        if (loginScreen) loginScreen.style.display = 'flex';
+
+        console.log('[FIX_28] Logout completo. Estado visual resetado.');
+      } catch (e) {
+        console.error('[FIX_28] Erro no logout:', e.message);
+        // Fallback antigo
+        localStorage.removeItem('token');
+        if (window.state) window.state.user = null;
+        location.reload();
+      }
     }
 
     // =========================================================================
@@ -7527,6 +7639,9 @@ try {
           ? '<span class="badge-pos">Ativo</span>'
           : '<span class="badge-neg">Inativo</span>';
 
+        // [FIX_30b] Botao Resetar 2FA (so aparece se totp_ativo = true)
+        const btnReset2FA = (u.totp_ativo === true) ? `<button class="action-btn action-btn-key" title="Resetar 2FA" onclick="resetar2FAUsuario('${u.id}', '${u.nome}')">🔓</button>` : '';
+
         const btnToggleAtivo = u.ativo
           ? `<button class="action-btn action-btn-key" title="Inativar usuario" onclick="inativarUsuário('${u.id}', '${u.nome}')">🚫</button>`
           : `<button class="action-btn action-btn-reativar" title="Reativar usuario" onclick="reativarUsuário('${u.id}', '${u.nome}')">✅</button>`;
@@ -7545,6 +7660,7 @@ try {
             <div class="action-group">
               <button class="action-btn action-btn-edit" title="Editar usuario" onclick="abrirModalUsuárioEditar('${u.id}')">&#9999;&#65039;</button>
                             <!-- [FIX_11] Botao "Resetar senha" removido. Use "🔑 Trocar Senha" no header. -->
+${btnReset2FA}
               ${btnToggleAtivo}
               ${btnExcluir}
             </div>
@@ -7578,7 +7694,13 @@ try {
         sel.innerHTML += `<option value="${p.id}">${p.nome}</option>`;
       });
 
-      document.getElementById('modal-usuario').style.display = 'flex';
+// [FIX_29c-3-v3] Esconde bloco 2FA
+      var wrap2faNovo = document.getElementById('modal-user-2fa-wrap');
+      if (wrap2faNovo) wrap2faNovo.style.display = 'none';
+      var chkPermitirNovo = document.getElementById('modal-user-permite-desativar');
+      if (chkPermitirNovo) chkPermitirNovo.checked = false;
+
+            document.getElementById('modal-usuario').style.display = 'flex';
     }
 
     async function abrirModalUsuárioEditar(id) {
@@ -7620,6 +7742,14 @@ try {
         perfis.filter(p => p.ativo || p.id === u.perfil_id).forEach(p => {
           const selected = p.id === u.perfil_id ? 'selected' : '';
           sel.innerHTML += `<option value="${p.id}" ${selected}>${p.nome}</option>`;
+
+        // [FIX_29c-3-v3] Popula checkbox 2FA + mostra bloco
+        var chkPermitirEd = document.getElementById('modal-user-permite-desativar');
+        if (chkPermitirEd) chkPermitirEd.checked = u.permite_desativar_2fa === true;
+
+        if (typeof atualizarBloco2FAUsuario === 'function') {
+          setTimeout(atualizarBloco2FAUsuario, 100);
+        }
         });
 
         document.getElementById('modal-usuario').style.display = 'flex';
@@ -7657,7 +7787,7 @@ try {
 
       try {
         if (modalUsuárioEditandoId) {
-          const payload = { nome, email, perfil_id, ativo, cpf, matricula }; // [FIX_14c]
+          const payload = { nome, email, perfil_id, ativo, cpf, matricula, permite_desativar_2fa: (document.getElementById('modal-user-permite-desativar') || {}).checked === true }; // [FIX_29c-3]
           const res = await apiFetch(`/usuarios/${modalUsuárioEditandoId}`, {
             method: 'PUT',
             body: JSON.stringify(payload)
@@ -7687,7 +7817,7 @@ try {
           }
           alert('Usuário atualizado com sucesso.');
         } else {
-          const payload = { nome, email, senha, perfil_id, cpf, matricula }; // [FIX_14c]
+          const payload = { nome, email, senha, perfil_id, cpf, matricula, permite_desativar_2fa: (document.getElementById('modal-user-permite-desativar') || {}).checked === true }; // [FIX_29c-3]
           const res = await apiFetch('/usuarios', {
             method: 'POST',
             body: JSON.stringify(payload)
@@ -7987,6 +8117,8 @@ try {
             document.getElementById('modal-perfil-nome').value = p.nome || '';
             document.getElementById('modal-perfil-descricao').value = p.descricao || '';
             document.getElementById('modal-perfil-ativo').checked = !!p.ativo;
+            var chkTotp = document.getElementById('modal-perfil-totp');
+            if (chkTotp) chkTotp.checked = p.totp_obrigatorio === true; // [FIX_29c-2]
           }
           if (rQ.ok) {
             var arr = await rQ.json();
@@ -7996,6 +8128,8 @@ try {
       } else {
         document.getElementById('modal-perfil-titulo').innerHTML = '&#128737; Novo Perfil';
         document.getElementById('modal-perfil-nome').value = '';
+        var chkTotpNovo = document.getElementById('modal-perfil-totp');
+        if (chkTotpNovo) chkTotpNovo.checked = false; // [FIX_29c-2-v3]
         document.getElementById('modal-perfil-descricao').value = '';
         document.getElementById('modal-perfil-ativo').checked = true;
       }
@@ -8059,15 +8193,16 @@ try {
       var nome = document.getElementById('modal-perfil-nome').value.trim();
       var descricao = document.getElementById('modal-perfil-descricao').value.trim();
       var ativo = document.getElementById('modal-perfil-ativo').checked;
+      var totp_obrigatorio = document.getElementById('modal-perfil-totp') ? document.getElementById('modal-perfil-totp').checked : false; // [FIX_29c-2]
       var permissoes = Array.from(document.querySelectorAll('.perm-check:checked')).map(function(cb) { return cb.getAttribute('data-permissao-id'); });
       if (!nome) { alert('Informe o nome do perfil.'); return; }
       try {
         var perfilId = __perfilEditandoId;
         if (__perfilEditandoId) {
-          var r1 = await apiFetch('/perfis/' + __perfilEditandoId, { method: 'PUT', body: JSON.stringify({ nome: nome, descricao: descricao, ativo: ativo }) });
+          var r1 = await apiFetch('/perfis/' + __perfilEditandoId, { method: 'PUT', body: JSON.stringify({ nome: nome, descricao: descricao, ativo: ativo, totp_obrigatorio: totp_obrigatorio }) });
           if (!r1.ok) { var e1 = await r1.json(); alert(e1.erro || 'Erro'); return; }
         } else {
-          var r2 = await apiFetch('/perfis', { method: 'POST', body: JSON.stringify({ nome: nome, descricao: descricao, ativo: ativo }) });
+          var r2 = await apiFetch('/perfis', { method: 'POST', body: JSON.stringify({ nome: nome, descricao: descricao, ativo: ativo, totp_obrigatorio: totp_obrigatorio }) });
           if (!r2.ok) { var e2 = await r2.json(); alert(e2.erro || 'Erro'); return; }
           var novo = await r2.json();
           perfilId = novo.id;
@@ -15094,6 +15229,261 @@ window.enviar2FALogin = enviar2FALogin;
 window.voltarLogin = voltarLogin;
 // ============================================================
 // [/FIX_27]
+// ============================================================
+
+
+// ============================================================
+// [FIX_29c-3] Logica do bloco 2FA no modal de usuario
+// ============================================================
+
+// Verifica o perfil selecionado e mostra/esconde o bloco 2FA
+async function atualizarBloco2FAUsuario() {
+  var sel = document.getElementById('modal-user-perfil');
+  var wrap = document.getElementById('modal-user-2fa-wrap');
+  if (!sel || !wrap) return;
+
+  var perfilId = sel.value;
+  if (!perfilId) {
+    wrap.style.display = 'none';
+    return;
+  }
+
+  try {
+    var res = await apiFetch('/perfis/' + perfilId);
+    if (!res.ok) { wrap.style.display = 'none'; return; }
+    var p = await res.json();
+    if (p.totp_obrigatorio === true) {
+      wrap.style.display = 'block';
+      console.log('[FIX_29c-3] Perfil exige 2FA. Mostrando bloco.');
+    } else {
+      wrap.style.display = 'none';
+    }
+  } catch (e) {
+    console.warn('[FIX_29c-3] Erro ao verificar perfil:', e.message);
+    wrap.style.display = 'none';
+  }
+}
+
+// Listener no select de perfil
+(function init2FAUserListener() {
+  function bind() {
+    var sel = document.getElementById('modal-user-perfil');
+    if (!sel || sel.dataset.bound29c3) return;
+    sel.dataset.bound29c3 = '1';
+    sel.addEventListener('change', atualizarBloco2FAUsuario);
+    console.log('[FIX_29c-3] Listener do select de perfil registrado');
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+  else bind();
+})();
+
+window.atualizarBloco2FAUsuario = atualizarBloco2FAUsuario;
+// ============================================================
+// [/FIX_29c-3]
+// ============================================================
+
+
+// ============================================================
+// [FIX_29c-4] Ativacao obrigatoria de 2FA no login
+// ============================================================
+
+var _tokenTempSetup2FA = null;
+
+function _mostrarBlocoSetup2FA() {
+  var main = document.getElementById('login-form');
+  var blocoLogin = document.getElementById('login-2fa-block');
+  var blocoSetup = document.getElementById('login-2fa-setup-block');
+  if (main) main.classList.add('hidden-setup');
+  if (blocoLogin) blocoLogin.classList.add('hidden-setup');
+  if (blocoSetup) blocoSetup.classList.add('visible');
+  var input = document.getElementById('login-2fa-codigo-setup');
+  if (input) { input.value = ''; setTimeout(function() { input.focus(); }, 200); }
+  var btn = document.getElementById('btn-setup-2fa');
+  var btnTxt = document.getElementById('btn-setup-2fa-txt');
+  if (btn) btn.disabled = true;
+  if (btnTxt) btnTxt.textContent = 'Ativar 2FA e Entrar';
+}
+
+function voltarLoginSetup() {
+  _tokenTempSetup2FA = null;
+  var main = document.getElementById('login-form');
+  var blocoLogin = document.getElementById('login-2fa-block');
+  var blocoSetup = document.getElementById('login-2fa-setup-block');
+  if (blocoSetup) blocoSetup.classList.remove('visible');
+  if (blocoLogin) blocoLogin.classList.remove('visible');
+  if (main) main.classList.remove('hidden-setup');
+  window.__loginEmAndamento = false;
+  var emailInput = document.getElementById('login-email');
+  if (emailInput) { emailInput.value = ''; emailInput.focus(); }
+  var senhaInput = document.getElementById('login-senha');
+  if (senhaInput) senhaInput.value = '';
+  console.log('[FIX_29c-4] Voltou ao login. Token temporario limpo.');
+}
+
+async function iniciarSetup2FA() {
+  // Chama /api/auth/2fa/setup usando o token temporario (que ainda nao eh JWT final)
+  // Como o endpoint exige JWT, vamos primeiro "logar" com o token temporario + codigo vazio?
+  // Nao. O /api/auth/2fa/setup exige autenticar. Mas o usuario ainda nao tem JWT final.
+  // SOLUCAO: o backend poderia aceitar token_temp. Vou usar um fallback: usar o token_temp
+  // no header Authorization. O /api/auth/2fa/setup aceita tambem? Vamos ver.
+  
+  // Por ora, chamamos /api/auth/2fa/setup passando Authorization Bearer token_temp.
+  // Se o backend nao aceitar, mostramos mensagem de erro.
+  try {
+    var res = await fetch(API_URL + '/auth/2fa/setup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + (_tokenTempSetup2FA || '')
+      },
+      body: '{}'
+    });
+    var data = await res.json().catch(function() { return {}; });
+    if (!res.ok) {
+      console.error('[FIX_29c-4] Erro no setup:', data.erro);
+      alert('Erro: ' + (data.erro || 'Nao foi possivel gerar o QR Code'));
+      voltarLoginSetup();
+      return;
+    }
+    var qrImg = document.getElementById('setup-qr-img');
+    var secretEl = document.getElementById('setup-secret');
+    if (qrImg) qrImg.src = data.qr_code;
+    if (secretEl) secretEl.textContent = data.secret;
+  } catch (e) {
+    console.error('[FIX_29c-4] Erro:', e.message);
+    alert('Erro de rede: ' + e.message);
+    voltarLoginSetup();
+  }
+}
+
+async function ativar2FASetup() {
+  var input = document.getElementById('login-2fa-codigo-setup');
+  var btn = document.getElementById('btn-setup-2fa');
+  var btnTxt = document.getElementById('btn-setup-2fa-txt');
+  if (!input || !btn) return;
+
+  var codigo = (input.value || '').replace(/\D/g, '');
+  if (codigo.length !== 6) {
+    alert('Digite os 6 digitos do autenticador.');
+    input.focus();
+    return;
+  }
+  if (!_tokenTempSetup2FA) {
+    alert('Sessao expirada. Faca login novamente.');
+    voltarLoginSetup();
+    return;
+  }
+
+  btn.disabled = true;
+  if (btnTxt) btnTxt.textContent = 'Ativando...';
+
+  try {
+    var res = await fetch(API_URL + '/auth/2fa/verificar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + _tokenTempSetup2FA
+      },
+      body: JSON.stringify({ codigo: codigo })
+    });
+    var data = await res.json().catch(function() { return {}; });
+    if (!res.ok) {
+      btn.disabled = false;
+      if (btnTxt) btnTxt.textContent = 'Ativar 2FA e Entrar';
+      alert('Erro: ' + (data.erro || 'Codigo invalido'));
+      input.value = '';
+      input.focus();
+      return;
+    }
+
+    // Sucesso! 2FA ativado. Entra direto no sistema com o JWT.
+    console.log('[FIX_29c-5b] 2FA ativado! Entrando no sistema...');
+    alert('✅ 2FA ativado com sucesso! Voce ja esta dentro.');
+
+    // Salva o JWT (que foi emitido no login inicial com flag precisa_ativar_2fa)
+    localStorage.setItem('token', _tokenTempSetup2FA);
+    if (window.state) window.state.user = null;
+
+    // Esconde bloco setup + mostra login (mas ja vai entrar)
+    var blocoSetup2 = document.getElementById('login-2fa-setup-block');
+    if (blocoSetup2) blocoSetup2.classList.remove('visible');
+    var loginScreen2 = document.getElementById('login-screen');
+    if (loginScreen2) loginScreen2.style.display = 'none';
+
+    _tokenTempSetup2FA = null;
+
+    if (typeof initApp === 'function') initApp();
+    if (typeof verificarStatus2FA === 'function') setTimeout(verificarStatus2FA, 500);
+  } catch (e) {
+    btn.disabled = false;
+    if (btnTxt) btnTxt.textContent = 'Ativar 2FA e Entrar';
+    alert('Erro de rede: ' + e.message);
+  }
+}
+
+(function init2FASetup() {
+  function bind() {
+    var input = document.getElementById('login-2fa-codigo-setup');
+    if (!input || input.dataset.boundSetup) return;
+    input.dataset.boundSetup = '1';
+    input.addEventListener('input', function() {
+      var v = (input.value || '').replace(/\D/g, '').slice(0, 6);
+      input.value = v;
+      var btn = document.getElementById('btn-setup-2fa');
+      if (btn) btn.disabled = v.length !== 6;
+    });
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        var btn = document.getElementById('btn-setup-2fa');
+        if (btn && !btn.disabled) ativar2FASetup();
+      }
+    });
+    console.log('[FIX_29c-4] Listener do setup 2FA registrado');
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind);
+  else bind();
+})();
+
+window.ativar2FASetup = ativar2FASetup;
+window.voltarLoginSetup = voltarLoginSetup;
+window._mostrarBlocoSetup2FA = _mostrarBlocoSetup2FA;
+window.iniciarSetup2FA = iniciarSetup2FA;
+// ============================================================
+// [/FIX_29c-4]
+// ============================================================
+
+
+// ============================================================
+// [FIX_30b] Resetar 2FA de um usuario
+// ============================================================
+
+async function resetar2FAUsuario(id, nome) {
+  var confirmou = confirm(
+    'Resetar o 2FA do usuario "' + nome + '"?\n\n' +
+    'Ele vai precisar ativar a autenticacao em 2 fatores novamente no proximo login.'
+  );
+  if (!confirmou) return;
+
+  try {
+    var res = await apiFetch('/usuarios/' + id + '/resetar-2fa', { method: 'PUT' });
+    var data = await res.json().catch(function() { return {}; });
+
+    if (!res.ok) {
+      alert('Erro: ' + (data.erro || 'desconhecido'));
+      return;
+    }
+
+    alert('2FA do usuario resetado com sucesso!');
+    loadUsuariosDaAPI();
+  } catch (e) {
+    alert('Erro de rede: ' + e.message);
+  }
+}
+
+window.resetar2FAUsuario = resetar2FAUsuario;
+// ============================================================
+// [/FIX_30b]
 // ============================================================
 
 </script>
