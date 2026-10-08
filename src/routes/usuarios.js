@@ -60,6 +60,29 @@ async function routes(fastify, options) {
     }
   });
 
+  // [FIX_12] Listar usuários excluídos (soft-deleted)
+  fastify.get('/api/usuarios/excluidos', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+    try {
+      await ensureUsuariosETabelas();
+      const res = await db.query(`
+        SELECT u.id, u.nome, u.email, u.perfil_id,
+               COALESCE(p.nome, u.perfil, 'Administrador') as perfil,
+               u.ativo, u.deleted_at, u.deleted_by,
+               COALESCE(ud.nome, 'Desconhecido') as deleted_by_nome,
+               u.ultimo_login, u.created_at
+        FROM usuarios u
+        LEFT JOIN perfis p ON u.perfil_id::text = p.id::text
+        LEFT JOIN usuarios ud ON u.deleted_by::text = ud.id::text
+        WHERE u.deleted_at IS NOT NULL
+        ORDER BY u.deleted_at DESC
+      `);
+      return reply.send(res.rows);
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+
   fastify.get('/api/usuarios/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { id } = req.params;
     try {

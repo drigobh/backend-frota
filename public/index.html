@@ -4667,7 +4667,8 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
           <div class="bar-controls-left">
             <span class="label-month-select">Gestao de Usuários:</span>
           </div>
-          <div class="bar-controls-right">
+                    <div class="bar-controls-right">
+            <button class="btn-action" id="btn-toggle-excluidos" onclick="toggleVerExcluidos()">👁️ Ver Excluídos</button>
             <button class="btn-action btn-action-primary" id="btn-add-usuario">+ Novo Usuário</button>
           </div>
         </div>
@@ -4690,6 +4691,30 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
               </tr>
             </thead>
             <tbody id="tbody-usuarios"></tbody>
+          </table>
+        </div>
+
+        <!-- [FIX_12] Tabela de Usuários Excluídos (soft-deleted) -->
+        <div class="table-container" id="table-excluidos-container" style="display:none; margin-top:20px;">
+          <div style="padding:12px 16px; background:#fef3c7; border-left:4px solid #f59e0b; border-radius:6px; margin-bottom:12px;">
+            <strong style="color:#92400e;">⚠️ Usuários Excluídos (soft delete)</strong>
+            <div style="font-size:0.8rem; color:#78350f; margin-top:4px;">
+              Estes usuários não conseguem fazer login. O histórico deles foi preservado. Você pode restaurá-los a qualquer momento.
+            </div>
+          </div>
+          <table class="data-table" id="table-usuarios-excluidos">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Perfil</th>
+                <th style="width: 130px;">Excluído em</th>
+                <th style="width: 160px;">Excluído por</th>
+                <th style="width: 130px;" class="col-center">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-usuarios-excluidos"></tbody>
           </table>
         </div>
 
@@ -7668,6 +7693,102 @@ ${btnReset2FA}
         `;
         tbody.appendChild(tr);
       });
+    }
+
+
+    // ============================================================
+    // [FIX_12] Usuários Excluídos (soft delete)
+    // ============================================================
+    let _mostrandoExcluidos = false;
+
+    async function toggleVerExcluidos() {
+      _mostrandoExcluidos = !_mostrandoExcluidos;
+      const btn = document.getElementById('btn-toggle-excluidos');
+      const containerAtivos = document.getElementById('table-usuarios')?.closest('.table-container');
+      const containerExcluidos = document.getElementById('table-excluidos-container');
+      const btnAdd = document.getElementById('btn-add-usuario');
+
+      if (_mostrandoExcluidos) {
+        if (containerAtivos) containerAtivos.style.display = 'none';
+        if (containerExcluidos) containerExcluidos.style.display = 'block';
+        if (btn) btn.textContent = '👥 Ver Ativos';
+        if (btnAdd) btnAdd.style.display = 'none';
+        await loadUsuariosExcluidos();
+      } else {
+        if (containerAtivos) containerAtivos.style.display = 'block';
+        if (containerExcluidos) containerExcluidos.style.display = 'none';
+        if (btn) btn.textContent = '👁️ Ver Excluídos';
+        if (btnAdd) btnAdd.style.display = '';
+        await loadUsuáriosDaAPI();
+      }
+    }
+
+    async function loadUsuariosExcluidos() {
+      try {
+        const res = await apiFetch('/usuarios/excluidos');
+        if (!res.ok) {
+          console.error('[FIX_12] Erro ao carregar excluídos:', res.status);
+          return;
+        }
+        const data = await res.json();
+        renderUsuariosExcluidos(data);
+      } catch (err) {
+        console.error('[FIX_12] Falha ao buscar excluídos:', err);
+      }
+    }
+
+    function renderUsuariosExcluidos(lista) {
+      const tbody = document.getElementById('tbody-usuarios-excluidos');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!lista || lista.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:1.5rem; color:#64748b;">Nenhum usuário excluído.</td></tr>';
+        return;
+      }
+
+      lista.forEach((u, idx) => {
+        const dataExcl = u.deleted_at ? new Date(u.deleted_at).toLocaleDateString('pt-BR') : '-';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td><strong>${u.nome}</strong></td>
+          <td>${u.email}</td>
+          <td>${u.perfil || '-'}</td>
+          <td>${dataExcl}</td>
+          <td>${u.deleted_by_nome || '-'}</td>
+          <td class="col-center">
+            <button class="action-btn action-btn-reativar" title="Restaurar usuário"
+                    onclick="restaurarUsuario('${u.id}', '${u.nome}')">♻️ Restaurar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function restaurarUsuario(id, nome) {
+      if (typeof confirmarAção === 'function') {
+        var ok = await confirmarAção(
+          '♻️ Restaurar o usuário "' + nome + '"?\n\nEle voltará a poder fazer login no sistema.',
+          { okLabel: 'Restaurar', cancelLabel: 'Cancelar' }
+        );
+        if (!ok) return;
+      } else {
+        if (!confirm('Restaurar o usuário "' + nome + '"?')) return;
+      }
+
+      try {
+        const res = await apiFetch('/usuarios/' + id + '/restaurar', { method: 'POST' });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          alert('Erro ao restaurar: ' + (err.erro || res.status));
+          return;
+        }
+        alert('Usuário restaurado com sucesso!');
+        await loadUsuariosExcluidos();
+      } catch (err) {
+        alert('Falha ao restaurar: ' + err.message);
+      }
     }
 
     async function abrirModalUsuárioNovo() {
