@@ -74,3 +74,10 @@ public/empresas_*.bak
 
 public/index_MANUAL_BACKUP_*.html
 public/empresas_BACKUP_*
+*.backup.*
+.env
+.env.test
+_test-full.log
+_debug.js
+_read05.js
+_readAuth.js

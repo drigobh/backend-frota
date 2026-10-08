@@ -10,7 +10,12 @@
     "test": "jest --runInBand --forceExit",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage --runInBand --forceExit",
-    "lint": "node --check src/server.js && node --check src/database.js && node --check src/auto_migrate.js"
+    "lint": "node --check src/server.js && node --check src/database.js && node --check src/auto_migrate.js",
+    "test:matricula": "cross-env NODE_ENV=test SKIP_RATE_LIMIT=true jest --runInBand --testPathPatterns=matricula",
+    "test:matricula:watch": "cross-env NODE_ENV=test SKIP_RATE_LIMIT=true jest --watch --testPathPatterns=matricula",
+    "test:ci": "cross-env NODE_ENV=test SKIP_RATE_LIMIT=true jest --runInBand --ci --coverage",
+    "pretest": "node scripts/32_seed_admin_teste.js",
+    "pretest:matricula": "node scripts/32_seed_admin_teste.js"
   },
   "keywords": [
     "frota",
@@ -44,6 +49,7 @@
     "bcrypt@6.0.0": true
   },
   "devDependencies": {
+    "cross-env": "^10.1.0",
     "jest": "^30.5.2",
     "sharp": "^0.35.4",
     "supertest": "^7.3.1"

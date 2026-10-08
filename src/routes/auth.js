@@ -1,4 +1,10 @@
 const db = require('../database');
+
+// FIX_30_v3_APPLIED
+const __RL_DISABLED__ =
+  process.env.SKIP_RATE_LIMIT === 'true' ||
+  process.env.NODE_ENV !== 'production';
+
 const { capturarSessaoInfo, gravarLogAcesso } = require('../session'); // FASE_13_SESSAO
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
@@ -21,8 +27,8 @@ async function routes(fastify, options) {
   fastify.post('/api/login', {
       config: {
         rateLimit: {
-          max: 5,
-          timeWindow: '1 minute'
+          max: __RL_DISABLED__ ? 1000000 : 5,
+          timeWindow: __RL_DISABLED__ ? '1 second' : '1 minute'
         }
       } // FASE_3B_RATE_LIMIT
     }, async (req, reply) => {

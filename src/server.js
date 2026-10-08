@@ -52,6 +52,15 @@ const fastify = require('fastify')({
 });
 const cors = require('@fastify/cors');
 const rateLimit = require('@fastify/rate-limit');
+
+// FIX_30_v3_APPLIED
+const __RL_DISABLED__ =
+  process.env.SKIP_RATE_LIMIT === 'true' ||
+  process.env.NODE_ENV !== 'production';
+
+const __RL_MAX__ = __RL_DISABLED__ ? 1000000 : 20;
+const __RL_WINDOW__ = __RL_DISABLED__ ? '1 second' : '1 minute';
+
 const helmet = require('@fastify/helmet'); // FASE_3B_HELMET // FASE_3B_RATE_LIMIT
 const path = require('path');
 const fs = require('fs');
@@ -153,16 +162,17 @@ fastify.register(cors, {
 // ===========================================================================
 fastify.register(rateLimit, {
   global: false,                        // NAO aplica em todas as rotas
-  max: 20,                              // 20 tentativas
-  timeWindow: '1 minute',               // janela de 1 minuto
-  allowList: [],                        // sem excecoes
+  max: __RL_MAX__,                              // 20 tentativas
+  timeWindow: __RL_WINDOW__,               // janela de 1 minuto
+  allowList: __RL_DISABLED__ ? [() => true] : [],                        // sem excecoes
   keyGenerator: (req) => req.ip,        // bloqueia por IP
   errorResponseBuilder: (req, context) => ({
     statusCode: 429,
     error: 'Too Many Requests',
     message: 'Muitas tentativas de login. Aguarde ' + Math.ceil(context.ttl / 1000) + ' segundos antes de tentar novamente.',
     retryAfter: Math.ceil(context.ttl / 1000)
-  }),
+  
+}),
   addHeadersOnExceeding: {
     'x-ratelimit-limit': true,
     'x-ratelimit-remaining': true,

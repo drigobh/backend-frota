@@ -1,13 +1,39 @@
-/**
- * Jest - Configuracao de testes
- */
+/** [FIX_31 v2] Jest Configuration - Matrícula Automática */
 module.exports = {
   testEnvironment: 'node',
-  testMatch: ['**/tests/**/*.test.js'],
-  verbose: true,
-  collectCoverage: false,
+
+  // Setup global (delays, timers, helpers)
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+
+  // Timeouts
   testTimeout: 30000,
-  detectOpenHandles: true,
+
+  // Execução sequencial para evitar conflitos de DB/rate limit
+  maxWorkers: 1,
+
+  // Detectar handles abertos (útil para debugar timers)
+  detectOpenHandles: false,
   forceExit: true,
-  silent: false
+
+  // Cobertura focada em matrícula
+  collectCoverageFrom: [
+    'src/**/*.js',
+    '!src/**/*.test.js',
+    '!src/**/__tests__/**',
+    '!src/migrations/**',
+    '!src/scripts/**',
+  ],
+
+  // Padrões de teste
+  testMatch: [
+    '**/__tests__/**/*.test.js',
+    '**/?(*.)+(spec|test).js',
+  ],
+
+  // Ignorar
+  testPathIgnorePatterns: ['/node_modules/', '/dist/', '/coverage/'],
+
+  // Reporters mais limpos
+  verbose: true,
+  bail: false,
 };
