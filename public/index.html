@@ -5860,6 +5860,7 @@ try {
     // API E RENDERIZAÇÃO: DASHBOARD
     // =========================================================================
     async function loadDashboardData() {
+      if (!localStorage.getItem('token')) return; // [FIX_16] sem token, pula
       const monthKey = getFirstDayOfMonth(state.currentMonth);
       try {
         const res = await apiFetch(`/dashboard/${monthKey}`);
@@ -5898,6 +5899,7 @@ try {
     // API E RENDERIZAÇÃO: CADASTROS
     // =========================================================================
     async function loadCadastrosDaAPI() {
+      if (!localStorage.getItem('token')) return; // [FIX_16] sem token, pula
       try {
         const resCavalos = await apiFetch('/veiculos');
         const cavalos = resCavalos.ok ? await resCavalos.json() : [];
@@ -6159,6 +6161,7 @@ try {
     // API E RENDERIZAÇÃO: ACOPLAMENTO
     // =========================================================================
     async function loadAcoplamentosDaAPI() {
+      if (!localStorage.getItem('token')) return; // [FIX_16] sem token, pula
       try {
         const monthKey = getFirstDayOfMonth(state.currentMonth);
         const res = await apiFetch(`/acoplamentos/${monthKey}`);
@@ -6286,6 +6289,7 @@ try {
     // API E RENDERIZAÇÃO: KM MENSAL
     // =========================================================================
     async function loadKmDaAPI() {
+      if (!localStorage.getItem('token')) return; // [FIX_16] sem token, pula
       try {
         const monthKey = getFirstDayOfMonth(state.currentMonth);
         const res = await apiFetch(`/km/${monthKey}`);
@@ -6425,6 +6429,7 @@ try {
     // API E RENDERIZAÇÃO: ABASTECIMENTOS DETALHADOS (Prioridade 11)
     // =========================================================================
     async function loadAbastecimentosDaAPI() {
+      if (!localStorage.getItem('token')) return; // [FIX_16] sem token, pula
       try {
         const monthKey = getFirstDayOfMonth(state.currentMonth);
         const res = await apiFetch(`/abastecimentos/${monthKey}`);
@@ -6941,6 +6946,7 @@ try {
     // API E RENDERIZAÇÃO: MANUTENÇÃO (Prioridade 15)
     // =========================================================================
     async function loadManutencoesDaAPI() {
+      if (!localStorage.getItem('token')) return; // [FIX_16] sem token, pula
       try {
         const res = await apiFetch(`/manutencoes`);
         const data = await res.json();
@@ -7025,6 +7031,7 @@ try {
     // API E RENDERIZAÇÃO: DOCUMENTOS (Prioridade 16)
     // =========================================================================
     async function loadDocumentosDaAPI() {
+      if (!localStorage.getItem('token')) return; // [FIX_16] sem token, pula
       try {
         const res = await apiFetch(`/documentos`);
         const data = await res.json();
@@ -7627,6 +7634,7 @@ try {
     let modalUsuárioEditandoId = null;
 
     async function loadUsuáriosDaAPI() {
+      if (!localStorage.getItem('token')) return; // [FIX_16] sem token, pula
       try {
         const res = await apiFetch('/usuarios');
         if (!res.ok) return;
@@ -8174,6 +8182,7 @@ ${btnReset2FA}
     var __perfilEditandoId = null;
 
     async function loadPerfisDaAPI() {
+      if (!localStorage.getItem('token')) return; // [FIX_16] sem token, pula
       try {
         var res = await apiFetch('/perfis');
         if (!res.ok) return;
@@ -9061,6 +9070,7 @@ ${btnReset2FA}
     var __souAdmin = false;
 
     async function carregarMinhasPermissoes() {
+      if (!localStorage.getItem('token')) return; // [FIX_16] sem token, pula
       try {
         var res = await apiFetch("/me/permissoes");
         if (!res.ok) return;
@@ -12558,6 +12568,7 @@ function renderHistorico(data) {
     };
 
     async function loadConfiguracoes() {
+      if (!localStorage.getItem('token')) return; // [FIX_16] sem token, pula
       // FASE_FIX_GUARD_401: pula se nao estiver logado
   if (!localStorage.getItem("token")) return;
   try {

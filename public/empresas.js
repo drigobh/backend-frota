@@ -19,6 +19,12 @@ function escapeEmp(s) {
 }
 
 async function carregarTudo() {
+  // [FIX_16] Guard: não chamar API antes do login
+  var __tk = getToken();
+  if (!__tk) {
+    console.log('[EMPRESAS] Sem token — aguardando login antes de carregar dados.');
+    return;
+  }
   try {
     const resEmp = await apiFetch('/api/empresas');
     if (resEmp.ok) {
