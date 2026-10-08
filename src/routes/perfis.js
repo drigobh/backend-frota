@@ -1,4 +1,5 @@
 const db = require('../database');
+const autorizar = require('../middleware/autorizar'); // [FIX_13]
 
 let perfisEnsured = false;
 async function ensurePerfis() {
@@ -32,7 +33,7 @@ async function routes(fastify, options) {
   // ==========================================================================
   // LISTAR PERFIS (com contagem de permissoes)
   // ==========================================================================
-  fastify.get('/api/perfis', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get('/api/perfis', { preHandler: [fastify.autenticar, autorizar('perfis.visualizar')] }, async (req, reply) => {
     try {
       await ensurePerfis();
       const res = await db.query(`
@@ -54,7 +55,7 @@ async function routes(fastify, options) {
   // ==========================================================================
   // LISTAR TODAS AS PERMISSOES (catalogo)
   // ==========================================================================
-  fastify.get('/api/permissoes', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get('/api/permissoes', { preHandler: [fastify.autenticar, autorizar('perfis.visualizar')] }, async (req, reply) => {
     try {
       await ensurePerfis();
       const res = await db.query(`
@@ -71,7 +72,7 @@ async function routes(fastify, options) {
   // ==========================================================================
   // DETALHES DE UM PERFIL
   // ==========================================================================
-  fastify.get('/api/perfis/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get('/api/perfis/:id', { preHandler: [fastify.autenticar, autorizar('perfis.visualizar')] }, async (req, reply) => {
     try {
       await ensurePerfis();
       const res = await db.query('SELECT * FROM perfis WHERE id = $1', [req.params.id]);
@@ -87,7 +88,7 @@ async function routes(fastify, options) {
   // ==========================================================================
   // PERMISSOES DE UM PERFIL
   // ==========================================================================
-  fastify.get('/api/perfis/:id/permissoes', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get('/api/perfis/:id/permissoes', { preHandler: [fastify.autenticar, autorizar('perfis.visualizar')] }, async (req, reply) => {
     try {
       await ensurePerfis();
       const res = await db.query(`
@@ -106,7 +107,7 @@ async function routes(fastify, options) {
   // ==========================================================================
   // CRIAR PERFIL (com permissoes opcionais)
   // ==========================================================================
-  fastify.post('/api/perfis', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.post('/api/perfis', { preHandler: [fastify.autenticar, autorizar('perfis.criar')] }, async (req, reply) => {
     const { nome, descricao, ativo = true, permissoes = [], totp_obrigatorio = false } = req.body || {}; if (!nome) return reply.code(400).send({ erro: 'Nome do perfil e obrigatorio.' });
 
     const client = await db.pool.connect();
@@ -143,7 +144,7 @@ async function routes(fastify, options) {
   // ==========================================================================
   // ATUALIZAR PERFIL
   // ==========================================================================
-  fastify.put('/api/perfis/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.put('/api/perfis/:id', { preHandler: [fastify.autenticar, autorizar('perfis.editar')] }, async (req, reply) => {
     const { id } = req.params;
     const { nome, descricao, ativo, totp_obrigatorio } = req.body || {}; try {
       await ensurePerfis();
@@ -160,7 +161,7 @@ async function routes(fastify, options) {
   // ==========================================================================
   // SALVAR PERMISSOES DE UM PERFIL (batch)
   // ==========================================================================
-  fastify.put('/api/perfis/:id/permissoes', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.put('/api/perfis/:id/permissoes', { preHandler: [fastify.autenticar, autorizar('permissoes.gerenciar')] }, async (req, reply) => {
     const { id } = req.params;
     const { permissoes = [] } = req.body || {};
 
@@ -199,7 +200,7 @@ async function routes(fastify, options) {
   // ==========================================================================
   // EXCLUIR PERFIL
   // ==========================================================================
-  fastify.delete('/api/perfis/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.delete('/api/perfis/:id', { preHandler: [fastify.autenticar, autorizar('perfis.excluir')] }, async (req, reply) => {
     try {
       await ensurePerfis();
 
