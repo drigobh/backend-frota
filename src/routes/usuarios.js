@@ -183,8 +183,22 @@ async function routes(fastify, options) {
 
       return reply.code(201).send(res.rows[0]);
     } catch (err) {
+      // [FIX_24]_catch Diferencia constraint específica
       if (err.code === '23505') {
-        return reply.code(400).send({ erro: 'Já existe um usuário com este e-mail.' });
+        const constraint = err.constraint || '';
+        if (constraint.includes('email')) {
+          return reply.code(400).send({ erro: 'Já existe um usuário com este e-mail.' });
+        }
+        if (constraint.includes('cpf')) {
+          return reply.code(400).send({ erro: 'Já existe um usuário com este CPF.' });
+        }
+        if (constraint.includes('matricula')) {
+          return reply.code(400).send({ erro: 'Já existe um usuário com esta matrícula.' });
+        }
+        return reply.code(400).send({
+          erro: 'Já existe um registro com um destes valores (email, cpf ou matrícula).',
+          constraint: constraint
+        });
       }
       return reply.code(500).send({ erro: err.message });
     }
