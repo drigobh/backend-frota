@@ -110,7 +110,7 @@ fastify.register(helmet, {
       styleSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net', 'https://fonts.googleapis.com'],
       fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
       imgSrc: ["'self'", 'data:', 'blob:'],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", 'https:'],
       frameAncestors: ["'self'"],
       baseUri: ["'self'"],
       formAction: ["'self'"]
