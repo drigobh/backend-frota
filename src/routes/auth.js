@@ -92,7 +92,7 @@ async function routes(fastify, options) {
 
       await db.query('UPDATE usuarios SET ultimo_login = CURRENT_TIMESTAMP WHERE id = $1', [user.id]);
 
-      const payload = { id: user.id, email: user.email, nome: user.nome, perfil: user.perfil || 'Operador' };
+      const payload = { id: user.id, email: user.email, nome: user.nome, perfil: user.perfil || 'Operador', perfil_id: user.perfil_id }; // [FIX_19]
 
       // [FIX_29b] Verifica 2FA obrigatorio + ativo
       const check2fa = await db.query('SELECT totp_ativo, totp_obrigatorio FROM usuarios WHERE id::text = $1::text', [String(user.id)]);
@@ -191,7 +191,7 @@ async function routes(fastify, options) {
 
     try {
       // [FIX_29b-2] Inclui flags de RBAC no SELECT
-      const r = await db.query('SELECT id, nome, email, perfil, totp_secret, totp_ativo, totp_obrigatorio, permite_desativar_2fa, ativo FROM usuarios WHERE id::text = $1::text', [String(decoded.id)]);
+      const r = await db.query('SELECT id, nome, email, perfil, perfil_id, totp_secret, totp_ativo, totp_obrigatorio, permite_desativar_2fa, ativo FROM usuarios WHERE id::text = $1::text /* [FIX_19c] */', [String(decoded.id)]);
       if (r.rows.length === 0) return reply.code(404).send({ erro: 'Usuario nao encontrado.' });
       const user = r.rows[0];
 
@@ -220,6 +220,7 @@ async function routes(fastify, options) {
         perfil: user.perfil || 'Operador',
         totp_obrigatorio: user.totp_obrigatorio === true,
         permite_desativar_2fa: user.permite_desativar_2fa === true,
+        perfil_id: user.perfil_id // [FIX_19]
       };
       const token = fastify.jwt.sign(payload);
 
