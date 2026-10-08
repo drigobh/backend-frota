@@ -207,6 +207,45 @@ fastify.register(require('@fastify/jwt'), {
   sign: { expiresIn: '8h' },
 });
 
+// =========================================================================
+// [FIX_23_SWAGGER] Swagger — documentação interativa da API
+// =========================================================================
+fastify.register(require('@fastify/swagger'), {
+  openapi: {
+    info: {
+      title: 'Caderninho de Frota API',
+      description: 'API do sistema integrado de gestão de frota',
+      version: '2.0.0'
+    },
+    servers: [
+      { url: 'http://localhost:3000', description: 'Desenvolvimento' },
+      { url: 'https://backend-frota-72ni.onrender.com', description: 'Produção' }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    },
+    security: [{ bearerAuth: [] }]
+  }
+});
+
+fastify.register(require('@fastify/swagger-ui'), {
+  routePrefix: '/api/docs',
+  uiConfig: {
+    docExpansion: 'list',
+    deepLinking: true,
+    persistAuthorization: true
+  },
+  staticCSP: true,
+  transformStaticCSP: (header) => header
+});
+
+
 fastify.decorate('autenticar', async (request, reply) => {
   try {
     await request.jwtVerify();
