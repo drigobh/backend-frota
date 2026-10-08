@@ -7737,6 +7737,7 @@ ${btnReset2FA}
       }
     }
 
+        // [FIX_15_RENDER_EXCLUIDOS]
     function renderUsuariosExcluidos(lista) {
       const tbody = document.getElementById('tbody-usuarios-excluidos');
       if (!tbody) return;
@@ -7750,18 +7751,14 @@ ${btnReset2FA}
       lista.forEach((u, idx) => {
         const dataExcl = u.deleted_at ? new Date(u.deleted_at).toLocaleDateString('pt-BR') : '-';
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${idx + 1}</td>
-          <td><strong>${u.nome}</strong></td>
-          <td>${u.email}</td>
-          <td>${u.perfil || '-'}</td>
-          <td>${dataExcl}</td>
-          <td>${u.deleted_by_nome || '-'}</td>
-          <td class="col-center">
-            <button class="action-btn action-btn-reativar" title="Restaurar usuário"
-                    onclick="restaurarUsuario('${u.id}', '${u.nome}')">♻️ Restaurar</button>
-          </td>
-        `;
+        var btnRestaurar = '<button class="action-btn action-btn-reativar" title="Restaurar usuário" onclick="restaurarUsuario(\'' + u.id + '\', \'' + u.nome + '\')">♻️ Restaurar</button>';
+        tr.innerHTML = '<td>' + (idx + 1) + '</td>' +
+          '<td><strong>' + u.nome + '</strong></td>' +
+          '<td>' + u.email + '</td>' +
+          '<td>' + (u.perfil || '-') + '</td>' +
+          '<td>' + dataExcl + '</td>' +
+          '<td>' + (u.deleted_by_nome || '-') + '</td>' +
+          '<td class="col-center">' + btnRestaurar + '</td>';
         tbody.appendChild(tr);
       });
     }
@@ -9106,6 +9103,7 @@ ${btnReset2FA}
         { id: "btn-add-documento", perm: "manutencoes.criar" },
         { id: "btn-add-usuario", perm: "usuarios.criar" },
         { id: "btn-add-perfil", perm: "perfis.criar" },
+        { id: "btn-toggle-excluidos", perm: "usuarios.excluidos.visualizar" }, // [FIX_13_RBAC]
       ];
       acoes.forEach(function(a) {
         var el = document.getElementById(a.id);
