@@ -7796,6 +7796,22 @@ ${btnReset2FA}
       }
     }
 
+    // [FIX_28c]_prefill Busca a próxima matrícula e preenche o campo
+    async function preencherProximaMatricula() {
+      try {
+        const res = await apiFetch('/usuarios/proxima-matricula');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.proxima_matricula) {
+          const el = document.getElementById('modal-user-matricula');
+          if (el) el.value = data.proxima_matricula;
+          console.log('[FIX_28c] Próxima matrícula:', data.proxima_matricula);
+        }
+      } catch (e) {
+        console.warn('[FIX_28c] Erro ao buscar próxima matrícula:', e.message);
+      }
+    }
+
     async function abrirModalUsuárioNovo() {
       modalUsuárioEditandoId = null;
       document.getElementById('modal-usuario-title').textContent = 'Novo Usuário';
@@ -7826,7 +7842,13 @@ ${btnReset2FA}
       var chkPermitirNovo = document.getElementById('modal-user-permite-desativar');
       if (chkPermitirNovo) chkPermitirNovo.checked = false;
 
-            document.getElementById('modal-usuario').style.display = 'flex';
+                  // [FIX_28]_prefill Busca e preenche a próxima matrícula
+      await preencherProximaMatricula();
+
+            // [FIX_28c]_prefill Busca e preenche a próxima matrícula
+      await preencherProximaMatricula();
+
+      document.getElementById('modal-usuario').style.display = 'flex';
     }
 
     async function abrirModalUsuárioEditar(id) {

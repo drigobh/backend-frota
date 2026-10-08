@@ -102,6 +102,20 @@ async function routes(fastify, options) {
     }
   });
 
+  // [FIX_28c]_rota Retorna a próxima matrícula disponível
+  fastify.get('/api/usuarios/proxima-matricula', { preHandler: [fastify.autenticar, autorizar('usuarios.criar')] }, async (req, reply) => {
+    try {
+      const sql = "SELECT COALESCE(MAX(CAST(matricula AS INTEGER)), 0) + 1 AS proximo FROM usuarios WHERE matricula IS NOT NULL AND matricula <> '' AND matricula !~ '[^0-9]'";
+      const r = await db.query(sql);
+      const num = r.rows[0].proximo || 1;
+      const proxima = String(num).padStart(2, '0');
+      return reply.send({ proxima_matricula: proxima });
+    } catch (err) {
+      fastify.log.error(err);
+      return reply.code(500).send({ erro: err.message });
+    }
+  });
+
   fastify.post('/api/usuarios', { preHandler: [fastify.autenticar, autorizar('usuarios.criar')] }, fastify.comAuditoria(async (req, reply) => {
     const { nome, email, senha, perfil_id, ativo = true, cpf, matricula } = req.body || {};
     if (!nome || !email) return reply.code(400).send({ erro: 'Nome e e-mail são obrigatórios.' });
