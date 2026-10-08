@@ -8443,6 +8443,7 @@ ${btnReset2FA}
     var __dreDadosAtuais = null;
 
     async function carregarPlacasDre() {
+      if (!localStorage.getItem('token')) return; // [FIX_18] sem token
       // FASE_FIX_GUARD_401: pula se nao estiver logado
   if (!localStorage.getItem("token")) return;
   var sel = document.getElementById("dre-filtro-placa");
@@ -8466,6 +8467,7 @@ ${btnReset2FA}
     }
 
     async function carregarCategoriasDre() {
+      if (!localStorage.getItem('token')) return; // [FIX_18] sem token
       // FASE_FIX_GUARD_401: pula se nao estiver logado
   if (!localStorage.getItem("token")) return;
   var sel = document.getElementById("dre-filtro-categoria");
