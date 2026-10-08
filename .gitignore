@@ -28,7 +28,10 @@ _teste_*.js
 # FASE_FIX_FAXINA — Adicionado em 02/10/2026
 # ==========================================================================
 # Scripts temporarios de correcao (rodam 1x e sao descartados)
-scripts/
+scripts/*
+!scripts/30_fix_rate_limit_dev.js
+!scripts/31_fix_jest_delay.js
+!scripts/32_seed_admin_teste.js
 
 # Backups com sufixo .bak2
 *.bak2
