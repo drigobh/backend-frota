@@ -1,4 +1,5 @@
 const db = require('../database');
+const autorizar = require('../middleware/autorizar'); // [FIX_13]
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { validarCPF, limparCPF, formatarCPF } = require('../validarCPF'); // [FIX_14b]
@@ -43,7 +44,7 @@ async function ensureUsuariosETabelas() {
 async function routes(fastify, options) {
 
   // Listar usuários sem erro de tipo (conversão mútua para ::text)
-  fastify.get('/api/usuarios', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get('/api/usuarios', { preHandler: [fastify.autenticar, autorizar('usuarios.visualizar')] }, async (req, reply) => {
     try {
       await ensureUsuariosETabelas();
       const res = await db.query(`
@@ -61,7 +62,7 @@ async function routes(fastify, options) {
   });
 
   // [FIX_12] Listar usuários excluídos (soft-deleted)
-  fastify.get('/api/usuarios/excluidos', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get('/api/usuarios/excluidos', { preHandler: [fastify.autenticar, autorizar('usuarios.excluidos.visualizar')] }, async (req, reply) => {
     try {
       await ensureUsuariosETabelas();
       const res = await db.query(`
@@ -83,7 +84,7 @@ async function routes(fastify, options) {
     }
   });
 
-  fastify.get('/api/usuarios/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get('/api/usuarios/:id', { preHandler: [fastify.autenticar, autorizar('usuarios.visualizar')] }, async (req, reply) => {
     const { id } = req.params;
     try {
       await ensureUsuariosETabelas();
@@ -101,7 +102,7 @@ async function routes(fastify, options) {
     }
   });
 
-  fastify.post('/api/usuarios', { preHandler: [fastify.autenticar] }, fastify.comAuditoria(async (req, reply) => {
+  fastify.post('/api/usuarios', { preHandler: [fastify.autenticar, autorizar('usuarios.criar')] }, fastify.comAuditoria(async (req, reply) => {
     const { nome, email, senha, perfil_id, ativo = true, cpf, matricula } = req.body || {};
     if (!nome || !email) return reply.code(400).send({ erro: 'Nome e e-mail são obrigatórios.' });
 
@@ -130,6 +131,22 @@ async function routes(fastify, options) {
       }
     }
 
+    // [FIX_27_MATRICULA_AUTO] Gera matrícula automática se não foi informada
+    let matriculaFinal = matriculaLimpa;
+    if (!matriculaFinal) {
+      try {
+        const proximo = await db.query(
+          "SELECT COALESCE(MAX(CAST(matricula AS INTEGER)), 0) + 1 AS proximo FROM usuarios WHERE matricula IS NOT NULL AND matricula <> '' AND matricula ~ '^[0-9]+$'"
+        );
+        const num = proximo.rows[0].proximo || 1;
+        matriculaFinal = String(num).padStart(2, '0');
+        console.log('[FIX_27] Matrícula gerada automaticamente:', matriculaFinal);
+      } catch (e) {
+        console.error('[FIX_27] Erro ao gerar matrícula:', e.message);
+        matriculaFinal = null;
+      }
+    }
+
     const senhaFinal = senha || '123456';
     const senhaHash = await hashSenha(senhaFinal);
 
@@ -148,7 +165,7 @@ async function routes(fastify, options) {
         INSERT INTO usuarios (nome, email, senha_hash, perfil_id, perfil, ativo, cpf, matricula, totp_obrigatorio, permite_desativar_2fa)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING id, nome, email, perfil_id, perfil, ativo, cpf, matricula, totp_ativo, totp_obrigatorio, permite_desativar_2fa, ultimo_login, created_at /* [FIX_30d] */
-      `, [nome, email.toLowerCase().trim(), senhaHash, perfil_id ? String(perfil_id) : null, perfilNome, ativo, cpfLimpo, matriculaLimpa, (typeof totpObrigadoPerfil !== 'undefined' ? totpObrigadoPerfil : false), ((req.body || {}).permite_desativar_2fa === true)]); // [FIX_29b-4]
+      `, [nome, email.toLowerCase().trim(), senhaHash, perfil_id ? String(perfil_id) : null, perfilNome, ativo, cpfLimpo, matriculaFinal, (typeof totpObrigadoPerfil !== 'undefined' ? totpObrigadoPerfil : false), ((req.body || {}).permite_desativar_2fa === true)]); // [FIX_29b-4]
 
       return reply.code(201).send(res.rows[0]);
     } catch (err) {
@@ -159,7 +176,7 @@ async function routes(fastify, options) {
     }
   }));
 
-  fastify.put('/api/usuarios/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.put('/api/usuarios/:id', { preHandler: [fastify.autenticar, autorizar('usuarios.editar')] }, async (req, reply) => {
     const { id } = req.params;
     const { nome, email, perfil_id, ativo, cpf, matricula } = req.body || {};
     try {
@@ -219,7 +236,7 @@ async function routes(fastify, options) {
     }
   });
 
-  fastify.put('/api/usuarios/:id/resetar-senha', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.put('/api/usuarios/:id/resetar-senha', { preHandler: [fastify.autenticar, autorizar('usuarios.editar')] }, async (req, reply) => {
     const { id } = req.params;
     const { nova_senha } = req.body || {};
     if (!nova_senha || nova_senha.length < 6) {
@@ -236,7 +253,7 @@ async function routes(fastify, options) {
   });
 
   // [FIX_02 + FIX_12] DELETE — Soft delete com auditoria
-  fastify.delete('/api/usuarios/:id', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.delete('/api/usuarios/:id', { preHandler: [fastify.autenticar, autorizar('usuarios.excluir')] }, async (req, reply) => {
     const { id } = req.params;
     try {
       await ensureUsuariosETabelas();
@@ -316,7 +333,7 @@ async function routes(fastify, options) {
   // ============================================================
   // [FIX_02] Rota para restaurar usuário excluído
   // ============================================================
-  fastify.post('/api/usuarios/:id/restaurar', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.post('/api/usuarios/:id/restaurar', { preHandler: [fastify.autenticar, autorizar('usuarios.excluidos.restaurar')] }, async (req, reply) => {
     const { id } = req.params;
     try {
       const adminId = req.user && req.user.id ? String(req.user.id) : null;
@@ -354,7 +371,7 @@ async function routes(fastify, options) {
   });
 
   // [FIX_12] PUT /inativar — marca ativo = false
-  fastify.put('/api/usuarios/:id/inativar', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.put('/api/usuarios/:id/inativar', { preHandler: [fastify.autenticar, autorizar('usuarios.editar')] }, async (req, reply) => {
     const { id } = req.params;
     try {
       await ensureUsuariosETabelas();
@@ -373,7 +390,7 @@ async function routes(fastify, options) {
   });
 
   // [FIX_12] PUT /reativar — marca ativo = true
-  fastify.put('/api/usuarios/:id/reativar', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.put('/api/usuarios/:id/reativar', { preHandler: [fastify.autenticar, autorizar('usuarios.editar')] }, async (req, reply) => {
     const { id } = req.params;
     try {
       await ensureUsuariosETabelas();
@@ -392,7 +409,7 @@ async function routes(fastify, options) {
   // [FIX_30a] PUT /api/usuarios/:id/resetar-2fa
   // Reseta o 2FA de um usuário (admin destrava usuário que perdeu celular)
   // =========================================================================
-  fastify.put('/api/usuarios/:id/resetar-2fa', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.put('/api/usuarios/:id/resetar-2fa', { preHandler: [fastify.autenticar, autorizar('usuarios.editar')] }, async (req, reply) => {
     const { id } = req.params;
     try {
       await ensureUsuariosETabelas();

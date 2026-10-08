@@ -4681,7 +4681,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
           <table class="data-table" id="table-usuarios">
             <thead>
               <tr>
-                <th style="width: 50px;">#</th>
+                <th style="width: 80px;" class="col-center">Matrícula</th> <!-- [FIX_27B_MATRICULA_GRID] -->
                 <th>Nome</th>
                 <th>E-mail</th>
                 <th>Perfil</th>
@@ -7683,7 +7683,7 @@ try {
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${idx + 1}</td>
+          <td class="col-center"><strong>${u.matricula || '-'}</strong></td>
           <td><strong>${u.nome}</strong></td>
           <td>${u.email}</td>
           <td>${u.perfil || '-'}</td>
