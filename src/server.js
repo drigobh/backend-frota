@@ -321,9 +321,7 @@ fastify.addHook('onRoute', (routeOptions) => {
 fastify.register(require('@fastify/static'), {
   root: path.join(__dirname, '../public'),
   prefix: '/',
-  index: false
-  // FASE_63_STATIC_FIX_CRASH: removido setHeaders (causava crash no @fastify/static)
-  // O Fastify define Content-Type automaticamente
+  preCompressed: true,  // FIX_37: serve .br/.gz automaticamente
 });
 
 // =========================================================================
@@ -452,6 +450,31 @@ fastify.get('/', async (req, reply) => {
       html = html.replace(/\{\{VERSAO_SISTEMA\}\}/g, 'v1977-?');
     }
 
+    // FIX_37_PRECOMPRESS: serve versao pre-comprimida se existir
+    const acceptsBr = (req.headers['accept-encoding'] || '').includes('br');
+    const acceptsGz = (req.headers['accept-encoding'] || '').includes('gzip');
+    const fsMod = require('fs');
+    const brPath = path.join(__dirname, '../public/index.html.br');
+    const gzPath = path.join(__dirname, '../public/index.html.gz');
+
+    if (acceptsBr && fsMod.existsSync(brPath)) {
+      return reply
+        .type('text/html; charset=utf-8')
+        .header('Content-Encoding', 'br')
+        .header('Vary', 'Accept-Encoding')
+        .send(fsMod.createReadStream(brPath));
+    }
+
+    if (acceptsGz && fsMod.existsSync(gzPath)) {
+      return reply
+        .type('text/html; charset=utf-8')
+        .header('Content-Encoding', 'gzip')
+        .header('Vary', 'Accept-Encoding')
+        .send(fsMod.createReadStream(gzPath));
+    }
+
+    // Fallback: HTML sem compressao
+    reply.header('Vary', 'Accept-Encoding');
     return reply.type('text/html; charset=utf-8').send(html);
 });
 
@@ -994,6 +1017,17 @@ setInterval(function () {
     console.error('[BACKUP] Erro em background (nao fatal):', e && e.message);
   });
 
+// FIX_37_PRECOMPRESS_BOOT: gera .br/.gz no boot se necessario
+try {
+  const { execSync } = require('child_process');
+  execSync('node scripts/37_pre_compress.js', {
+    cwd: path.join(__dirname, '..'),
+    stdio: 'inherit'
+  });
+} catch (e) {
+  console.warn('[FIX_37] Aviso: falha ao gerar pre-compressao:', e.message);
+  console.warn('[FIX_37] Continuando sem pre-compressao (fallback automatico)');
+}
 console.log('[BOOT] Chamando fastify.listen...');
     await fastify.listen({ port: Number(PORT), host: HOST });
     clearTimeout(watchdog);

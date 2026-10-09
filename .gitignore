@@ -26,7 +26,6 @@ _teste_*.js
 
 # ==========================================================================
 # FASE_FIX_FAXINA — Adicionado em 02/10/2026
-# ==========================================================================
 # Scripts temporarios de correcao (rodam 1x e sao descartados)
 scripts/*
 !scripts/30_fix_rate_limit_dev.js
@@ -59,9 +58,7 @@ desktop.ini
 # Backups com sufixo .bak + numeracao (bak07a, bak14b_v5, etc)
 *.bak*
 
-# ==========================================================================
 # Credenciais (service accounts, chaves JSON)
-# ==========================================================================
 secrets/
 *service-account*.json
 *gserviceaccount*.json
@@ -78,7 +75,6 @@ public/empresas_*.bak
 public/index_MANUAL_BACKUP_*.html
 public/empresas_BACKUP_*
 *.backup.*
-.env
 .env.test
 _test-full.log
 _debug.js
@@ -87,3 +83,12 @@ _readAuth.js
 
 # Backups locais (nao commitar)
 public/_backups/
+
+# Coverage do Jest
+coverage/
+
+# Pre-compressao (gerados no boot)
+public/*.br
+public/*.gz
+public/*.meta.json
+
