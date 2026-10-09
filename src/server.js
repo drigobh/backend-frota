@@ -1,4 +1,4 @@
-require('dotenv').config();
+﻿require('dotenv').config();
 // =========================================================================
 // CADERNINHO DE MOTORISTA - SERVIDOR PRINCIPAL
 // Stack: Fastify + PostgreSQL (Neon) + Render
@@ -94,15 +94,6 @@ const ALLOWED_ORIGINS = [
 ];
 // =========================================================================
 // WATCHDOG — se o listen não rodar em 10s, derruba com log claro
-// =========================================================================
-const watchdog = setTimeout(() => {
-  console.error('⚠️ [WATCHDOG] Alguma coisa travou ANTES do listen().');
-  console.error('⚠️ [WATCHDOG] Possíveis causas:');
-  console.error('   - DATABASE_URL ausente ou inacessível');
-  console.error('   - algum require() de rota está lançando erro');
-  console.error('   - Neon/Postgres lento respondendo');
-  process.exit(1);
-}, 10000);
 
 // =========================================================================
 // CORS — Restrito aos domínios autorizados
@@ -1028,6 +1019,17 @@ try {
   console.warn('[FIX_37] Aviso: falha ao gerar pre-compressao:', e.message);
   console.warn('[FIX_37] Continuando sem pre-compressao (fallback automatico)');
 }
+// FIX_38_WATCHDOG_MOVED: watchdog reposicionado (após pre-compressao)
+// 30s em producao, 15s em dev — Neon/Postgres pode demorar pra acordar
+const WATCHDOG_TIMEOUT = process.env.NODE_ENV === 'production' ? 30000 : 15000;
+const watchdog = setTimeout(() => {
+  console.error('⚠️ [WATCHDOG] Alguma coisa travou ANTES do listen().');
+  console.error('⚠️ [WATCHDOG] Possíveis causas:');
+  console.error('   - DATABASE_URL ausente ou inacessível');
+  console.error('   - algum require() de rota está lançando erro');
+  console.error('   - Neon/Postgres lento respondendo');
+  process.exit(1);
+}, WATCHDOG_TIMEOUT);
 console.log('[BOOT] Chamando fastify.listen...');
     await fastify.listen({ port: Number(PORT), host: HOST });
     clearTimeout(watchdog);
