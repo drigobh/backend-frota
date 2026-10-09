@@ -9,13 +9,19 @@ async function autoMigrate(pool) {
       -- ============================================================
       -- 1. Perfis
       -- ============================================================
-      CREATE TABLE IF NOT EXISTS perfis (
+          CREATE TABLE IF NOT EXISTS perfis (
         id SERIAL PRIMARY KEY,
         nome VARCHAR(50) NOT NULL UNIQUE,
         descricao TEXT,
         ativo BOOLEAN DEFAULT true,
+        eh_sistema BOOLEAN DEFAULT false,
+        totp_obrigatorio BOOLEAN DEFAULT false,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+
+      -- FIX_43: garante colunas em perfis pre-existentes
+      ALTER TABLE perfis ADD COLUMN IF NOT EXISTS eh_sistema BOOLEAN DEFAULT false;
+      ALTER TABLE perfis ADD COLUMN IF NOT EXISTS totp_obrigatorio BOOLEAN DEFAULT false;
 
       INSERT INTO perfis (nome, descricao) VALUES
       ('Administrador', 'Acesso total ao sistema'),
@@ -68,14 +74,26 @@ async function autoMigrate(pool) {
       -- ============================================================
       -- 3. Cavalos / Veiculos
       -- ============================================================
-      CREATE TABLE IF NOT EXISTS veiculos (
-        id SERIAL PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS veiculos (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        filial_id UUID,
         placa VARCHAR(20) NOT NULL UNIQUE,
         modelo VARCHAR(100),
         ano VARCHAR(20),
         obs TEXT,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        status VARCHAR(20) DEFAULT 'ATIVO',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP WITH TIME ZONE,
+        deleted_by UUID
       );
+
+      -- FIX_43: garante colunas em veiculos pre-existentes
+      ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS filial_id UUID;
+      ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'ATIVO';
+      ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+      ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
+      ALTER TABLE veiculos ADD COLUMN IF NOT EXISTS deleted_by UUID;
 
       -- ============================================================
       -- 4. Carretas
