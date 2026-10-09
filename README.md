@@ -1,17 +1,22 @@
-# 🚛 Caderninho de Frota — Backend
+﻿# 🚛 Caderninho de Frota — Backend
+
+[![Tests & Lint](https://github.com/drigobh/backend-frota/actions/workflows/test.yml/badge.svg)](https://github.com/drigobh/backend-frota/actions/workflows/test.yml)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)](https://www.postgresql.org)
+[![License](https://img.shields.io/badge/license-Private-red)]()
 
 API REST + frontend PWA para gestão de frota.
 
 ## 📋 Sumário
 
-- Rodando localmente
-- Variáveis de ambiente
-- Estrutura do projeto
-- Scripts npm
-- Testes
-- Deploy
-- Monitoramento
-- Troubleshooting
+- [Rodando localmente](#-rodando-localmente)
+- [Variáveis de ambiente](#-variáveis-de-ambiente)
+- [Estrutura do projeto](#-estrutura-do-projeto)
+- [Scripts npm](#-scripts-npm)
+- [Testes](#-testes)
+- [Deploy](#-deploy)
+- [Monitoramento](#-monitoramento)
+- [Troubleshooting](#-troubleshooting)
 
 ## 🚀 Rodando localmente
 
@@ -47,6 +52,7 @@ Acesse: http://localhost:3000
 - `src/` — código-fonte do backend
   - `server.js` — servidor Fastify principal
   - `database.js` — pool PostgreSQL
+  - `auto_migrate.js` — migrações automáticas (11 tabelas + RBAC)
   - `email.js` — envio de email via Resend
   - `middleware/` — middlewares (autorizar, etc.)
   - `routes/` — rotas da API
@@ -58,9 +64,10 @@ Acesse: http://localhost:3000
 - `scripts/` — scripts auxiliares
   - `30_fix_rate_limit_dev.js`
   - `31_fix_jest_delay.js`
-  - `32_seed_admin_teste.js`
+  - `32_seed_admin_teste.js` — seed do admin + operador de teste
   - `37_pre_compress.js` — pre-compressão do index.html
 - `tests/` — testes Jest
+- `.github/workflows/test.yml` — CI/CD (lint + smoke + testes em Node 20/22)
 
 ## 🎯 Scripts npm
 
@@ -81,13 +88,16 @@ Pré-requisito: servidor rodando em outro terminal.
 - Terminal 1: `npm start`
 - Terminal 2: `npm test`
 
-63 testes passando em 6 suites:
+**63 testes passando em 6 suites:**
+
 - Auth (4)
 - Endpoints protegidos (11)
 - Segurança (9)
 - Smoke (22)
 - RBAC (10)
 - Matrícula automática (5)
+
+**CI/CD:** GitHub Actions roda lint + smoke + testes completos em Node 20.x e 22.x. PostgreSQL efêmero com auto-migrate + seed.
 
 ## 🌐 Deploy
 
@@ -120,6 +130,15 @@ Regenera o lockfile:
 ### Email não envia com API key is invalid
 
 Atualiza a env var `RESEND_API_KEY` no Render com a chave completa.
+
+### CI/CD falha no GitHub Actions
+
+Verifica os logs em https://github.com/drigobh/backend-frota/actions
+
+Causas comuns:
+- Colunas faltando no `auto_migrate.js`
+- Seed do admin/operador não rodou
+- Race condition no boot do servidor
 
 ## 📞 Suporte
 
