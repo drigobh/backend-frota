@@ -1,58 +1,62 @@
-{
-  "name": "projeto-caderninho-frota",
-  "version": "2.0.0",
-  "description": "Sistema Corporativo de Gestao de Frota - Caderninho de Motorista",
-  "main": "src/server.js",
-  "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --env-file=.env.local src/server.js",
-    "dev:watch": "node --watch --env-file=.env.local src/server.js",
-    "test": "jest --runInBand --forceExit",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage --runInBand --forceExit",
-    "lint": "node --check src/server.js && node --check src/database.js && node --check src/auto_migrate.js",
-    "test:matricula": "cross-env NODE_ENV=test SKIP_RATE_LIMIT=true jest --runInBand --testPathPatterns=matricula",
-    "test:matricula:watch": "cross-env NODE_ENV=test SKIP_RATE_LIMIT=true jest --watch --testPathPatterns=matricula",
-    "test:ci": "cross-env NODE_ENV=test SKIP_RATE_LIMIT=true jest --runInBand --ci --coverage",
-    "pretest": "node scripts/32_seed_admin_teste.js",
-    "pretest:matricula": "node scripts/32_seed_admin_teste.js"
-  },
-  "keywords": [
-    "frota",
-    "logistica",
-    "transporte",
-    "dre"
-  ],
-  "author": "Drigo",
-  "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "@fastify/compress": "^9.2.1",
-    "@fastify/cors": "^11.3.0",
-    "@fastify/helmet": "^13.1.1",
-    "@fastify/jwt": "^10.2.2",
-    "@fastify/rate-limit": "^11.2.0",
-    "@fastify/static": "^10.1.3",
-    "@fastify/swagger": "^9.9.1",
-    "@fastify/swagger-ui": "^6.1.1",
-    "adm-zip": "^0.6.1",
-    "bcrypt": "^6.0.0",
-    "dotenv": "^17.4.2",
-    "fastify": "^5.12.4",
-    "googleapis": "^183.0.0",
-    "nodemailer": "^10.0.10",
-    "pg": "^8.23.0",
-    "qrcode": "^1.5.4",
-    "resend": "^6.28.1",
-    "speakeasy": "^2.0.0"
-  },
-  "allowScripts": {
-    "bcrypt@6.0.0": true
-  },
-  "devDependencies": {
-    "cross-env": "^10.1.0",
-    "jest": "^30.5.2",
-    "sharp": "^0.35.4",
-    "supertest": "^7.3.1"
-  }
+﻿{
+    "name":  "projeto-caderninho-frota",
+    "version":  "2.0.0",
+    "description":  "Sistema Corporativo de Gestao de Frota - Caderninho de Motorista",
+    "main":  "src/server.js",
+    "scripts":  {
+                    "start":  "node src/server.js",
+                    "dev":  "node --env-file=.env.local src/server.js",
+                    "dev:watch":  "node --watch --env-file=.env.local src/server.js",
+                    "test":  "jest --runInBand --forceExit",
+                    "test:watch":  "jest --watch",
+                    "test:coverage":  "jest --coverage --runInBand --forceExit",
+                    "lint":  "node --check src/server.js \u0026\u0026 node --check src/database.js \u0026\u0026 node --check src/auto_migrate.js",
+                    "test:matricula":  "cross-env NODE_ENV=test SKIP_RATE_LIMIT=true jest --runInBand --testPathPatterns=matricula",
+                    "test:matricula:watch":  "cross-env NODE_ENV=test SKIP_RATE_LIMIT=true jest --watch --testPathPatterns=matricula",
+                    "test:ci":  "cross-env NODE_ENV=test SKIP_RATE_LIMIT=true jest --runInBand --ci --coverage",
+                    "pretest":  "node scripts/32_seed_admin_teste.js",
+                    "pretest:matricula":  "node scripts/32_seed_admin_teste.js"
+                },
+    "keywords":  [
+                     "frota",
+                     "logistica",
+                     "transporte",
+                     "dre"
+                 ],
+    "author":  "Drigo",
+    "license":  "ISC",
+    "type":  "commonjs",
+    "dependencies":  {
+                         "@fastify/compress":  "^9.2.1",
+                         "@fastify/cors":  "^11.3.0",
+                         "@fastify/helmet":  "^13.1.1",
+                         "@fastify/jwt":  "^10.2.2",
+                         "@fastify/rate-limit":  "^11.2.0",
+                         "@fastify/static":  "^10.1.3",
+                         "@fastify/swagger":  "^9.9.1",
+                         "@fastify/swagger-ui":  "^6.1.1",
+                         "adm-zip":  "^0.6.1",
+                         "bcrypt":  "^6.0.0",
+                         "dotenv":  "^17.4.2",
+                         "fastify":  "^5.12.4",
+                         "googleapis":  "^183.0.0",
+                         "nodemailer":  "^10.0.10",
+                         "pg":  "^8.23.0",
+                         "qrcode":  "^1.5.4",
+                         "resend":  "^6.28.1",
+                         "speakeasy":  "^2.0.0"
+                     },
+    "allowScripts":  {
+                         "bcrypt@6.0.0":  true
+                     },
+    "devDependencies":  {
+                            "cross-env":  "^10.1.0",
+                            "jest":  "^30.5.2",
+                            "sharp":  "^0.35.4",
+                            "supertest":  "^7.3.1"
+                        },
+    "engines":  {
+                    "node":  ">=20.0.0",
+                    "npm":  ">=10.0.0"
+                }
 }
