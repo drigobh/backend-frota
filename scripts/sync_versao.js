@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SYNC VERSAO — Lê a versão do banco e atualiza o <meta> do HTML
  * Uso: node scripts/sync_versao.js
  */

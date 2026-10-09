@@ -1,4 +1,4 @@
-﻿require('dotenv').config();
+require('dotenv').config();
 // =========================================================================
 // CADERNINHO DE MOTORISTA - SERVIDOR PRINCIPAL
 // Stack: Fastify + PostgreSQL (Neon) + Render

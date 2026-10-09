@@ -1,4 +1,4 @@
-﻿const db = require('../database');
+const db = require('../database');
 
 // FASE_3B_VALIDACAO_FINANCEIRO
 

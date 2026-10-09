@@ -1,4 +1,4 @@
-﻿/**
+/**
  * FASE_13_SESSION - Captura dados da sessao (IP, geo, ISP, device)
  * Usa ip-api.com (gratis, sem chave, HTTP).
  */

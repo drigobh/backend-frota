@@ -1,4 +1,4 @@
-﻿# 🚛 Caderninho de Frota — Backend
+# 🚛 Caderninho de Frota — Backend
 
 API REST + frontend PWA para gestão de frota.
 

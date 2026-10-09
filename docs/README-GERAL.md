@@ -1,4 +1,4 @@
-﻿# 🚛 Caderninho de Frota
+# 🚛 Caderninho de Frota
 
 Sistema integrado de gestão de frota com controle de veículos, motoristas, abastecimentos, quilometragem, financeiro e auditoria.
 
