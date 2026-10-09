@@ -6,7 +6,9 @@ async function autoMigrate(pool) {
   if (migrationRan) return;
   try {
     await pool.query(`
-      -- 1. Perfis e Usuários
+      -- ============================================================
+      -- 1. Perfis
+      -- ============================================================
       CREATE TABLE IF NOT EXISTS perfis (
         id SERIAL PRIMARY KEY,
         nome VARCHAR(50) NOT NULL UNIQUE,
@@ -15,12 +17,15 @@ async function autoMigrate(pool) {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
-      INSERT INTO perfis (nome, descricao) VALUES 
+      INSERT INTO perfis (nome, descricao) VALUES
       ('Administrador', 'Acesso total ao sistema'),
       ('Operador', 'Lançamentos operacionais'),
       ('Financeiro', 'Gestão financeira e DRE')
       ON CONFLICT (nome) DO NOTHING;
 
+      -- ============================================================
+      -- 2. Usuarios (com TODAS as colunas do banco real)
+      -- ============================================================
       CREATE TABLE IF NOT EXISTS usuarios (
         id SERIAL PRIMARY KEY,
         nome VARCHAR(100) NOT NULL,
@@ -31,10 +36,38 @@ async function autoMigrate(pool) {
         perfil VARCHAR(50) DEFAULT 'Administrador',
         ativo BOOLEAN DEFAULT true,
         ultimo_login TIMESTAMP WITH TIME ZONE,
-        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP WITH TIME ZONE,
+        deleted_by UUID,
+        cpf VARCHAR(20),
+        matricula VARCHAR(50),
+        totp_secret VARCHAR(255),
+        totp_ativo BOOLEAN DEFAULT false,
+        totp_ativo_em TIMESTAMP WITH TIME ZONE,
+        totp_obrigatorio BOOLEAN DEFAULT false,
+        permite_desativar_2fa BOOLEAN DEFAULT false,
+        recovery_codes JSONB DEFAULT '[]'::jsonb,
+        recovery_codes_at TIMESTAMP WITH TIME ZONE
       );
 
-      -- 2. Cavalos / Veículos
+      -- Garante colunas em tabelas usuarios pre-existentes
+      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
+      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS deleted_by UUID;
+      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS cpf VARCHAR(20);
+      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS matricula VARCHAR(50);
+      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS totp_secret VARCHAR(255);
+      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS totp_ativo BOOLEAN DEFAULT false;
+      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS totp_ativo_em TIMESTAMP WITH TIME ZONE;
+      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS totp_obrigatorio BOOLEAN DEFAULT false;
+      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS permite_desativar_2fa BOOLEAN DEFAULT false;
+      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS recovery_codes JSONB DEFAULT '[]'::jsonb;
+      ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS recovery_codes_at TIMESTAMP WITH TIME ZONE;
+
+      -- ============================================================
+      -- 3. Cavalos / Veiculos
+      -- ============================================================
       CREATE TABLE IF NOT EXISTS veiculos (
         id SERIAL PRIMARY KEY,
         placa VARCHAR(20) NOT NULL UNIQUE,
@@ -44,7 +77,9 @@ async function autoMigrate(pool) {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
-      -- 3. Carretas
+      -- ============================================================
+      -- 4. Carretas
+      -- ============================================================
       CREATE TABLE IF NOT EXISTS carretas (
         id SERIAL PRIMARY KEY,
         codigo VARCHAR(50) NOT NULL UNIQUE,
@@ -53,7 +88,9 @@ async function autoMigrate(pool) {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
-      -- 4. Motoristas
+      -- ============================================================
+      -- 5. Motoristas
+      -- ============================================================
       CREATE TABLE IF NOT EXISTS motoristas (
         id SERIAL PRIMARY KEY,
         nome VARCHAR(100) NOT NULL,
@@ -63,7 +100,9 @@ async function autoMigrate(pool) {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
-      -- 5. Acoplamentos Mensais
+      -- ============================================================
+      -- 6. Acoplamentos Mensais
+      -- ============================================================
       CREATE TABLE IF NOT EXISTS acoplamentos (
         id SERIAL PRIMARY KEY,
         mes_referencia DATE NOT NULL,
@@ -73,7 +112,9 @@ async function autoMigrate(pool) {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
-      -- 6. Quilometragem Mensal
+      -- ============================================================
+      -- 7. Quilometragem Mensal
+      -- ============================================================
       CREATE TABLE IF NOT EXISTS km_mensal (
         id SERIAL PRIMARY KEY,
         mes_referencia DATE NOT NULL,
@@ -85,7 +126,9 @@ async function autoMigrate(pool) {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
-      -- 7. Abastecimentos Detalhados
+      -- ============================================================
+      -- 8. Abastecimentos Detalhados
+      -- ============================================================
       CREATE TABLE IF NOT EXISTS abastecimentos (
         id SERIAL PRIMARY KEY,
         placa VARCHAR(20) NOT NULL,
@@ -100,7 +143,9 @@ async function autoMigrate(pool) {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
-      -- 8. Financeiro / Lançamentos DRE
+      -- ============================================================
+      -- 9. Financeiro / Lancamentos DRE
+      -- ============================================================
       CREATE TABLE IF NOT EXISTS financeiro (
         id SERIAL PRIMARY KEY,
         placa VARCHAR(20),
@@ -112,7 +157,9 @@ async function autoMigrate(pool) {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
-      -- 9. Manutenções
+      -- ============================================================
+      -- 10. Manutencoes
+      -- ============================================================
       CREATE TABLE IF NOT EXISTS manutencoes (
         id SERIAL PRIMARY KEY,
         placa VARCHAR(20) NOT NULL,
@@ -125,7 +172,9 @@ async function autoMigrate(pool) {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
-      -- 10. Documentos & Certidões
+      -- ============================================================
+      -- 11. Documentos & Certidoes
+      -- ============================================================
       CREATE TABLE IF NOT EXISTS documentos (
         id SERIAL PRIMARY KEY,
         entidade_tipo VARCHAR(50),
@@ -137,9 +186,10 @@ async function autoMigrate(pool) {
       );
     `);
     migrationRan = true;
-    console.log('✔ Todas as 10 tabelas operacionais verificadas/criadas no Neon!');
+    console.log('OK: Todas as 11 tabelas operacionais verificadas/criadas!');
   } catch (err) {
-    console.error('Erro na auto-migracao central:', err.message);
+    console.error('ERRO na auto-migracao central:', err.message);
+    throw err; // FIX: propaga erro para o caller saber que falhou
   }
 }
 
