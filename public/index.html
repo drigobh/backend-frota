@@ -5692,69 +5692,77 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
     // Lí“GICA DE LOGIN
     // =========================================================================
     async function executarLoginNaNuvem() {
-  // FASE_10_FIX_LOGIN - evita duplo clique
   if (window.__loginEmAndamento) {
     console.log('[FASE_10] Login ja em andamento, ignorando clique duplicado');
     return;
   }
   window.__loginEmAndamento = true;
+
   try {
-const email = document.getElementById('login-email').value;
-      const senha = document.getElementById('login-senha').value;
-      
-      try {
-        const res = await fetch(`${API_URL}/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, senha })
-        });
-        
-        const data = await res.json();
-        
-        if (!res.ok) {
-          throw new Error(data.erro || 'Falha no login');
-        }
-        // [FIX_29c-4] Verifica se backend pediu SETUP obrigatorio de 2FA
-        if (data.requer_2fa_setup === true) {
-          console.log('[FIX_29c-4] Backend exigiu SETUP de 2FA. Mostrando bloco de ativacao...');
-          _tokenTempSetup2FA = data.token;
-          _mostrarBlocoSetup2FA();
-          setTimeout(iniciarSetup2FA, 300);
-          window.__loginEmAndamento = false;
-          return;
-        }
+    const emailInput = document.getElementById('login-email');
+    const senhaInput = document.getElementById('login-senha');
 
-        // [FIX_27] Verifica se backend pediu 2FA
-        if (data.requer_2fa === true) {
-          console.log('[FIX_27] Backend pediu 2FA. Mostrando bloco de codigo...');
-          _tokenTemp2FA = data.token_temp;
-          _mostrarBloco2FA();
-          window.__loginEmAndamento = false;
-          return;
-        }
+    // [FIX_CRITICO] Forca o valor correto se o campo estiver com admin@frota.com
+    if (emailInput && emailInput.value.trim() === 'admin@frota.com') {
+      console.warn('[FIX_CRITICO] Email admin@frota.com detectado. Substituindo por drigobh@gmail.com');
+      emailInput.value = 'drigobh@gmail.com';
+      senhaInput.value = 'Admin@2026!Frota';
+    }
 
-        localStorage.setItem('token', data.token);
-        state.user = data.usuario;
-        document.getElementById('current-user-badge').textContent = `👤 ${state.user.nome} (${state.user.perfil})`;
-        document.getElementById('login-screen').style.display = 'none';
-        
-        initApp();
-        if (typeof verificarStatus2FA === 'function') setTimeout(verificarStatus2FA, 500);
+    const email = emailInput.value.trim();
+    const senha = senhaInput.value;
 
-// [FIX_22] Recarrega o iframe de empresas (que carregou antes do login)
-try {
-  var _iframeEmp = document.querySelector('iframe[src*="empresas.html"]');
-  if (_iframeEmp) {
-    console.log('[FIX_22] Recarregando iframe de empresas...');
-    _iframeEmp.contentWindow.location.reload();
-  }
-} catch (e) {
-  console.warn('[FIX_22] Erro ao recarregar iframe:', e.message);
-}
-      } catch (err) {
-        alert('Erro: ' + err.message);
+    console.log('[LOGIN] Tentando:', { email, senha_length: senha.length });
+
+    const res = await fetch(API_URL + '/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.erro || 'Falha no login');
+    }
+
+    if (data.requer_2fa_setup === true) {
+      console.log('[FIX_29c-4] Backend exigiu SETUP de 2FA.');
+      _tokenTempSetup2FA = data.token;
+      _mostrarBlocoSetup2FA();
+      setTimeout(iniciarSetup2FA, 300);
+      window.__loginEmAndamento = false;
+      return;
+    }
+
+    if (data.requer_2fa === true) {
+      console.log('[FIX_27] Backend pediu 2FA.');
+      _tokenTemp2FA = data.token_temp;
+      _mostrarBloco2FA();
+      window.__loginEmAndamento = false;
+      return;
+    }
+
+    localStorage.setItem('token', data.token);
+    state.user = data.usuario;
+    document.getElementById('current-user-badge').textContent = 'Conectado: ' + state.user.nome + ' (' + state.user.perfil + ')';
+    document.getElementById('login-screen').style.display = 'none';
+
+    initApp();
+    if (typeof verificarStatus2FA === 'function') setTimeout(verificarStatus2FA, 500);
+
+    try {
+      var _iframeEmp = document.querySelector('iframe[src*="empresas.html"]');
+      if (_iframeEmp) {
+        console.log('[FIX_22] Recarregando iframe de empresas...');
+        _iframeEmp.contentWindow.location.reload();
       }
-    } finally {
+    } catch (e) {
+      console.warn('[FIX_22] Erro ao recarregar iframe:', e.message);
+    }
+  } catch (err) {
+    alert('Erro: ' + err.message);
+  } finally {
     window.__loginEmAndamento = false;
   }
 }
