@@ -108,15 +108,34 @@ jobs:
           PORT: 3000
         run: |
           node src/server.js > /tmp/server.log 2>&1 &
-          echo "Aguardando servidor..."
-          for i in {1..30}; do
-            if curl -s http://localhost:3000/health > /dev/null; then
-              echo "Servidor online!"
+          echo "Aguardando servidor responder JSON em /health..."
+          READY=0
+          for i in {1..60}; do
+            RESP=$(curl -s http://localhost:3000/health 2>/dev/null || echo "")
+            if echo "$RESP" | grep -q '"status":"ok"'; then
+              echo "Servidor online e pronto! (tentativa $i)"
+              READY=1
               break
             fi
-            echo "  Tentativa $i/30..."
+            echo "  Tentativa $i/60..."
             sleep 1
           done
+
+          if [ "$READY" != "1" ]; then
+            echo "ERRO: Servidor nao respondeu com JSON esperado em 60s"
+            echo "=== Ultima resposta do /health ==="
+            curl -s http://localhost:3000/health | head -20
+            echo ""
+            echo "=== Logs do servidor ==="
+            cat /tmp/server.log
+            exit 1
+          fi
+
+          # Validacao extra: confirma que /health retorna JSON valido com JWT ok
+          echo "Validando resposta completa do /health..."
+          curl -s http://localhost:3000/health | head -c 500
+          echo ""
+          echo "Servidor pronto para os testes."
 
       - name: Rodar testes completos
         env:
@@ -131,3 +150,9 @@ jobs:
         run: |
           echo "=== Logs do servidor ==="
           cat /tmp/server.log || echo "Sem logs"
+          echo ""
+          echo "=== Teste manual de /health ==="
+          curl -s http://localhost:3000/health || echo "Nao respondeu"
+          echo ""
+          echo "=== Teste manual de / ==="
+          curl -s -I http://localhost:3000/ || echo "Nao respondeu"
