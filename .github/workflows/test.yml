@@ -97,7 +97,7 @@ jobs:
           DATABASE_URL: postgres://test:test@localhost:5432/caderninho_test
           JWT_SECRET: test-secret-para-ci-com-128-caracteres-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
           NODE_ENV: test
-        run: node src/auto_migrate.js || echo "auto_migrate rodou"
+        run: node src/auto_migrate.js
 
       - name: Subir servidor em background
         env:

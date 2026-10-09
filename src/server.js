@@ -1030,6 +1030,16 @@ const watchdog = setTimeout(() => {
   console.error('   - Neon/Postgres lento respondendo');
   process.exit(1);
 }, WATCHDOG_TIMEOUT);
+// FIX_40: roda auto_migrate no boot (garante tabelas criadas)
+try {
+  const { autoMigrate } = require('./auto_migrate');
+  if (typeof autoMigrate === 'function') {
+    await autoMigrate(db.pool || db);
+    console.log('OK: [BOOT] auto_migrate executado');
+  }
+} catch (e) {
+  console.warn('AVISO: [BOOT] auto_migrate falhou:', e.message);
+}
 console.log('[BOOT] Chamando fastify.listen...');
     await fastify.listen({ port: Number(PORT), host: HOST });
     clearTimeout(watchdog);

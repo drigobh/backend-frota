@@ -144,3 +144,20 @@ async function autoMigrate(pool) {
 }
 
 module.exports = { autoMigrate };
+
+
+// Permite rodar diretamente: node src/auto_migrate.js
+if (require.main === module) {
+  const { Pool } = require('pg');
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  autoMigrate(pool)
+    .then(() => {
+      console.log('OK: Migrations executadas (execucao direta)');
+      return pool.end();
+    })
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error('ERRO na migration:', err.message);
+      pool.end().finally(() => process.exit(1));
+    });
+}
