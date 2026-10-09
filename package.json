@@ -50,7 +50,6 @@
     "bcrypt@6.0.0": true
   },
   "devDependencies": {
-    "cheerio": "^1.2.0",
     "cross-env": "^10.1.0",
     "jest": "^30.5.2",
     "sharp": "^0.35.4",
