@@ -1,4 +1,4 @@
-const { Pool } = require('pg');
+﻿const { Pool } = require('pg');
 
 let migrationRan = false;
 
@@ -171,6 +171,111 @@ async function autoMigrate(pool) {
         proxima_manutencao_km NUMERIC DEFAULT 0,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+
+
+      -- ============================================================
+      -- FIX_41_RBAC_TABLES: permissoes e perfil_permissoes
+      -- ============================================================
+      CREATE TABLE IF NOT EXISTS permissoes (
+        id SERIAL PRIMARY KEY,
+        chave VARCHAR(100) NOT NULL UNIQUE,
+        modulo VARCHAR(50) NOT NULL,
+        descricao VARCHAR(200),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+
+      -- Catalogo de permissoes do sistema
+      INSERT INTO permissoes (chave, modulo, descricao) VALUES
+        ('dashboard.visualizar', 'Dashboard', 'Ver dashboard'),
+        ('veiculos.visualizar', 'Cadastros', 'Ver veiculos'),
+        ('veiculos.criar', 'Cadastros', 'Criar veiculos'),
+        ('veiculos.editar', 'Cadastros', 'Editar veiculos'),
+        ('veiculos.excluir', 'Cadastros', 'Excluir veiculos'),
+        ('carretas.visualizar', 'Cadastros', 'Ver carretas'),
+        ('carretas.criar', 'Cadastros', 'Criar carretas'),
+        ('carretas.editar', 'Cadastros', 'Editar carretas'),
+        ('carretas.excluir', 'Cadastros', 'Excluir carretas'),
+        ('motoristas.visualizar', 'Cadastros', 'Ver motoristas'),
+        ('motoristas.criar', 'Cadastros', 'Criar motoristas'),
+        ('motoristas.editar', 'Cadastros', 'Editar motoristas'),
+        ('motoristas.excluir', 'Cadastros', 'Excluir motoristas'),
+        ('categorias.visualizar', 'Cadastros', 'Ver categorias'),
+        ('categorias.criar', 'Cadastros', 'Criar categorias'),
+        ('categorias.editar', 'Cadastros', 'Editar categorias'),
+        ('categorias.excluir', 'Cadastros', 'Excluir categorias'),
+        ('centros_custo.visualizar', 'Cadastros', 'Ver centros de custo'),
+        ('centros_custo.criar', 'Cadastros', 'Criar centros de custo'),
+        ('centros_custo.editar', 'Cadastros', 'Editar centros de custo'),
+        ('centros_custo.excluir', 'Cadastros', 'Excluir centros de custo'),
+        ('acoplamentos.visualizar', 'Operacao', 'Ver acoplamentos'),
+        ('acoplamentos.criar', 'Operacao', 'Criar acoplamentos'),
+        ('acoplamentos.editar', 'Operacao', 'Editar acoplamentos'),
+        ('acoplamentos.excluir', 'Operacao', 'Excluir acoplamentos'),
+        ('km.visualizar', 'Operacao', 'Ver KM'),
+        ('km.criar', 'Operacao', 'Criar KM'),
+        ('km.editar', 'Operacao', 'Editar KM'),
+        ('abastecimentos.visualizar', 'Operacao', 'Ver abastecimentos'),
+        ('abastecimentos.criar', 'Operacao', 'Criar abastecimentos'),
+        ('abastecimentos.editar', 'Operacao', 'Editar abastecimentos'),
+        ('abastecimentos.excluir', 'Operacao', 'Excluir abastecimentos'),
+        ('manutencoes.visualizar', 'Operacao', 'Ver manutencoes'),
+        ('manutencoes.criar', 'Operacao', 'Criar manutencoes'),
+        ('manutencoes.editar', 'Operacao', 'Editar manutencoes'),
+        ('manutencoes.excluir', 'Operacao', 'Excluir manutencoes'),
+        ('lancamentos.visualizar', 'Financeiro', 'Ver lancamentos'),
+        ('lancamentos.criar', 'Financeiro', 'Criar lancamentos'),
+        ('lancamentos.editar', 'Financeiro', 'Editar lancamentos'),
+        ('lancamentos.excluir', 'Financeiro', 'Excluir lancamentos'),
+        ('dre.visualizar', 'Financeiro', 'Ver DRE por veiculo'),
+        ('dre.consolidada.visualizar', 'Financeiro', 'Ver DRE consolidada'),
+        ('metas.visualizar', 'Indicadores', 'Ver metas'),
+        ('metas.criar', 'Indicadores', 'Criar metas'),
+        ('metas.editar', 'Indicadores', 'Editar metas'),
+        ('metas.excluir', 'Indicadores', 'Excluir metas'),
+        ('ranking.visualizar', 'Indicadores', 'Ver ranking'),
+        ('resumo.visualizar', 'Indicadores', 'Ver resumo executivo'),
+        ('graficos.visualizar', 'Indicadores', 'Ver graficos'),
+        ('historico.visualizar', 'Indicadores', 'Ver historico'),
+        ('usuarios.visualizar', 'Administracao', 'Ver usuarios'),
+        ('usuarios.criar', 'Administracao', 'Criar usuarios'),
+        ('usuarios.editar', 'Administracao', 'Editar usuarios'),
+        ('usuarios.excluir', 'Administracao', 'Excluir usuarios'),
+        ('usuarios.excluidos.visualizar', 'Administracao', 'Ver usuarios excluidos'),
+        ('usuarios.excluidos.restaurar', 'Administracao', 'Restaurar usuarios excluidos'),
+        ('perfis.visualizar', 'Administracao', 'Ver perfis'),
+        ('perfis.criar', 'Administracao', 'Criar perfis'),
+        ('perfis.editar', 'Administracao', 'Editar perfis'),
+        ('perfis.excluir', 'Administracao', 'Excluir perfis'),
+        ('permissoes.gerenciar', 'Administracao', 'Gerenciar permissoes'),
+        ('auditoria.visualizar', 'Administracao', 'Ver auditoria')
+      ON CONFLICT (chave) DO NOTHING;
+
+      CREATE TABLE IF NOT EXISTS perfil_permissoes (
+        perfil_id INT NOT NULL REFERENCES perfis(id) ON DELETE CASCADE,
+        permissao_id INT NOT NULL REFERENCES permissoes(id) ON DELETE CASCADE,
+        PRIMARY KEY (perfil_id, permissao_id)
+      );
+
+      -- Admin (perfil 1) tem TODAS as permissoes
+      INSERT INTO perfil_permissoes (perfil_id, permissao_id)
+      SELECT 1, id FROM permissoes
+      ON CONFLICT DO NOTHING;
+
+      -- Operador (perfil 2) tem permissoes de leitura/operacao
+      INSERT INTO perfil_permissoes (perfil_id, permissao_id)
+      SELECT 2, id FROM permissoes WHERE chave IN (
+        'dashboard.visualizar',
+        'km.visualizar', 'km.criar', 'km.editar',
+        'abastecimentos.visualizar', 'abastecimentos.criar', 'abastecimentos.editar',
+        'acoplamentos.visualizar', 'acoplamentos.criar', 'acoplamentos.editar',
+        'veiculos.visualizar',
+        'carretas.visualizar',
+        'motoristas.visualizar',
+        'manutencoes.visualizar',
+        'lancamentos.visualizar',
+        'historico.visualizar'
+      )
+      ON CONFLICT DO NOTHING;
 
       -- ============================================================
       -- 11. Documentos & Certidoes
