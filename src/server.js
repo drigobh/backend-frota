@@ -155,6 +155,24 @@ fastify.register(cors, {
   allowedHeaders: ['Content-Type', 'Authorization'],
 });
 
+
+// ===========================================================================
+// FIX_36_COMPRESS - Compressao Gzip/Brotli
+// Reduz transferencia de rede (index.html: 694 KB -> ~120 KB)
+// ===========================================================================
+fastify.register(require('@fastify/compress'), {
+  global: true,
+  encodings: ['br', 'gzip', 'deflate'],
+  brotliOptions: {
+    params: {
+      [require('zlib').constants.BROTLI_PARAM_QUALITY]: 4
+    }
+  },
+  zlibOptions: {
+    level: 6
+  },
+  threshold: 1024
+});
 // =========================================================================
 // ===========================================================================
 // RATE LIMITING — Protege /api/login contra forca bruta

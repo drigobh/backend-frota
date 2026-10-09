@@ -84,3 +84,6 @@ _test-full.log
 _debug.js
 _read05.js
 _readAuth.js
+
+# Backups locais (nao commitar)
+public/_backups/
