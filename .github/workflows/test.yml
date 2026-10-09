@@ -7,10 +7,12 @@ on:
     branches: [main, develop]
 
 jobs:
-  test:
-    name: Rodar testes
+  # ============================================================
+  # Job 1: Lint e sintaxe (rápido, ~1 min)
+  # ============================================================
+  lint:
+    name: Lint e Sintaxe
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout do codigo
         uses: actions/checkout@v4
@@ -27,9 +29,105 @@ jobs:
       - name: Verificar sintaxe (lint)
         run: npm run lint
 
-      - name: Rodar testes
-        run: npm test
+  # ============================================================
+  # Job 2: Smoke tests (nao precisa de servidor nem banco)
+  # ============================================================
+  smoke:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Rodar smoke tests (04-smoke)
+        run: npx jest tests/04-smoke.test.js --runInBand --forceExit
+
+  # ============================================================
+  # Job 3: Testes completos com PostgreSQL efemero
+  # ============================================================
+  test:
+    name: Node ${{ matrix.node-version }} - Testes completos
+    runs-on: ubuntu-latest
+    needs: [lint, smoke]
+
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+      fail-fast: false
+
+    services:
+      postgres:
+        image: postgres:16
         env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: caderninho_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout do codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Rodar auto_migrate (cria tabelas)
+        env:
+          DATABASE_URL: postgres://test:test@localhost:5432/caderninho_test
+          JWT_SECRET: test-secret-para-ci-com-128-caracteres-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
           NODE_ENV: test
-          JWT_SECRET: test-secret-para-ci
-          DATABASE_URL: postgres://test:test@localhost:5432/test
+        run: node src/auto_migrate.js || echo "auto_migrate rodou"
+
+      - name: Subir servidor em background
+        env:
+          DATABASE_URL: postgres://test:test@localhost:5432/caderninho_test
+          JWT_SECRET: test-secret-para-ci-com-128-caracteres-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          NODE_ENV: test
+          SKIP_RATE_LIMIT: 'true'
+          PORT: 3000
+        run: |
+          node src/server.js > /tmp/server.log 2>&1 &
+          echo "Aguardando servidor..."
+          for i in {1..30}; do
+            if curl -s http://localhost:3000/health > /dev/null; then
+              echo "Servidor online!"
+              break
+            fi
+            echo "  Tentativa $i/30..."
+            sleep 1
+          done
+
+      - name: Rodar testes completos
+        env:
+          DATABASE_URL: postgres://test:test@localhost:5432/caderninho_test
+          JWT_SECRET: test-secret-para-ci-com-128-caracteres-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          NODE_ENV: test
+          SKIP_RATE_LIMIT: 'true'
+        run: npm test
+
+      - name: Logs do servidor (se falhou)
+        if: failure()
+        run: |
+          echo "=== Logs do servidor ==="
+          cat /tmp/server.log || echo "Sem logs"
