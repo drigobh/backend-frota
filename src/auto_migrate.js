@@ -26,8 +26,8 @@ async function autoMigrate(pool) {
       -- ============================================================
       -- 2. Usuarios (com TODAS as colunas do banco real)
       -- ============================================================
-      CREATE TABLE IF NOT EXISTS usuarios (
-        id SERIAL PRIMARY KEY,
+        CREATE TABLE IF NOT EXISTS usuarios (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         nome VARCHAR(100) NOT NULL,
         email VARCHAR(150) NOT NULL UNIQUE,
         senha_hash VARCHAR(255),
