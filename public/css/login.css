@@ -1,0 +1,11 @@
+/* [FIX_53_v2] Bloco 1 de 1 - login */
+/* [FIX_27] Bloco 2FA no login */
+#login-2fa-block { display:none; }
+#login-2fa-block.visible { display:block; }
+#login-2fa-block .login-2fa-title { color:#ffffff; font-size:1.1rem; font-weight:700; margin:0 0 0.5rem; text-align:center; }
+#login-2fa-block .login-2fa-subtitle { color:#cbd5e1; font-size:0.85rem; margin:0 0 1.5rem; text-align:center; line-height:1.5; }
+#login-2fa-codigo { letter-spacing:8px; text-align:center; font-family:monospace; font-size:1.3rem; }
+.login-2fa-actions { display:flex; flex-direction:column; gap:8px; margin-top:1rem; }
+.login-2fa-back { background:transparent; border:none; color:#cbd5e1; font-size:0.8rem; cursor:pointer; padding:6px; text-decoration:underline; }
+.login-2fa-back:hover { color:#ffffff; }
+#login-form.hidden { display:none; }

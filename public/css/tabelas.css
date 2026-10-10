@@ -1,0 +1,28 @@
+/* [FIX_53_v2] Bloco 1 de 1 - tabelas */
+/* FASE_25_PRINT_FIX: forca fundo branco na impressao do navegador (evita tela preta no dark mode) */
+@media print {
+  html, body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    color-scheme: light !important;
+  }
+  * {
+    background-color: transparent !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  /* Preserva cores de tabelas e cabecalhos */
+  thead th, .pdf-header, .hist-print-header, .aud-print-header {
+    background: #f1f5f9 !important;
+    color: #0f2a4a !important;
+  }
+  /* Remove sombras e bordas escuras */
+  table, th, td {
+    border-color: #cbd5e1 !important;
+  }
+  /* Esconde elementos que não devem ser impressos */
+  .no-print, .ds-pdf-fab, nav, header, button, .btn-action, .action-btn {
+    display: none !important;
+  }
+}
