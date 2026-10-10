@@ -197,7 +197,8 @@ async function routes(fastify, options) {
           if (pRes.rows.length > 0) {
             perfilNome = pRes.rows[0].nome;
             var totpObrigadoPerfil = pRes.rows[0].totp_obrigatorio === true; // [FIX_29b-3]
-          } else { totpObrigadoPerfil = false;
+          } else {
+            totpObrigadoPerfil = false;
           }
         }
 
@@ -259,7 +260,8 @@ async function routes(fastify, options) {
           if (pRes.rows.length > 0) {
             perfilNome = pRes.rows[0].nome;
             var totpObrigadoPerfil = pRes.rows[0].totp_obrigatorio === true; // [FIX_29b-3]
-          } else { totpObrigadoPerfil = null;
+          } else {
+            totpObrigadoPerfil = null;
           }
         }
 

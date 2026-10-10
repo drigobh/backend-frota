@@ -91,7 +91,9 @@ async function runAsUser(user, callback) {
   } catch (e) {
     try {
       await client.query("ROLLBACK");
-    } catch (_) { /* ignore */ }
+    } catch (_) {
+      /* ignore */
+    }
     throw e;
   } finally {
     client.release();
