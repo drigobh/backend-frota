@@ -8,7 +8,7 @@
  *   APP_URL        - URL do sistema (para link de recuperacao)
  */
 
-const { Resend } = require('resend');
+const { Resend } = require("resend");
 
 let _resend = null;
 function getResend() {
@@ -16,7 +16,7 @@ function getResend() {
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.warn('[email] RESEND_API_KEY nao configurado.');
+    console.warn("[email] RESEND_API_KEY nao configurado.");
     return null;
   }
 
@@ -24,22 +24,22 @@ function getResend() {
     _resend = new Resend(apiKey);
     return _resend;
   } catch (e) {
-    console.error('[email] Erro ao criar cliente Resend:', e.message);
+    console.error("[email] Erro ao criar cliente Resend:", e.message);
     return null;
   }
 }
 
-const FROM = process.env.EMAIL_FROM || 'Caderninho de Frota <onboarding@resend.dev>';
-const APP_URL = process.env.APP_URL || 'https://backend-frota-72ni.onrender.com';
+const FROM = process.env.EMAIL_FROM || "Caderninho de Frota <onboarding@resend.dev>";
+const APP_URL = process.env.APP_URL || "https://backend-frota-72ni.onrender.com";
 
 async function enviarEmailRecuperacaoSenha(para, nome, token) {
   const resend = getResend();
   if (!resend) {
-    return { ok: false, erro: 'RESEND_API_KEY nao configurado' };
+    return { ok: false, erro: "RESEND_API_KEY nao configurado" };
   }
 
-  const link = APP_URL + '/reset?token=' + encodeURIComponent(token);
-  const nomeSeguro = nome || 'usuario';
+  const link = APP_URL + "/reset?token=" + encodeURIComponent(token);
+  const nomeSeguro = nome || "usuario";
 
   const html = `<!DOCTYPE html>
 <html>
@@ -79,20 +79,20 @@ async function enviarEmailRecuperacaoSenha(para, nome, token) {
     const result = await resend.emails.send({
       from: FROM,
       to: para,
-      subject: 'Recuperacao de senha - Caderninho de Frota',
-      html: html,
+      subject: "Recuperacao de senha - Caderninho de Frota",
+      html: html
     });
 
     if (result.error) {
-      console.error('[email] Resend erro:', result.error.message || JSON.stringify(result.error));
-      return { ok: false, erro: result.error.message || 'Erro Resend' };
+      console.error("[email] Resend erro:", result.error.message || JSON.stringify(result.error));
+      return { ok: false, erro: result.error.message || "Erro Resend" };
     }
 
     const id = result.data && result.data.id;
-    console.log('[email] Enviado (Resend) para ' + para + ' - ID: ' + id);
+    console.log("[email] Enviado (Resend) para " + para + " - ID: " + id);
     return { ok: true, id: id };
   } catch (err) {
-    console.error('[email] Erro:', err.message);
+    console.error("[email] Erro:", err.message);
     return { ok: false, erro: err.message };
   }
 }
@@ -100,17 +100,17 @@ async function enviarEmailRecuperacaoSenha(para, nome, token) {
 async function enviarEmailAlertaBackup(erro) {
   const resend = getResend();
   if (!resend) {
-    console.warn('[email] Nao foi possivel enviar alerta de backup: RESEND_API_KEY nao configurado.');
-    return { ok: false, erro: 'email nao configurado' };
+    console.warn("[email] Nao foi possivel enviar alerta de backup: RESEND_API_KEY nao configurado.");
+    return { ok: false, erro: "email nao configurado" };
   }
 
   const adminEmail = process.env.EMAIL_FROM || process.env.EMAIL_USER;
   if (!adminEmail) {
-    return { ok: false, erro: 'EMAIL_FROM/USER nao configurados' };
+    return { ok: false, erro: "EMAIL_FROM/USER nao configurados" };
   }
 
   const mensagemErro = erro && erro.message ? erro.message : String(erro);
-  const stack = erro && erro.stack ? erro.stack : '(sem stack trace)';
+  const stack = erro && erro.stack ? erro.stack : "(sem stack trace)";
   const agora = new Date().toISOString();
 
   const html = `<!DOCTYPE html>
@@ -146,20 +146,20 @@ async function enviarEmailAlertaBackup(erro) {
     const result = await resend.emails.send({
       from: FROM,
       to: adminEmail,
-      subject: '[ALERTA] Falha no backup automatico - Caderninho de Frota',
-      html: html,
+      subject: "[ALERTA] Falha no backup automatico - Caderninho de Frota",
+      html: html
     });
 
     if (result.error) {
-      console.error('[email] Resend erro (alerta):', result.error.message || JSON.stringify(result.error));
-      return { ok: false, erro: result.error.message || 'Erro Resend' };
+      console.error("[email] Resend erro (alerta):", result.error.message || JSON.stringify(result.error));
+      return { ok: false, erro: result.error.message || "Erro Resend" };
     }
 
     const id = result.data && result.data.id;
-    console.log('[email] Alerta de backup enviado (Resend) para ' + adminEmail + ' - ID: ' + id);
+    console.log("[email] Alerta de backup enviado (Resend) para " + adminEmail + " - ID: " + id);
     return { ok: true, id: id };
   } catch (err) {
-    console.error('[email] Falha ao enviar alerta de backup:', err.message);
+    console.error("[email] Falha ao enviar alerta de backup:", err.message);
     return { ok: false, erro: err.message };
   }
 }

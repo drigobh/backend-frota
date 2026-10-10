@@ -12,51 +12,72 @@
 function validarSenhaForte(senha, email) {
   const erros = [];
 
-  if (typeof senha !== 'string' || senha.length === 0) {
-    return { ok: false, erros: ['Senha nao pode estar vazia'] };
+  if (typeof senha !== "string" || senha.length === 0) {
+    return { ok: false, erros: ["Senha nao pode estar vazia"] };
   }
 
   // 1. Tamanho: 6 a 10
   if (senha.length < 6) {
-    erros.push('Deve ter no minimo 6 caracteres');
+    erros.push("Deve ter no minimo 6 caracteres");
   }
 
   // 2. Sem acentos
   if (/[áàâãäéèêëíìîïóòôõöúùûüçñÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇÑ]/.test(senha)) {
-    erros.push('Nao pode conter acentos');
+    erros.push("Nao pode conter acentos");
   }
 
   // 3. Sem o login do cadastro (parte antes do @)
-  var login = (email || '').split('@')[0].toLowerCase();
+  const login = (email || "").split("@")[0].toLowerCase();
   if (login && login.length >= 3 && senha.toLowerCase().includes(login)) {
-    erros.push('Nao pode conter o login do cadastro');
+    erros.push("Nao pode conter o login do cadastro");
   }
 
   // 4. Sem numeros em sequencia
-  var seq = ['012','123','234','345','456','567','678','789','890',
-             '987','876','765','654','543','432','321','210'];
-  if (seq.some(function(s) { return senha.indexOf(s) !== -1; })) {
-    erros.push('Nao pode conter numeros em sequencia');
+  const seq = [
+    "012",
+    "123",
+    "234",
+    "345",
+    "456",
+    "567",
+    "678",
+    "789",
+    "890",
+    "987",
+    "876",
+    "765",
+    "654",
+    "543",
+    "432",
+    "321",
+    "210"
+  ];
+  if (
+    seq.some(function (s) {
+      return senha.indexOf(s) !== -1;
+    })
+  ) {
+    erros.push("Nao pode conter numeros em sequencia");
   }
 
   // 5. Ao menos 1 maiuscula
   if (!/[A-Z]/.test(senha)) {
-    erros.push('Deve conter ao menos 1 letra maiuscula');
+    erros.push("Deve conter ao menos 1 letra maiuscula");
   }
 
   // 6. Ao menos 1 minuscula
   if (!/[a-z]/.test(senha)) {
-    erros.push('Deve conter ao menos 1 letra minuscula');
+    erros.push("Deve conter ao menos 1 letra minuscula");
   }
 
   // 7. Ao menos 1 numero
   if (!/[0-9]/.test(senha)) {
-    erros.push('Deve conter ao menos 1 numero');
+    erros.push("Deve conter ao menos 1 numero");
   }
 
   // 8. Ao menos 1 caractere especial
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(senha)) {
-    erros.push('Deve conter ao menos 1 caractere especial (!@#$%...)');
+  if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(senha)) {
+    erros.push("Deve conter ao menos 1 caractere especial (!@#$%...)");
   }
 
   return { ok: erros.length === 0, erros: erros };

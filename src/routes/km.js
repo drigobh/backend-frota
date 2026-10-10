@@ -1,15 +1,16 @@
-const db = require('../database');
+const db = require("../database");
 
 // FASE_3B_VALIDACAO_OPERACAO
 
-
 module.exports = async function (fastify, options) {
-
-  fastify.get('/api/km/:mes', {
-    preHandler: [fastify.autenticar],
-  }, async (request, reply) => {
-    const { mes } = request.params;
-    const query = `
+  fastify.get(
+    "/api/km/:mes",
+    {
+      preHandler: [fastify.autenticar]
+    },
+    async (request, reply) => {
+      const { mes } = request.params;
+      const query = `
       SELECT 
         v.placa,
         COALESCE(c.km_inicial, 0) as inicial,
@@ -22,90 +23,91 @@ module.exports = async function (fastify, options) {
         AND DATE_TRUNC('month', a.data_abastecimento) = $1
       WHERE v.status = 'ATIVO'
     `;
-    const { rows } = await db.query(query, [mes]);
-    return rows;
-  });
-
-  fastify.post('/api/km', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "placa",
-                "mes_referencia"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "placa": {
-                    "type": "string",
-                    "minLength": 3,
-                    "maxLength": 20
-                },
-                "mes_referencia": {
-                    "type": "string",
-                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
-                },
-                "inicial": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "final": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "litros": {
-                    "type": "number",
-                    "minimum": 0
-                },
-                "precoLitro": {
-                    "type": "number",
-                    "minimum": 0
-                }
-            }
-        }
-    },
-    preHandler: [fastify.autenticar],
-  }, async (request, reply) => {
-    const { placa, mes_referencia, inicial, final, litros, precoLitro } = request.body;
-
-    if (final > 0 && final < inicial) {
-      return reply.status(400).send({ erro: 'A quilometragem final não pode ser inferior à inicial.' });
+      const { rows } = await db.query(query, [mes]);
+      return rows;
     }
+  );
 
-    const kmFinalDb = final > 0 ? final : null;
+  fastify.post(
+    "/api/km",
+    {
+      schema: {
+        body: {
+          type: "object",
+          required: ["placa", "mes_referencia"],
+          additionalProperties: true,
+          properties: {
+            placa: {
+              type: "string",
+              minLength: 3,
+              maxLength: 20
+            },
+            mes_referencia: {
+              type: "string",
+              pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            inicial: {
+              type: "number",
+              minimum: 0
+            },
+            final: {
+              type: "number",
+              minimum: 0
+            },
+            litros: {
+              type: "number",
+              minimum: 0
+            },
+            precoLitro: {
+              type: "number",
+              minimum: 0
+            }
+          }
+        }
+      },
+      preHandler: [fastify.autenticar]
+    },
+    async (request, reply) => {
+      const { placa, mes_referencia, inicial, final, litros, precoLitro } = request.body;
 
-    try {
-      const veiculoReq = await db.query(`SELECT id FROM veiculos WHERE placa = $1`, [placa]);
-      if (veiculoReq.rows.length === 0) {
-        return reply.status(404).send({ erro: 'Veículo não encontrado' });
+      if (final > 0 && final < inicial) {
+        return reply.status(400).send({ erro: "A quilometragem final não pode ser inferior à inicial." });
       }
-      const veiculo_id = veiculoReq.rows[0].id;
 
-      const checkKm = await db.query(
-        `SELECT id FROM controle_km WHERE veiculo_id = $1 AND mes_referencia = $2`,
-        [veiculo_id, mes_referencia]
-      );
+      const kmFinalDb = final > 0 ? final : null;
 
-      if (checkKm.rows.length > 0) {
-        await db.query(
-          `UPDATE controle_km 
+      try {
+        const veiculoReq = await db.query(`SELECT id FROM veiculos WHERE placa = $1`, [placa]);
+        if (veiculoReq.rows.length === 0) {
+          return reply.status(404).send({ erro: "Veículo não encontrado" });
+        }
+        const veiculo_id = veiculoReq.rows[0].id;
+
+        const checkKm = await db.query(`SELECT id FROM controle_km WHERE veiculo_id = $1 AND mes_referencia = $2`, [
+          veiculo_id,
+          mes_referencia
+        ]);
+
+        if (checkKm.rows.length > 0) {
+          await db.query(
+            `UPDATE controle_km 
            SET km_inicial = $1, km_final = $2, updated_at = CURRENT_TIMESTAMP 
            WHERE id = $3`,
-          [inicial, kmFinalDb, checkKm.rows[0].id]
-        );
-      } else {
-        await db.query(
-          `INSERT INTO controle_km (veiculo_id, mes_referencia, km_inicial, km_final) 
+            [inicial, kmFinalDb, checkKm.rows[0].id]
+          );
+        } else {
+          await db.query(
+            `INSERT INTO controle_km (veiculo_id, mes_referencia, km_inicial, km_final) 
            VALUES ($1, $2, $3, $4)`,
-          [veiculo_id, mes_referencia, inicial, kmFinalDb]
-        );
+            [veiculo_id, mes_referencia, inicial, kmFinalDb]
+          );
+        }
+
+        return { sucesso: true };
+      } catch (error) {
+        fastify.log.error(error);
+        return reply.status(500).send({ erro: "Erro interno ao salvar KM" });
       }
-
-      return { sucesso: true };
-    } catch (error) {
-      fastify.log.error(error);
-      return reply.status(500).send({ erro: 'Erro interno ao salvar KM' });
     }
-  });
-
+  );
 };

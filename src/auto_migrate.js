@@ -1,4 +1,4 @@
-﻿const { Pool } = require('pg');
+﻿const { Pool } = require("pg");
 
 let migrationRan = false;
 
@@ -309,28 +309,27 @@ async function autoMigrate(pool) {
       );
     `);
     migrationRan = true;
-    console.log('OK: Todas as 11 tabelas operacionais verificadas/criadas!');
+    console.log("OK: Todas as 11 tabelas operacionais verificadas/criadas!");
   } catch (err) {
-    console.error('ERRO na auto-migracao central:', err.message);
+    console.error("ERRO na auto-migracao central:", err.message);
     throw err; // FIX: propaga erro para o caller saber que falhou
   }
 }
 
 module.exports = { autoMigrate };
 
-
 // Permite rodar diretamente: node src/auto_migrate.js
 if (require.main === module) {
-  const { Pool } = require('pg');
+  const { Pool } = require("pg");
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   autoMigrate(pool)
     .then(() => {
-      console.log('OK: Migrations executadas (execucao direta)');
+      console.log("OK: Migrations executadas (execucao direta)");
       return pool.end();
     })
     .then(() => process.exit(0))
     .catch((err) => {
-      console.error('ERRO na migration:', err.message);
+      console.error("ERRO na migration:", err.message);
       pool.end().finally(() => process.exit(1));
     });
 }

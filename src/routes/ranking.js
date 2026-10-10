@@ -1,11 +1,10 @@
-const db = require('../database');
+const db = require("../database");
 
 module.exports = async function (fastify, options) {
-
   // ==========================================================================
   // RANKING DE VEICULOS - Retorna todos os veiculos com seus KPIs
   // ==========================================================================
-  fastify.get('/api/ranking', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get("/api/ranking", { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { mes } = req.query;
 
     if (!mes) {
@@ -14,13 +13,12 @@ module.exports = async function (fastify, options) {
 
     try {
       // 1) Busca todos os veiculos ativos
-      const veicRes = await db.query(
-        "SELECT id, placa, modelo FROM veiculos WHERE status = 'ATIVO' ORDER BY placa"
-      );
+      const veicRes = await db.query("SELECT id, placa, modelo FROM veiculos WHERE status = 'ATIVO' ORDER BY placa");
       const veiculos = veicRes.rows;
 
       // 2) Busca lancamentos do mes
-      const lancRes = await db.query(`
+      const lancRes = await db.query(
+        `
         SELECT 
           l.veiculo_id,
           l.tipo,
@@ -28,10 +26,13 @@ module.exports = async function (fastify, options) {
         FROM lancamentos_financeiros l
         WHERE DATE_TRUNC('month', l.data_lancamento) = $1::date
           AND l.deleted_at IS NULL
-      `, [mes]);
+      `,
+        [mes]
+      );
 
       // 3) Busca abastecimentos do mes (combustivel)
-      const abastRes = await db.query(`
+      const abastRes = await db.query(
+        `
         SELECT 
           veiculo_id,
           COALESCE(SUM(valor_total), 0) AS valor,
@@ -40,42 +41,47 @@ module.exports = async function (fastify, options) {
         WHERE DATE_TRUNC('month', data_abastecimento) = $1::date
           AND deleted_at IS NULL
         GROUP BY veiculo_id
-      `, [mes]);
+      `,
+        [mes]
+      );
 
       // 4) Busca KM rodado do mes
-      const kmRes = await db.query(`
+      const kmRes = await db.query(
+        `
         SELECT 
           veiculo_id,
           COALESCE(SUM(GREATEST(0, km_final - km_inicial)), 0) AS km_rodado
         FROM controle_km
         WHERE mes_referencia = $1::date
         GROUP BY veiculo_id
-      `, [mes]);
+      `,
+        [mes]
+      );
 
       // Indexadores por veiculo
       const combustivelPorVeic = {};
-      abastRes.rows.forEach(function(r) {
+      abastRes.rows.forEach(function (r) {
         combustivelPorVeic[r.veiculo_id] = {
           valor: parseFloat(r.valor) || 0,
-          litros: parseFloat(r.litros) || 0,
+          litros: parseFloat(r.litros) || 0
         };
       });
 
       const kmPorVeic = {};
-      kmRes.rows.forEach(function(r) {
+      kmRes.rows.forEach(function (r) {
         kmPorVeic[r.veiculo_id] = parseInt(r.km_rodado) || 0;
       });
 
       // 5) Consolida por veiculo
-      const ranking = veiculos.map(function(v) {
+      const ranking = veiculos.map(function (v) {
         let receita = 0;
         let despesaManual = 0;
 
-        lancRes.rows.forEach(function(l) {
+        lancRes.rows.forEach(function (l) {
           if (l.veiculo_id === v.id) {
             const valor = parseFloat(l.valor) || 0;
-            if (l.tipo === 'Receita') receita += valor;
-            if (l.tipo === 'Despesa') despesaManual += valor;
+            if (l.tipo === "Receita") receita += valor;
+            if (l.tipo === "Despesa") despesaManual += valor;
           }
         });
 
@@ -85,14 +91,14 @@ module.exports = async function (fastify, options) {
         const despesaTotal = despesaManual + comb.valor;
         const resultado = receita - despesaTotal;
         const margem = receita > 0 ? (resultado / receita) * 100 : 0;
-        const kml = comb.litros > 0 && km > 0 ? (km / comb.litros) : 0;
-        const receitaPorKm = km > 0 ? (receita / km) : 0;
-        const custoPorKm = km > 0 ? (despesaTotal / km) : 0;
+        const kml = comb.litros > 0 && km > 0 ? km / comb.litros : 0;
+        const receitaPorKm = km > 0 ? receita / km : 0;
+        const custoPorKm = km > 0 ? despesaTotal / km : 0;
 
         return {
           veiculo_id: v.id,
           placa: v.placa,
-          modelo: v.modelo || '',
+          modelo: v.modelo || "",
           receita: receita,
           despesa: despesaTotal,
           combustivel: comb.valor,
@@ -102,25 +108,28 @@ module.exports = async function (fastify, options) {
           km_rodado: km,
           kml: kml,
           receita_por_km: receitaPorKm,
-          custo_por_km: custoPorKm,
+          custo_por_km: custoPorKm
         };
       });
 
       // Ordena por resultado DESC (ranking principal)
-      ranking.sort(function(a, b) { return b.resultado - a.resultado; });
+      ranking.sort(function (a, b) {
+        return b.resultado - a.resultado;
+      });
 
       // Adiciona posicao
-      ranking.forEach(function(r, i) { r.posicao = i + 1; });
+      ranking.forEach(function (r, i) {
+        r.posicao = i + 1;
+      });
 
       return reply.send({
         mes: mes,
         total_veiculos: ranking.length,
-        ranking: ranking,
+        ranking: ranking
       });
     } catch (err) {
       fastify.log.error(err);
       return reply.code(500).send({ erro: err.message });
     }
   });
-
 };

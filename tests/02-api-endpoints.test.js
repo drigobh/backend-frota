@@ -13,11 +13,11 @@ const ENDPOINTS_PROTEGIDOS = [
   "/api/centros-custo",
   "/api/perfis",
   "/api/auditoria",
-  "/api/metas",
+  "/api/metas"
 ];
 
 describe("API - Endpoints protegidos (sem token)", () => {
-  ENDPOINTS_PROTEGIDOS.forEach(endpoint => {
+  ENDPOINTS_PROTEGIDOS.forEach((endpoint) => {
     test("GET " + endpoint + " sem token retorna 401", async () => {
       const res = await fetch(BASE_URL + endpoint);
       expect(res.status).toBe(401);

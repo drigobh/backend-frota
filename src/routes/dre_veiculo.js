@@ -1,11 +1,10 @@
-const db = require('../database');
+const db = require("../database");
 
 module.exports = async function (fastify, options) {
-
   // ==========================================================================
   // DRE POR PLACA
   // ==========================================================================
-  fastify.get('/api/dre/placa/:placa', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get("/api/dre/placa/:placa", { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { placa } = req.params;
     const { mes, categoria, tipo } = req.query;
 
@@ -14,12 +13,11 @@ module.exports = async function (fastify, options) {
     }
 
     try {
-      const vRes = await db.query(
-        "SELECT id, placa, modelo FROM veiculos WHERE placa = $1 AND status = 'ATIVO'",
-        [placa.toUpperCase()]
-      );
+      const vRes = await db.query("SELECT id, placa, modelo FROM veiculos WHERE placa = $1 AND status = 'ATIVO'", [
+        placa.toUpperCase()
+      ]);
       if (vRes.rows.length === 0) {
-        return reply.code(404).send({ erro: 'Veiculo nao encontrado.' });
+        return reply.code(404).send({ erro: "Veiculo nao encontrado." });
       }
       const veiculo = vRes.rows[0];
 
@@ -57,19 +55,20 @@ module.exports = async function (fastify, options) {
         idx++;
       }
 
-      query += ' ORDER BY l.data_lancamento DESC, l.created_at DESC';
+      query += " ORDER BY l.data_lancamento DESC, l.created_at DESC";
 
       const lancRes = await db.query(query, params);
 
       let receita = 0;
       let despesaManual = 0;
-      lancRes.rows.forEach(function(l) {
+      lancRes.rows.forEach(function (l) {
         const v = parseFloat(l.valor) || 0;
-        if (l.tipo === 'Receita') receita += v;
-        if (l.tipo === 'Despesa') despesaManual += v;
+        if (l.tipo === "Receita") receita += v;
+        if (l.tipo === "Despesa") despesaManual += v;
       });
 
-      const abastRes = await db.query(`
+      const abastRes = await db.query(
+        `
         SELECT 
           COALESCE(SUM(valor_total), 0) AS total, 
           COALESCE(SUM(litros), 0) AS litros
@@ -77,7 +76,9 @@ module.exports = async function (fastify, options) {
         WHERE veiculo_id = $1
           AND DATE_TRUNC('month', data_abastecimento) = $2::date
           AND deleted_at IS NULL
-      `, [veiculo.id, mes]);
+      `,
+        [veiculo.id, mes]
+      );
 
       const combustivel = parseFloat(abastRes.rows[0].total) || 0;
       const litros = parseFloat(abastRes.rows[0].litros) || 0;
@@ -96,13 +97,13 @@ module.exports = async function (fastify, options) {
           despesa_total: despesaTotal,
           resultado: resultado,
           margem: margem,
-          total_lancamentos: lancRes.rows.length,
+          total_lancamentos: lancRes.rows.length
         },
-        lancamentos: lancRes.rows.map(function(l) {
+        lancamentos: lancRes.rows.map(function (l) {
           return Object.assign({}, l, {
-            data: l.data instanceof Date ? l.data.toISOString().split('T')[0] : l.data,
+            data: l.data instanceof Date ? l.data.toISOString().split("T")[0] : l.data
           });
-        }),
+        })
       });
     } catch (err) {
       fastify.log.error(err);
@@ -113,15 +114,14 @@ module.exports = async function (fastify, options) {
   // ==========================================================================
   // CATEGORIAS DISPONIVEIS
   // ==========================================================================
-  fastify.get('/api/dre/categorias', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get("/api/dre/categorias", { preHandler: [fastify.autenticar] }, async (req, reply) => {
     try {
       const res = await db.query(
-        'SELECT id, nome, tipo FROM categorias_financeiras WHERE ativo = true ORDER BY tipo, ordem, nome'
+        "SELECT id, nome, tipo FROM categorias_financeiras WHERE ativo = true ORDER BY tipo, ordem, nome"
       );
       return reply.send(res.rows);
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
     }
   });
-
 };

@@ -4,26 +4,26 @@
  * Tambem pode ser chamado manualmente: node scripts/37_pre_compress.js
  */
 
-const fs = require('fs');
-const path = require('path');
-const zlib = require('zlib');
+const fs = require("fs");
+const path = require("path");
+const zlib = require("zlib");
 
-const ROOT = path.resolve(__dirname, '..');
-const PUBLIC = path.join(ROOT, 'public');
+const ROOT = path.resolve(__dirname, "..");
+const PUBLIC = path.join(ROOT, "public");
 
-console.log('[FIX_37] Gerando pre-compressao de assets...\n');
+console.log("[FIX_37] Gerando pre-compressao de assets...\n");
 
 const ARQUIVOS = [
-  'index.html',
-  'empresas.html',
-  'empresas.css',
-  'empresas.js',
-  'manifest.json',
-  'offline.html',
-  'sw.js',
+  "index.html",
+  "empresas.html",
+  "empresas.css",
+  "empresas.js",
+  "manifest.json",
+  "offline.html",
+  "sw.js"
 ];
 
-const DIRS = ['libs', 'icons'];
+const DIRS = ["libs", "icons"];
 
 let totalBr = 0;
 let totalGz = 0;
@@ -33,32 +33,32 @@ function comprimirArquivo(filePath) {
   const stat = fs.statSync(filePath);
   if (stat.isDirectory()) return;
   if (stat.size < 1024) return;
-  if (filePath.endsWith('.br') || filePath.endsWith('.gz')) return;
+  if (filePath.endsWith(".br") || filePath.endsWith(".gz")) return;
 
   const content = fs.readFileSync(filePath);
   const rel = path.relative(PUBLIC, filePath);
 
   try {
-    const brPath = filePath + '.br';
+    const brPath = filePath + ".br";
     const brContent = zlib.brotliCompressSync(content, {
       params: {
         [zlib.constants.BROTLI_PARAM_QUALITY]: 11,
-        [zlib.constants.BROTLI_PARAM_LGWIN]: 22,
-      },
+        [zlib.constants.BROTLI_PARAM_LGWIN]: 22
+      }
     });
     fs.writeFileSync(brPath, brContent);
     totalBr++;
   } catch (e) {
-    console.warn('  Aviso Brotli ' + rel + ': ' + e.message);
+    console.warn("  Aviso Brotli " + rel + ": " + e.message);
   }
 
   try {
-    const gzPath = filePath + '.gz';
+    const gzPath = filePath + ".gz";
     const gzContent = zlib.gzipSync(content, { level: 9 });
     fs.writeFileSync(gzPath, gzContent);
     totalGz++;
   } catch (e) {
-    console.warn('  Aviso Gzip ' + rel + ': ' + e.message);
+    console.warn("  Aviso Gzip " + rel + ": " + e.message);
   }
 }
 
@@ -66,7 +66,7 @@ ARQUIVOS.forEach((f) => {
   const full = path.join(PUBLIC, f);
   if (fs.existsSync(full)) {
     comprimirArquivo(full);
-    console.log('OK: ' + f);
+    console.log("OK: " + f);
   }
 });
 
@@ -84,6 +84,6 @@ DIRS.forEach((d) => {
   walk(dir);
 });
 
-console.log('\n[FIX_37] Pre-compressao concluida!');
-console.log('  Brotli (.br): ' + totalBr + ' arquivos');
-console.log('  Gzip (.gz):   ' + totalGz + ' arquivos');
+console.log("\n[FIX_37] Pre-compressao concluida!");
+console.log("  Brotli (.br): " + totalBr + " arquivos");
+console.log("  Gzip (.gz):   " + totalGz + " arquivos");

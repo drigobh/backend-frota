@@ -9,22 +9,24 @@ const fs = require("fs");
 // Carrega .env
 const envPath = path.resolve(__dirname, "..", ".env");
 if (fs.existsSync(envPath)) {
-  fs.readFileSync(envPath, "utf8").split("\n").forEach(line => {
-    const m = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*)\s*$/i);
-    if (m) {
-      let val = m[2].trim();
-      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-        val = val.slice(1, -1);
+  fs.readFileSync(envPath, "utf8")
+    .split("\n")
+    .forEach((line) => {
+      const m = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*)\s*$/i);
+      if (m) {
+        let val = m[2].trim();
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
+        }
+        if (!process.env[m[1]]) process.env[m[1]] = val;
       }
-      if (!process.env[m[1]]) process.env[m[1]] = val;
-    }
-  });
+    });
 }
 
 const { Pool } = require("pg");
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
 });
 
 const HTML = path.resolve(__dirname, "..", "public", "index.html");

@@ -1,26 +1,26 @@
-const db = require('../database');
+const db = require("../database");
 
 // FASE_3B_VALIDACAO_FINANCEIRO
 
-
 module.exports = async function (fastify, options) {
-
   // ==========================================================================
   // LISTAR LANCAMENTOS (com filtros)
   // ==========================================================================
-  fastify.get('/api/lancamentos', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get("/api/lancamentos", { preHandler: [fastify.autenticar] }, async (req, reply) => {
     let { mes, mesNumero, ano, tipo, categoria, veiculo, dias, periodo } = req.query;
 
-      // Normaliza: '---------' e '' viram undefined
-      function limpar(v) { return (v === '---------' || v === '' || v === undefined) ? undefined : v; }
-      mes = limpar(mes);
-      mesNumero = limpar(mesNumero);
-      ano = limpar(ano);
-      tipo = limpar(tipo);
-      categoria = limpar(categoria);
-      veiculo = limpar(veiculo);
-      dias = limpar(dias);
-      periodo = limpar(periodo);
+    // Normaliza: '---------' e '' viram undefined
+    function limpar(v) {
+      return v === "---------" || v === "" || v === undefined ? undefined : v;
+    }
+    mes = limpar(mes);
+    mesNumero = limpar(mesNumero);
+    ano = limpar(ano);
+    tipo = limpar(tipo);
+    categoria = limpar(categoria);
+    veiculo = limpar(veiculo);
+    dias = limpar(dias);
+    periodo = limpar(periodo);
 
     try {
       let query = `
@@ -53,7 +53,7 @@ module.exports = async function (fastify, options) {
 
       // 1) Filtro ANO
       if (ano) {
-                query += ` AND EXTRACT(YEAR FROM l.data_lancamento) = $${idx}::int`;
+        query += ` AND EXTRACT(YEAR FROM l.data_lancamento) = $${idx}::int`;
         params.push(parseInt(ano));
         idx++;
       }
@@ -73,7 +73,7 @@ module.exports = async function (fastify, options) {
       }
 
       // 4) Filtro DIAS
-      if (dias && periodo !== 'tudo') {
+      if (dias && periodo !== "tudo") {
         const diasNum = parseInt(dias);
         if (diasNum > 0 && diasNum <= 365) {
           if (ano && mesNumero) {
@@ -95,8 +95,6 @@ module.exports = async function (fastify, options) {
         }
       }
 
-      
-
       if (tipo) {
         query += ` AND l.tipo = $${idx}`;
         params.push(tipo);
@@ -115,14 +113,14 @@ module.exports = async function (fastify, options) {
         idx++;
       }
 
-      query += ' ORDER BY l.data_lancamento DESC, l.created_at DESC LIMIT 500';
+      query += " ORDER BY l.data_lancamento DESC, l.created_at DESC LIMIT 500";
 
       const result = await db.query(query, params);
 
       // Converte data para string YYYY-MM-DD
-      const rows = result.rows.map(function(r) {
+      const rows = result.rows.map(function (r) {
         return Object.assign({}, r, {
-          data: r.data instanceof Date ? r.data.toISOString().split('T')[0] : r.data,
+          data: r.data instanceof Date ? r.data.toISOString().split("T")[0] : r.data
         });
       });
 
@@ -136,16 +134,22 @@ module.exports = async function (fastify, options) {
   // ==========================================================================
   // RESUMO (receitas / despesas / resultado do mes)
   // ==========================================================================
-  fastify.get('/api/lancamentos/resumo', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get("/api/lancamentos/resumo", { preHandler: [fastify.autenticar] }, async (req, reply) => {
     let { mes, mesNumero, ano, tipo, categoria, veiculo, dias, periodo } = req.query;
 
-    function limpar(v) { return (v === '---------' || v === '' || v === undefined) ? undefined : v; }
-    mes = limpar(mes); mesNumero = limpar(mesNumero); ano = limpar(ano);
-    tipo = limpar(tipo); categoria = limpar(categoria); veiculo = limpar(veiculo);
-    dias = limpar(dias); periodo = limpar(periodo);
+    function limpar(v) {
+      return v === "---------" || v === "" || v === undefined ? undefined : v;
+    }
+    mes = limpar(mes);
+    mesNumero = limpar(mesNumero);
+    ano = limpar(ano);
+    tipo = limpar(tipo);
+    categoria = limpar(categoria);
+    veiculo = limpar(veiculo);
+    dias = limpar(dias);
+    periodo = limpar(periodo);
 
     try {
-
       // Monta query dinamicamente com os mesmos filtros da lista
       let query = `
         SELECT 
@@ -160,7 +164,7 @@ module.exports = async function (fastify, options) {
       const params = [];
       let idx = 1;
 
-      if (periodo === 'tudo') {
+      if (periodo === "tudo") {
         // sem filtro
       } else if (dias) {
         const diasNum = parseInt(dias);
@@ -169,14 +173,35 @@ module.exports = async function (fastify, options) {
         }
       } else if (mes) {
         query += ` AND DATE_TRUNC('month', l.data_lancamento) = $${idx}::date`;
-        params.push(mes); idx++;
+        params.push(mes);
+        idx++;
       } else {
-        if (ano) { query += ` AND EXTRACT(YEAR FROM l.data_lancamento) = $${idx}::int`; params.push(parseInt(ano)); idx++; }
-        if (mesNumero) { query += ` AND EXTRACT(MONTH FROM l.data_lancamento) = $${idx}::int`; params.push(parseInt(mesNumero)); idx++; }
+        if (ano) {
+          query += ` AND EXTRACT(YEAR FROM l.data_lancamento) = $${idx}::int`;
+          params.push(parseInt(ano));
+          idx++;
+        }
+        if (mesNumero) {
+          query += ` AND EXTRACT(MONTH FROM l.data_lancamento) = $${idx}::int`;
+          params.push(parseInt(mesNumero));
+          idx++;
+        }
       }
-      if (tipo) { query += ` AND l.tipo = ${idx}`; params.push(tipo); idx++; }
-      if (categoria) { query += ` AND c.nome = ${idx}`; params.push(categoria); idx++; }
-      if (veiculo) { query += ` AND v.placa = ${idx}`; params.push(veiculo); idx++; }
+      if (tipo) {
+        query += ` AND l.tipo = ${idx}`;
+        params.push(tipo);
+        idx++;
+      }
+      if (categoria) {
+        query += ` AND c.nome = ${idx}`;
+        params.push(categoria);
+        idx++;
+      }
+      if (veiculo) {
+        query += ` AND v.placa = ${idx}`;
+        params.push(veiculo);
+        idx++;
+      }
 
       const result = await db.query(query, params);
 
@@ -188,7 +213,7 @@ module.exports = async function (fastify, options) {
         despesas: despesas,
         resultado: receitas - despesas,
         margem: receitas > 0 ? ((receitas - despesas) / receitas) * 100 : 0,
-        total_lancamentos: parseInt(result.rows[0].total_lancamentos) || 0,
+        total_lancamentos: parseInt(result.rows[0].total_lancamentos) || 0
       });
     } catch (err) {
       fastify.log.error(err);
@@ -199,7 +224,7 @@ module.exports = async function (fastify, options) {
   // ==========================================================================
   // CATEGORIAS DISPONIVEIS
   // ==========================================================================
-  fastify.get('/api/lancamentos/categorias', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get("/api/lancamentos/categorias", { preHandler: [fastify.autenticar] }, async (req, reply) => {
     try {
       const result = await db.query(`
         SELECT id, nome, tipo, ordem
@@ -217,193 +242,184 @@ module.exports = async function (fastify, options) {
   // ==========================================================================
   // CRIAR LANCAMENTO
   // ==========================================================================
-  fastify.post('/api/lancamentos', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "data",
-                "tipo",
-                "categoria",
-                "descricao",
-                "valor"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "data": {
-                    "type": "string",
-                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
-                },
-                "tipo": {
-                    "type": "string",
-                    "enum": [
-                        "Receita",
-                        "Despesa"
-                    ]
-                },
-                "categoria": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 100
-                },
-                "descricao": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 255
-                },
-                "valor": {
-                    "type": "number",
-                    "minimum": 0.01
-                },
-                "placa": {
-                    "type": "string",
-                    "maxLength": 20
-                },
-                "centro_custo_id": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
-                }
+  fastify.post(
+    "/api/lancamentos",
+    {
+      schema: {
+        body: {
+          type: "object",
+          required: ["data", "tipo", "categoria", "descricao", "valor"],
+          additionalProperties: true,
+          properties: {
+            data: {
+              type: "string",
+              pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            tipo: {
+              type: "string",
+              enum: ["Receita", "Despesa"]
+            },
+            categoria: {
+              type: "string",
+              minLength: 1,
+              maxLength: 100
+            },
+            descricao: {
+              type: "string",
+              minLength: 1,
+              maxLength: 255
+            },
+            valor: {
+              type: "number",
+              minimum: 0.01
+            },
+            placa: {
+              type: "string",
+              maxLength: 20
+            },
+            centro_custo_id: {
+              type: ["string", "null"]
             }
+          }
         }
-    }, preHandler: [fastify.autenticar] }, fastify.comAuditoria(async (req, reply) => {
-    const { placa, data, tipo, categoria, descricao, valor, centro_custo_id } = req.body || {};
+      },
+      preHandler: [fastify.autenticar]
+    },
+    fastify.comAuditoria(async (req, reply) => {
+      const { placa, data, tipo, categoria, descricao, valor, centro_custo_id } = req.body || {};
 
-    if (!data || !tipo || !categoria || !descricao || !valor) {
-      return reply.code(400).send({ erro: 'Campos obrigatorios: data, tipo, categoria, descricao, valor.' });
-    }
-
-    if (parseFloat(valor) <= 0) {
-      return reply.code(400).send({ erro: 'Valor deve ser maior que zero.' });
-    }
-
-    if (tipo !== 'Receita' && tipo !== 'Despesa') {
-      return reply.code(400).send({ erro: 'Tipo deve ser Receita ou Despesa.' });
-    }
-
-    try {
-      // Resolve veiculo (opcional)
-      let veiculo_id = null;
-      if (placa) {
-        const vRes = await db.query('SELECT id FROM veiculos WHERE placa = $1', [placa.toUpperCase()]);
-        if (vRes.rows.length > 0) veiculo_id = vRes.rows[0].id;
+      if (!data || !tipo || !categoria || !descricao || !valor) {
+        return reply.code(400).send({ erro: "Campos obrigatorios: data, tipo, categoria, descricao, valor." });
       }
 
-      // Resolve categoria (obrigatoria)
-      const cRes = await db.query('SELECT id FROM categorias_financeiras WHERE nome = $1', [categoria]);
-      let categoria_id;
-      if (cRes.rows.length === 0) {
-        const nova = await db.query(
-          'INSERT INTO categorias_financeiras (nome, tipo) VALUES ($1, $2) RETURNING id',
-          [categoria, tipo]
-        );
-        categoria_id = nova.rows[0].id;
-      } else {
-        categoria_id = cRes.rows[0].id;
+      if (parseFloat(valor) <= 0) {
+        return reply.code(400).send({ erro: "Valor deve ser maior que zero." });
       }
 
-      const result = await db.query(`
+      if (tipo !== "Receita" && tipo !== "Despesa") {
+        return reply.code(400).send({ erro: "Tipo deve ser Receita ou Despesa." });
+      }
+
+      try {
+        // Resolve veiculo (opcional)
+        let veiculo_id = null;
+        if (placa) {
+          const vRes = await db.query("SELECT id FROM veiculos WHERE placa = $1", [placa.toUpperCase()]);
+          if (vRes.rows.length > 0) veiculo_id = vRes.rows[0].id;
+        }
+
+        // Resolve categoria (obrigatoria)
+        const cRes = await db.query("SELECT id FROM categorias_financeiras WHERE nome = $1", [categoria]);
+        let categoria_id;
+        if (cRes.rows.length === 0) {
+          const nova = await db.query("INSERT INTO categorias_financeiras (nome, tipo) VALUES ($1, $2) RETURNING id", [
+            categoria,
+            tipo
+          ]);
+          categoria_id = nova.rows[0].id;
+        } else {
+          categoria_id = cRes.rows[0].id;
+        }
+
+        const result = await db.query(
+          `
         INSERT INTO lancamentos_financeiros
           (veiculo_id, categoria_id, data_lancamento, tipo, descricao, valor, centro_custo_id, created_by)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING id
-      `, [veiculo_id, categoria_id, data, tipo, descricao, parseFloat(valor), centro_custo_id || null, req.user.id]);
+      `,
+          [veiculo_id, categoria_id, data, tipo, descricao, parseFloat(valor), centro_custo_id || null, req.user.id]
+        );
 
-      return reply.code(201).send({ sucesso: true, id: result.rows[0].id });
-    } catch (err) {
-      fastify.log.error(err);
-      return reply.code(500).send({ erro: err.message });
-    }
-  }));
+        return reply.code(201).send({ sucesso: true, id: result.rows[0].id });
+      } catch (err) {
+        fastify.log.error(err);
+        return reply.code(500).send({ erro: err.message });
+      }
+    })
+  );
 
   // ==========================================================================
   // ATUALIZAR LANCAMENTO
   // ==========================================================================
-  fastify.put('/api/lancamentos/:id', {
-    schema: {
-        "body": {
-            "type": "object",
-            "required": [
-                "data",
-                "tipo",
-                "categoria",
-                "descricao",
-                "valor"
-            ],
-            "additionalProperties": true,
-            "properties": {
-                "data": {
-                    "type": "string",
-                    "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
-                },
-                "tipo": {
-                    "type": "string",
-                    "enum": [
-                        "Receita",
-                        "Despesa"
-                    ]
-                },
-                "categoria": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 100
-                },
-                "descricao": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 255
-                },
-                "valor": {
-                    "type": "number",
-                    "minimum": 0.01
-                },
-                "placa": {
-                    "type": "string",
-                    "maxLength": 20
-                },
-                "centro_custo_id": {
-                    "type": [
-                        "string",
-                        "null"
-                    ]
-                }
+  fastify.put(
+    "/api/lancamentos/:id",
+    {
+      schema: {
+        body: {
+          type: "object",
+          required: ["data", "tipo", "categoria", "descricao", "valor"],
+          additionalProperties: true,
+          properties: {
+            data: {
+              type: "string",
+              pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            tipo: {
+              type: "string",
+              enum: ["Receita", "Despesa"]
+            },
+            categoria: {
+              type: "string",
+              minLength: 1,
+              maxLength: 100
+            },
+            descricao: {
+              type: "string",
+              minLength: 1,
+              maxLength: 255
+            },
+            valor: {
+              type: "number",
+              minimum: 0.01
+            },
+            placa: {
+              type: "string",
+              maxLength: 20
+            },
+            centro_custo_id: {
+              type: ["string", "null"]
             }
+          }
         }
-    }, preHandler: [fastify.autenticar] }, fastify.comAuditoria(async (req, reply) => {
-    const { id } = req.params;
-    const { placa, data, tipo, categoria, descricao, valor, centro_custo_id } = req.body || {};
+      },
+      preHandler: [fastify.autenticar]
+    },
+    fastify.comAuditoria(async (req, reply) => {
+      const { id } = req.params;
+      const { placa, data, tipo, categoria, descricao, valor, centro_custo_id } = req.body || {};
 
-    if (!data || !tipo || !categoria || !descricao || !valor) {
-      return reply.code(400).send({ erro: 'Campos obrigatorios faltando.' });
-    }
-
-    if (parseFloat(valor) <= 0) {
-      return reply.code(400).send({ erro: 'Valor deve ser maior que zero.' });
-    }
-
-    try {
-      // Resolve categoria
-      const cRes = await db.query('SELECT id FROM categorias_financeiras WHERE nome = $1', [categoria]);
-      let categoria_id;
-      if (cRes.rows.length === 0) {
-        const nova = await db.query(
-          'INSERT INTO categorias_financeiras (nome, tipo) VALUES ($1, $2) RETURNING id',
-          [categoria, tipo]
-        );
-        categoria_id = nova.rows[0].id;
-      } else {
-        categoria_id = cRes.rows[0].id;
+      if (!data || !tipo || !categoria || !descricao || !valor) {
+        return reply.code(400).send({ erro: "Campos obrigatorios faltando." });
       }
 
-      // Resolve veiculo_id (opcional) a partir da placa
-      let veiculo_id = null;
-      if (placa) {
-        const vRes = await db.query('SELECT id FROM veiculos WHERE placa = $1', [placa.toUpperCase()]);
-        if (vRes.rows.length > 0) veiculo_id = vRes.rows[0].id;
+      if (parseFloat(valor) <= 0) {
+        return reply.code(400).send({ erro: "Valor deve ser maior que zero." });
       }
 
-      const result = await db.query(`
+      try {
+        // Resolve categoria
+        const cRes = await db.query("SELECT id FROM categorias_financeiras WHERE nome = $1", [categoria]);
+        let categoria_id;
+        if (cRes.rows.length === 0) {
+          const nova = await db.query("INSERT INTO categorias_financeiras (nome, tipo) VALUES ($1, $2) RETURNING id", [
+            categoria,
+            tipo
+          ]);
+          categoria_id = nova.rows[0].id;
+        } else {
+          categoria_id = cRes.rows[0].id;
+        }
+
+        // Resolve veiculo_id (opcional) a partir da placa
+        let veiculo_id = null;
+        if (placa) {
+          const vRes = await db.query("SELECT id FROM veiculos WHERE placa = $1", [placa.toUpperCase()]);
+          if (vRes.rows.length > 0) veiculo_id = vRes.rows[0].id;
+        }
+
+        const result = await db.query(
+          `
         UPDATE lancamentos_financeiros
         SET data_lancamento = $1,
             tipo = $2,
@@ -416,58 +432,70 @@ module.exports = async function (fastify, options) {
             updated_by = $8
         WHERE id = $9 AND deleted_at IS NULL
         RETURNING id
-      `, [data, tipo, categoria_id, descricao, parseFloat(valor), centro_custo_id || null, veiculo_id, req.user.id, id]);
+      `,
+          [data, tipo, categoria_id, descricao, parseFloat(valor), centro_custo_id || null, veiculo_id, req.user.id, id]
+        );
 
-      if (result.rows.length === 0) {
-        return reply.code(404).send({ erro: 'Lancamento nao encontrado.' });
+        if (result.rows.length === 0) {
+          return reply.code(404).send({ erro: "Lancamento nao encontrado." });
+        }
+
+        return reply.send({ sucesso: true });
+      } catch (err) {
+        fastify.log.error(err);
+        return reply.code(500).send({ erro: err.message });
       }
-
-      return reply.send({ sucesso: true });
-    } catch (err) {
-      fastify.log.error(err);
-      return reply.code(500).send({ erro: err.message });
-    }
-  }));
+    })
+  );
 
   // ==========================================================================
   // EXCLUIR LANCAMENTO (soft delete)
   // ==========================================================================
   // FASE_6_DELETE_LANC_ENVELOPADO
-  fastify.delete('/api/lancamentos/:id', { preHandler: [fastify.autenticar] }, fastify.comAuditoria(async (req, reply) => {
-    const { id } = req.params;
-    try {
-      const result = await db.query(`
+  fastify.delete(
+    "/api/lancamentos/:id",
+    { preHandler: [fastify.autenticar] },
+    fastify.comAuditoria(async (req, reply) => {
+      const { id } = req.params;
+      try {
+        const result = await db.query(
+          `
         UPDATE lancamentos_financeiros
         SET deleted_at = CURRENT_TIMESTAMP, deleted_by = $1
         WHERE id = $2 AND deleted_at IS NULL
         RETURNING id
-      `, [req.user.id, id]);
+      `,
+          [req.user.id, id]
+        );
 
-      if (result.rows.length === 0) {
-        return reply.code(404).send({ erro: 'Lancamento nao encontrado.' });
+        if (result.rows.length === 0) {
+          return reply.code(404).send({ erro: "Lancamento nao encontrado." });
+        }
+
+        return reply.send({ sucesso: true });
+      } catch (err) {
+        fastify.log.error(err);
+        return reply.code(500).send({ erro: err.message });
       }
-
-      return reply.send({ sucesso: true });
-    } catch (err) {
-      fastify.log.error(err);
-      return reply.code(500).send({ erro: err.message });
-    }
-  }));
+    })
+  );
 
   // ==========================================================================
   // LISTA DE ANOS DISPONIVEIS (dos lancamentos cadastrados)
   // ==========================================================================
-  fastify.get('/api/lancamentos/anos-disponiveis', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.get("/api/lancamentos/anos-disponiveis", { preHandler: [fastify.autenticar] }, async (req, reply) => {
     try {
       const res = await db.query(
         "SELECT DISTINCT EXTRACT(YEAR FROM data_lancamento)::int AS ano FROM lancamentos_financeiros WHERE deleted_at IS NULL ORDER BY ano DESC"
       );
-      return reply.send(res.rows.map(function(r) { return r.ano; }));
+      return reply.send(
+        res.rows.map(function (r) {
+          return r.ano;
+        })
+      );
     } catch (err) {
       fastify.log.error(err);
       return reply.code(500).send({ erro: err.message });
     }
   });
-
 };
-

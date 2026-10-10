@@ -1,18 +1,17 @@
-const db = require('../database');
+const db = require("../database");
 
 async function routes(fastify, options) {
-
   // Listar logs ordenados estritamente por hora/id descrescente
-    // FASE_15_AUDITORIA_V2 - lista com filtros, paginacao e valores (antes/depois)
-  fastify.get('/api/auditoria', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  // FASE_15_AUDITORIA_V2 - lista com filtros, paginacao e valores (antes/depois)
+  fastify.get("/api/auditoria", { preHandler: [fastify.autenticar] }, async (req, reply) => {
     try {
-      var q = req.query || {};
-      var page = Math.max(1, parseInt(q.page || "1", 10));
-      var limit = Math.min(200, Math.max(1, parseInt(q.limit || "50", 10)));
-      var offset = (page - 1) * limit;
+      const q = req.query || {};
+      const page = Math.max(1, parseInt(q.page || "1", 10));
+      const limit = Math.min(200, Math.max(1, parseInt(q.limit || "50", 10)));
+      const offset = (page - 1) * limit;
 
-      var where = [];
-      var params = [];
+      const where = [];
+      const params = [];
 
       if (q.tabela) {
         params.push(q.tabela);
@@ -36,23 +35,32 @@ async function routes(fastify, options) {
       }
       if (q.busca) {
         params.push("%" + q.busca + "%");
-        var p = params.length;
-        where.push("(COALESCE(detalhes, descricao, '') ILIKE $" + p + " OR COALESCE(usuario_nome, usuario, '') ILIKE $" + p + " OR COALESCE(tabela, '') ILIKE $" + p + ")");
+        const p = params.length;
+        where.push(
+          "(COALESCE(detalhes, descricao, '') ILIKE $" +
+            p +
+            " OR COALESCE(usuario_nome, usuario, '') ILIKE $" +
+            p +
+            " OR COALESCE(tabela, '') ILIKE $" +
+            p +
+            ")"
+        );
       }
 
-      var whereSQL = where.length > 0 ? " WHERE " + where.join(" AND ") : "";
+      const whereSQL = where.length > 0 ? " WHERE " + where.join(" AND ") : "";
 
       // Total
-      var totalSQL = "SELECT COUNT(*) AS total FROM auditoria" + whereSQL;
-      var totalRes = await db.query(totalSQL, params);
-      var total = parseInt(totalRes.rows[0].total, 10);
+      const totalSQL = "SELECT COUNT(*) AS total FROM auditoria" + whereSQL;
+      const totalRes = await db.query(totalSQL, params);
+      const total = parseInt(totalRes.rows[0].total, 10);
 
       // Itens paginados
-      var paramsPaginados = params.slice();
+      const paramsPaginados = params.slice();
       paramsPaginados.push(limit);
       paramsPaginados.push(offset);
 
-      var itensSQL = "SELECT " +
+      const itensSQL =
+        "SELECT " +
         "id, " +
         "COALESCE(usuario_nome, usuario, 'Sistema') AS usuario_nome, " +
         "COALESCE(usuario_email, '') AS usuario_email, " +
@@ -65,21 +73,23 @@ async function routes(fastify, options) {
         "valor_novo, " +
         "ip, " +
         "COALESCE(created_at, NOW()) AS created_at " +
-        "FROM auditoria" + whereSQL +
+        "FROM auditoria" +
+        whereSQL +
         " ORDER BY created_at DESC, id DESC" +
-        " LIMIT $" + (params.length + 1) + " OFFSET $" + (params.length + 2);
+        " LIMIT $" +
+        (params.length + 1) +
+        " OFFSET $" +
+        (params.length + 2);
 
-      var itensRes = await db.query(itensSQL, paramsPaginados);
+      const itensRes = await db.query(itensSQL, paramsPaginados);
 
       // Tabelas distintas (para o filtro)
-      var tabelasRes = await db.query(
+      const tabelasRes = await db.query(
         "SELECT DISTINCT tabela FROM auditoria WHERE tabela IS NOT NULL ORDER BY tabela"
       );
 
       // Acoes distintas
-      var acoesRes = await db.query(
-        "SELECT DISTINCT acao FROM auditoria WHERE acao IS NOT NULL ORDER BY acao"
-      );
+      const acoesRes = await db.query("SELECT DISTINCT acao FROM auditoria WHERE acao IS NOT NULL ORDER BY acao");
 
       return reply.send({
         ok: true,
@@ -87,8 +97,12 @@ async function routes(fastify, options) {
         page: page,
         limit: limit,
         total_paginas: Math.ceil(total / limit),
-        tabelas: tabelasRes.rows.map(function(r) { return r.tabela; }),
-        acoes: acoesRes.rows.map(function(r) { return r.acao; }),
+        tabelas: tabelasRes.rows.map(function (r) {
+          return r.tabela;
+        }),
+        acoes: acoesRes.rows.map(function (r) {
+          return r.acao;
+        }),
         itens: itensRes.rows
       });
     } catch (err) {
@@ -98,21 +112,24 @@ async function routes(fastify, options) {
   });
 
   // Registrar log
-  fastify.post('/api/auditoria', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.post("/api/auditoria", { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { acao, modulo, entidade, detalhes, descricao, usuario_nome, usuario_email } = req.body || {};
-    const mod = String(modulo || entidade || 'SISTEMA').substring(0, 100);
-    const det = String(detalhes || descricao || 'Operação realizada');
-    const uNome = String(usuario_nome || 'Administrador');
-    const uEmail = String(usuario_email || 'admin@frota.com');
-    const act = String(acao || 'Ação').substring(0, 100);
+    const mod = String(modulo || entidade || "SISTEMA").substring(0, 100);
+    const det = String(detalhes || descricao || "Operação realizada");
+    const uNome = String(usuario_nome || "Administrador");
+    const uEmail = String(usuario_email || "admin@frota.com");
+    const act = String(acao || "Ação").substring(0, 100);
 
     try {
-      const res = await db.query(`
+      const res = await db.query(
+        `
         INSERT INTO auditoria (
           usuario_nome, usuario, usuario_email, acao, entidade, modulo, tabela, detalhes, descricao, created_at
         ) VALUES ($1, $1, $2, $3, $4, $4, $4, $5, $5, CURRENT_TIMESTAMP)
         RETURNING *
-      `, [uNome, uEmail, act, mod, det]);
+      `,
+        [uNome, uEmail, act, mod, det]
+      );
       return reply.code(201).send(res.rows[0]);
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
@@ -120,31 +137,35 @@ async function routes(fastify, options) {
   });
 
   // Limpar logs por critérios (usuário, mês ou período)
-  fastify.post('/api/auditoria/limpar', { preHandler: [fastify.autenticar] }, async (req, reply) => {
+  fastify.post("/api/auditoria/limpar", { preHandler: [fastify.autenticar] }, async (req, reply) => {
     const { tipo, usuario, mes, data_inicio, data_fim } = req.body || {};
 
     try {
-      let query = 'DELETE FROM auditoria';
+      let query = "DELETE FROM auditoria";
       const params = [];
 
-      if (tipo === 'usuario' && usuario) {
+      if (tipo === "usuario" && usuario) {
         params.push(usuario.trim());
-        query += ' WHERE LOWER(COALESCE(usuario_nome, usuario)) = LOWER($1) OR LOWER(COALESCE(usuario_email, CAST("" AS text))) = LOWER($1)'.replace('CAST("" AS text)', "''");
-      } else if (tipo === 'mes' && mes) {
-        params.push(mes.trim().substring(0, 7) + '%');
-        query += ' WHERE TO_CHAR(created_at, ' + "'YYYY-MM'" + ') LIKE $1';
-      } else if (tipo === 'periodo' && data_inicio && data_fim) {
-        params.push(data_inicio + ' 00:00:00');
-        params.push(data_fim + ' 23:59:59');
-        query += ' WHERE created_at >= $1::timestamp AND created_at <= $2::timestamp';
-      } else if (tipo === 'tudo') {
-        query = 'TRUNCATE TABLE auditoria';
+        query +=
+          ' WHERE LOWER(COALESCE(usuario_nome, usuario)) = LOWER($1) OR LOWER(COALESCE(usuario_email, CAST("" AS text))) = LOWER($1)'.replace(
+            'CAST("" AS text)',
+            "''"
+          );
+      } else if (tipo === "mes" && mes) {
+        params.push(mes.trim().substring(0, 7) + "%");
+        query += " WHERE TO_CHAR(created_at, " + "'YYYY-MM'" + ") LIKE $1";
+      } else if (tipo === "periodo" && data_inicio && data_fim) {
+        params.push(data_inicio + " 00:00:00");
+        params.push(data_fim + " 23:59:59");
+        query += " WHERE created_at >= $1::timestamp AND created_at <= $2::timestamp";
+      } else if (tipo === "tudo") {
+        query = "TRUNCATE TABLE auditoria";
       } else {
-        return reply.code(400).send({ erro: 'Critério de exclusão inválido ou parâmetros ausentes.' });
+        return reply.code(400).send({ erro: "Critério de exclusão inválido ou parâmetros ausentes." });
       }
 
       await db.query(query, params);
-      return reply.send({ mensagem: 'Logs removidos com sucesso!' });
+      return reply.send({ mensagem: "Logs removidos com sucesso!" });
     } catch (err) {
       return reply.code(500).send({ erro: err.message });
     }

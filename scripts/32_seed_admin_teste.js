@@ -3,24 +3,24 @@
  * FIX_32 + FIX_42: Seed do admin E operador de teste
  */
 
-const bcrypt = require('bcrypt');
-const db = require('../src/database');
+const bcrypt = require("bcrypt");
+const db = require("../src/database");
 
-const ADMIN_EMAIL = 'admin-teste@frota.com';
-const ADMIN_SENHA = 'TesteRBAC@2026';
-const ADMIN_NOME = 'Admin Teste RBAC';
-const ADMIN_PERFIL_ID = '1';
-const ADMIN_PERFIL = 'Administrador';
+const ADMIN_EMAIL = "admin-teste@frota.com";
+const ADMIN_SENHA = "TesteRBAC@2026";
+const ADMIN_NOME = "Admin Teste RBAC";
+const ADMIN_PERFIL_ID = "1";
+const ADMIN_PERFIL = "Administrador";
 
-const OPERADOR_EMAIL = 'teste@tes.com';
-const OPERADOR_SENHA = 'Frota@1977';
-const OPERADOR_NOME = 'Operador Teste';
-const OPERADOR_PERFIL_ID = '2';
-const OPERADOR_PERFIL = 'Operador';
+const OPERADOR_EMAIL = "teste@tes.com";
+const OPERADOR_SENHA = "Frota@1977";
+const OPERADOR_NOME = "Operador Teste";
+const OPERADOR_PERFIL_ID = "2";
+const OPERADOR_PERFIL = "Operador";
 
 async function upsertUsuario({ email, senha, nome, perfilId, perfil }) {
   const senhaHash = await bcrypt.hash(senha, 10);
-  const existing = await db.query('SELECT id FROM usuarios WHERE email = $1', [email]);
+  const existing = await db.query("SELECT id FROM usuarios WHERE email = $1", [email]);
 
   if (existing.rows.length === 0) {
     const insert = await db.query(
@@ -63,7 +63,7 @@ async function upsertUsuario({ email, senha, nome, perfilId, perfil }) {
 }
 
 (async () => {
-  console.log('🔧 FIX_32+FIX_42: Garantindo usuarios de teste...\n');
+  console.log("🔧 FIX_32+FIX_42: Garantindo usuarios de teste...\n");
 
   try {
     await upsertUsuario({
@@ -71,23 +71,23 @@ async function upsertUsuario({ email, senha, nome, perfilId, perfil }) {
       senha: ADMIN_SENHA,
       nome: ADMIN_NOME,
       perfilId: ADMIN_PERFIL_ID,
-      perfil: ADMIN_PERFIL,
+      perfil: ADMIN_PERFIL
     });
 
-    console.log('');
+    console.log("");
 
     await upsertUsuario({
       email: OPERADOR_EMAIL,
       senha: OPERADOR_SENHA,
       nome: OPERADOR_NOME,
       perfilId: OPERADOR_PERFIL_ID,
-      perfil: OPERADOR_PERFIL,
+      perfil: OPERADOR_PERFIL
     });
 
-    console.log('\n✅ Seed concluído!');
+    console.log("\n✅ Seed concluído!");
     process.exit(0);
   } catch (e) {
-    console.error('❌ ERRO:', e.message);
+    console.error("❌ ERRO:", e.message);
     process.exit(1);
   }
 })();

@@ -1,5 +1,5 @@
-const db = require('../database');
-const autorizar = require('../middleware/autorizar'); // [FIX_13]
+const db = require("../database");
+const autorizar = require("../middleware/autorizar"); // [FIX_13]
 
 let perfisEnsured = false;
 async function ensurePerfis() {
@@ -23,7 +23,7 @@ async function ensurePerfis() {
     `);
     perfisEnsured = true;
   } catch (err) {
-    console.error('Auto-migracao perfis:', err.message);
+    console.error("Auto-migracao perfis:", err.message);
   }
 }
 
@@ -33,10 +33,13 @@ async function routes(fastify, options) {
   // ==========================================================================
   // LISTAR PERFIS (com contagem de permissoes)
   // ==========================================================================
-  fastify.get('/api/perfis', { preHandler: [fastify.autenticar, autorizar('perfis.visualizar')] }, async (req, reply) => {
-    try {
-      await ensurePerfis();
-      const res = await db.query(`
+  fastify.get(
+    "/api/perfis",
+    { preHandler: [fastify.autenticar, autorizar("perfis.visualizar")] },
+    async (req, reply) => {
+      try {
+        await ensurePerfis();
+        const res = await db.query(`
         SELECT 
           p.id, p.nome, p.descricao, p.ativo, p.eh_sistema, p.totp_obrigatorio, p.created_at,
           COALESCE(COUNT(pp.permissao_id), 0)::int AS total_permissoes,
@@ -46,94 +49,112 @@ async function routes(fastify, options) {
         GROUP BY p.id
         ORDER BY p.id ASC
       `);
-      return reply.send(res.rows);
-    } catch (err) {
-      return reply.code(500).send({ erro: err.message });
+        return reply.send(res.rows);
+      } catch (err) {
+        return reply.code(500).send({ erro: err.message });
+      }
     }
-  });
+  );
 
   // ==========================================================================
   // LISTAR TODAS AS PERMISSOES (catalogo)
   // ==========================================================================
-  fastify.get('/api/permissoes', { preHandler: [fastify.autenticar, autorizar('perfis.visualizar')] }, async (req, reply) => {
-    try {
-      await ensurePerfis();
-      const res = await db.query(`
+  fastify.get(
+    "/api/permissoes",
+    { preHandler: [fastify.autenticar, autorizar("perfis.visualizar")] },
+    async (req, reply) => {
+      try {
+        await ensurePerfis();
+        const res = await db.query(`
         SELECT id, chave, descricao, modulo
         FROM permissoes
         ORDER BY modulo ASC, chave ASC
       `);
-      return reply.send(res.rows);
-    } catch (err) {
-      return reply.code(500).send({ erro: err.message });
+        return reply.send(res.rows);
+      } catch (err) {
+        return reply.code(500).send({ erro: err.message });
+      }
     }
-  });
+  );
 
   // ==========================================================================
   // DETALHES DE UM PERFIL
   // ==========================================================================
-  fastify.get('/api/perfis/:id', { preHandler: [fastify.autenticar, autorizar('perfis.visualizar')] }, async (req, reply) => {
-    try {
-      await ensurePerfis();
-      const res = await db.query('SELECT * FROM perfis WHERE id = $1', [req.params.id]);
-      if (res.rows.length === 0) {
-        return reply.code(404).send({ erro: 'Perfil nao encontrado.' });
+  fastify.get(
+    "/api/perfis/:id",
+    { preHandler: [fastify.autenticar, autorizar("perfis.visualizar")] },
+    async (req, reply) => {
+      try {
+        await ensurePerfis();
+        const res = await db.query("SELECT * FROM perfis WHERE id = $1", [req.params.id]);
+        if (res.rows.length === 0) {
+          return reply.code(404).send({ erro: "Perfil nao encontrado." });
+        }
+        return reply.send(res.rows[0]);
+      } catch (err) {
+        return reply.code(500).send({ erro: err.message });
       }
-      return reply.send(res.rows[0]);
-    } catch (err) {
-      return reply.code(500).send({ erro: err.message });
     }
-  });
+  );
 
   // ==========================================================================
   // PERMISSOES DE UM PERFIL
   // ==========================================================================
-  fastify.get('/api/perfis/:id/permissoes', { preHandler: [fastify.autenticar, autorizar('perfis.visualizar')] }, async (req, reply) => {
-    try {
-      await ensurePerfis();
-      const res = await db.query(`
+  fastify.get(
+    "/api/perfis/:id/permissoes",
+    { preHandler: [fastify.autenticar, autorizar("perfis.visualizar")] },
+    async (req, reply) => {
+      try {
+        await ensurePerfis();
+        const res = await db.query(
+          `
         SELECT perm.id, perm.chave, perm.descricao, perm.modulo
         FROM perfil_permissoes pp
         JOIN permissoes perm ON perm.id = pp.permissao_id
         WHERE pp.perfil_id = $1
         ORDER BY perm.modulo, perm.chave
-      `, [req.params.id]);
-      return reply.send(res.rows);
-    } catch (err) {
-      return reply.code(500).send({ erro: err.message });
+      `,
+          [req.params.id]
+        );
+        return reply.send(res.rows);
+      } catch (err) {
+        return reply.code(500).send({ erro: err.message });
+      }
     }
-  });
+  );
 
   // ==========================================================================
   // CRIAR PERFIL (com permissoes opcionais)
   // ==========================================================================
-  fastify.post('/api/perfis', { preHandler: [fastify.autenticar, autorizar('perfis.criar')] }, async (req, reply) => {
-    const { nome, descricao, ativo = true, permissoes = [], totp_obrigatorio = false } = req.body || {}; if (!nome) return reply.code(400).send({ erro: 'Nome do perfil e obrigatorio.' });
+  fastify.post("/api/perfis", { preHandler: [fastify.autenticar, autorizar("perfis.criar")] }, async (req, reply) => {
+    const { nome, descricao, ativo = true, permissoes = [], totp_obrigatorio = false } = req.body || {};
+    if (!nome) return reply.code(400).send({ erro: "Nome do perfil e obrigatorio." });
 
     const client = await db.pool.connect();
     try {
       await ensurePerfis();
-      await client.query('BEGIN');
+      await client.query("BEGIN");
 
       const res = await client.query(
-        'INSERT INTO perfis (nome, descricao, ativo, eh_sistema, totp_obrigatorio) VALUES ($1, $2, $3, false, $4) RETURNING *',
-        [nome, descricao || '', ativo, totp_obrigatorio === true] );
+        "INSERT INTO perfis (nome, descricao, ativo, eh_sistema, totp_obrigatorio) VALUES ($1, $2, $3, false, $4) RETURNING *",
+        [nome, descricao || "", ativo, totp_obrigatorio === true]
+      );
       const perfil = res.rows[0];
 
       if (permissoes.length > 0) {
-        const valores = permissoes.map((_, i) => '($1, $' + (i + 2) + ')').join(',');
-        await client.query(
-          'INSERT INTO perfil_permissoes (perfil_id, permissao_id) VALUES ' + valores,
-          [perfil.id, ...permissoes]
-        );
+        const valores = permissoes.map((_, i) => "($1, $" + (i + 2) + ")").join(",");
+        await client.query("INSERT INTO perfil_permissoes (perfil_id, permissao_id) VALUES " + valores, [
+          perfil.id,
+          ...permissoes
+        ]);
       }
 
-      await client.query('COMMIT');
+      await client.query("COMMIT");
       return reply.code(201).send(perfil);
     } catch (err) {
-      await client.query('ROLLBACK');
-      if (err.code === '23505') {
-        return reply.code(409).send({ erro: 'Ja existe um perfil com este nome.' });
+      await client.query("ROLLBACK");
+      if (err.code === "23505") {
+        return reply.code(409).send({ erro: "Ja existe um perfil com este nome." });
       }
       return reply.code(500).send({ erro: err.message });
     } finally {
@@ -144,91 +165,104 @@ async function routes(fastify, options) {
   // ==========================================================================
   // ATUALIZAR PERFIL
   // ==========================================================================
-  fastify.put('/api/perfis/:id', { preHandler: [fastify.autenticar, autorizar('perfis.editar')] }, async (req, reply) => {
-    const { id } = req.params;
-    const { nome, descricao, ativo, totp_obrigatorio } = req.body || {}; try {
-      await ensurePerfis();
-      const res = await db.query(
-        'UPDATE perfis SET nome = COALESCE($1, nome), descricao = COALESCE($2, descricao), ativo = COALESCE($3, ativo), totp_obrigatorio = COALESCE($5, totp_obrigatorio) WHERE id = $4 RETURNING *',
-        [nome, descricao, ativo, id, totp_obrigatorio] );
-      if (res.rows.length === 0) return reply.code(404).send({ erro: 'Perfil nao encontrado.' });
-      return reply.send(res.rows[0]);
-    } catch (err) {
-      return reply.code(500).send({ erro: err.message });
+  fastify.put(
+    "/api/perfis/:id",
+    { preHandler: [fastify.autenticar, autorizar("perfis.editar")] },
+    async (req, reply) => {
+      const { id } = req.params;
+      const { nome, descricao, ativo, totp_obrigatorio } = req.body || {};
+      try {
+        await ensurePerfis();
+        const res = await db.query(
+          "UPDATE perfis SET nome = COALESCE($1, nome), descricao = COALESCE($2, descricao), ativo = COALESCE($3, ativo), totp_obrigatorio = COALESCE($5, totp_obrigatorio) WHERE id = $4 RETURNING *",
+          [nome, descricao, ativo, id, totp_obrigatorio]
+        );
+        if (res.rows.length === 0) return reply.code(404).send({ erro: "Perfil nao encontrado." });
+        return reply.send(res.rows[0]);
+      } catch (err) {
+        return reply.code(500).send({ erro: err.message });
+      }
     }
-  });
+  );
 
   // ==========================================================================
   // SALVAR PERMISSOES DE UM PERFIL (batch)
   // ==========================================================================
-  fastify.put('/api/perfis/:id/permissoes', { preHandler: [fastify.autenticar, autorizar('permissoes.gerenciar')] }, async (req, reply) => {
-    const { id } = req.params;
-    const { permissoes = [] } = req.body || {};
+  fastify.put(
+    "/api/perfis/:id/permissoes",
+    { preHandler: [fastify.autenticar, autorizar("permissoes.gerenciar")] },
+    async (req, reply) => {
+      const { id } = req.params;
+      const { permissoes = [] } = req.body || {};
 
-    const client = await db.pool.connect();
-    try {
-      await ensurePerfis();
-      await client.query('BEGIN');
+      const client = await db.pool.connect();
+      try {
+        await ensurePerfis();
+        await client.query("BEGIN");
 
-      const check = await client.query('SELECT id FROM perfis WHERE id = $1', [id]);
-      if (check.rows.length === 0) {
-        await client.query('ROLLBACK');
-        return reply.code(404).send({ erro: 'Perfil nao encontrado.' });
+        const check = await client.query("SELECT id FROM perfis WHERE id = $1", [id]);
+        if (check.rows.length === 0) {
+          await client.query("ROLLBACK");
+          return reply.code(404).send({ erro: "Perfil nao encontrado." });
+        }
+
+        // Remove todas e insere as novas
+        await client.query("DELETE FROM perfil_permissoes WHERE perfil_id = $1", [id]);
+
+        if (permissoes.length > 0) {
+          const valores = permissoes.map((_, i) => "($1, $" + (i + 2) + ")").join(",");
+          await client.query("INSERT INTO perfil_permissoes (perfil_id, permissao_id) VALUES " + valores, [
+            id,
+            ...permissoes
+          ]);
+        }
+
+        await client.query("COMMIT");
+        return reply.send({ sucesso: true, total: permissoes.length });
+      } catch (err) {
+        await client.query("ROLLBACK");
+        return reply.code(500).send({ erro: err.message });
+      } finally {
+        client.release();
       }
-
-      // Remove todas e insere as novas
-      await client.query('DELETE FROM perfil_permissoes WHERE perfil_id = $1', [id]);
-
-      if (permissoes.length > 0) {
-        const valores = permissoes.map((_, i) => '($1, $' + (i + 2) + ')').join(',');
-        await client.query(
-          'INSERT INTO perfil_permissoes (perfil_id, permissao_id) VALUES ' + valores,
-          [id, ...permissoes]
-        );
-      }
-
-      await client.query('COMMIT');
-      return reply.send({ sucesso: true, total: permissoes.length });
-    } catch (err) {
-      await client.query('ROLLBACK');
-      return reply.code(500).send({ erro: err.message });
-    } finally {
-      client.release();
     }
-  });
+  );
 
   // ==========================================================================
   // EXCLUIR PERFIL
   // ==========================================================================
-  fastify.delete('/api/perfis/:id', { preHandler: [fastify.autenticar, autorizar('perfis.excluir')] }, async (req, reply) => {
-    try {
-      await ensurePerfis();
+  fastify.delete(
+    "/api/perfis/:id",
+    { preHandler: [fastify.autenticar, autorizar("perfis.excluir")] },
+    async (req, reply) => {
+      try {
+        await ensurePerfis();
 
-      const check = await db.query('SELECT nome, eh_sistema FROM perfis WHERE id = $1', [req.params.id]);
-      if (check.rows.length === 0) {
-        return reply.code(404).send({ erro: 'Perfil nao encontrado.' });
-      }
-      if (check.rows[0].eh_sistema) {
-        return reply.code(403).send({ erro: 'Perfis de sistema nao podem ser excluidos.' });
-      }
+        const check = await db.query("SELECT nome, eh_sistema FROM perfis WHERE id = $1", [req.params.id]);
+        if (check.rows.length === 0) {
+          return reply.code(404).send({ erro: "Perfil nao encontrado." });
+        }
+        if (check.rows[0].eh_sistema) {
+          return reply.code(403).send({ erro: "Perfis de sistema nao podem ser excluidos." });
+        }
 
-      // Verifica se ha usuarios usando este perfil
-      const usados = await db.query(
-        'SELECT COUNT(*)::int AS total FROM usuarios WHERE perfil_id::text = $1::text',
-        [req.params.id]
-      );
-      if (usados.rows[0].total > 0) {
-        return reply.code(400).send({
-          erro: 'Nao e possivel excluir: ' + usados.rows[0].total + ' usuario(s) estao usando este perfil.'
-        });
-      }
+        // Verifica se ha usuarios usando este perfil
+        const usados = await db.query("SELECT COUNT(*)::int AS total FROM usuarios WHERE perfil_id::text = $1::text", [
+          req.params.id
+        ]);
+        if (usados.rows[0].total > 0) {
+          return reply.code(400).send({
+            erro: "Nao e possivel excluir: " + usados.rows[0].total + " usuario(s) estao usando este perfil."
+          });
+        }
 
-      await db.query('DELETE FROM perfis WHERE id = $1', [req.params.id]);
-      return reply.send({ sucesso: true });
-    } catch (err) {
-      return reply.code(500).send({ erro: err.message });
+        await db.query("DELETE FROM perfis WHERE id = $1", [req.params.id]);
+        return reply.send({ sucesso: true });
+      } catch (err) {
+        return reply.code(500).send({ erro: err.message });
+      }
     }
-  });
+  );
 }
 
 module.exports = routes;

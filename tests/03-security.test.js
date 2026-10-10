@@ -59,22 +59,26 @@ describe("API - Rate Limit (login)", () => {
   const isCI = process.env.CI === "true" || process.env.GITHUB_ACTIONS === "true";
   const testFn = isCI ? test.skip : test;
 
-  testFn("Multiplas tentativas de login retornam 401 (dev) ou 429 (prod)", async () => {
-    const tentativas = [];
-    for (let i = 0; i < 8; i++) {
-      const res = await fetch(BASE_URL + "/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: "ratelimit@teste.com", senha: "errada" })
-      });
-      tentativas.push(res.status);
-      // Pequeno delay para nao estourar
-      await new Promise(r => setTimeout(r, 200));
-    }
-    // Em dev/test: rate limit desabilitado -> 401
+  testFn(
+    "Multiplas tentativas de login retornam 401 (dev) ou 429 (prod)",
+    async () => {
+      const tentativas = [];
+      for (let i = 0; i < 8; i++) {
+        const res = await fetch(BASE_URL + "/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: "ratelimit@teste.com", senha: "errada" })
+        });
+        tentativas.push(res.status);
+        // Pequeno delay para nao estourar
+        await new Promise((r) => setTimeout(r, 200));
+      }
+      // Em dev/test: rate limit desabilitado -> 401
       // Em prod: rate limit ativo -> 429
       const temRateLimit = tentativas.includes(429);
       const tem401 = tentativas.includes(401);
       expect(tem401 || temRateLimit).toBe(true);
-  }, 30000);
+    },
+    30000
+  );
 });

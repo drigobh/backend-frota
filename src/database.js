@@ -1,6 +1,6 @@
-const { Pool } = require('pg');
-const { AsyncLocalStorage } = require('async_hooks');
-require('dotenv').config();
+const { Pool } = require("pg");
+const { AsyncLocalStorage } = require("async_hooks");
+require("dotenv").config();
 
 // [FIX_21] Pool otimizado para Neon Free
 // - max: 10 (Neon free aceita ~10 conexoes)
@@ -10,16 +10,16 @@ require('dotenv').config();
 // - connectionTimeoutMillis: 10s (espera max 10s por conexao)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
   max: 10,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 10000,
   statement_timeout: 30000,
-  query_timeout: 30000,
+  query_timeout: 30000
 });
 
-pool.on('error', (err) => {
-  console.error('[DB] Erro inesperado no pool do PostgreSQL:', err.message);
+pool.on("error", (err) => {
+  console.error("[DB] Erro inesperado no pool do PostgreSQL:", err.message);
 });
 
 // Contador pra debug
@@ -53,7 +53,10 @@ async function query(text, params) {
   if (ctx.user && ctx.user.email) {
     _contadorQueriesSemContexto++;
     if (_contadorQueriesSemContexto <= 5) {
-      console.warn('[DB] query() chamada com user mas sem client (rota sem runAsUser). Usando pool direto. #' + _contadorQueriesSemContexto);
+      console.warn(
+        "[DB] query() chamada com user mas sem client (rota sem runAsUser). Usando pool direto. #" +
+          _contadorQueriesSemContexto
+      );
     }
     return pool.query(text, params);
   }
@@ -75,18 +78,20 @@ async function runAsUser(user, callback) {
 
   const client = await pool.connect();
   try {
-    await client.query('BEGIN');
+    await client.query("BEGIN");
     await client.query("SELECT set_config('app.user_email', $1, true)", [String(user.email)]);
     if (user.nome) await client.query("SELECT set_config('app.user_nome', $1, true)", [String(user.nome)]);
-    if (user.id)   await client.query("SELECT set_config('app.user_id', $1, true)",   [String(user.id)]);
-    if (user.ip)   await client.query("SELECT set_config('app.user_ip', $1, true)",   [String(user.ip)]); // FASE_17_IP_AUDITORIA
+    if (user.id) await client.query("SELECT set_config('app.user_id', $1, true)", [String(user.id)]);
+    if (user.ip) await client.query("SELECT set_config('app.user_ip', $1, true)", [String(user.ip)]); // FASE_17_IP_AUDITORIA
 
     const ctx = { user, client };
     const result = await userStorage.run(ctx, callback);
-    await client.query('COMMIT');
+    await client.query("COMMIT");
     return result;
   } catch (e) {
-    try { await client.query('ROLLBACK'); } catch (_) {}
+    try {
+      await client.query("ROLLBACK");
+    } catch (_) { /* ignore */ }
     throw e;
   } finally {
     client.release();

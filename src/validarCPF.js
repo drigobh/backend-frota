@@ -4,19 +4,19 @@
  */
 
 function limparCPF(cpf) {
-  return String(cpf || '').replace(/\D/g, '');
+  return String(cpf || "").replace(/\D/g, "");
 }
 
 function validarCPF(cpf) {
   const c = limparCPF(cpf);
 
   if (c.length !== 11) {
-    return { ok: false, erro: 'CPF deve ter 11 digitos.' };
+    return { ok: false, erro: "CPF deve ter 11 digitos." };
   }
 
   // Rejeita sequencias: 00000000000, 11111111111, ..., 99999999999
   if (/^(\d)\1{10}$/.test(c)) {
-    return { ok: false, erro: 'CPF invalido (digitos repetidos).' };
+    return { ok: false, erro: "CPF invalido (digitos repetidos)." };
   }
 
   // Valida 1o digito verificador
@@ -27,7 +27,7 @@ function validarCPF(cpf) {
   let resto = (soma * 10) % 11;
   if (resto === 10) resto = 0;
   if (resto !== parseInt(c[9], 10)) {
-    return { ok: false, erro: 'CPF invalido (1o digito verificador).' };
+    return { ok: false, erro: "CPF invalido (1o digito verificador)." };
   }
 
   // Valida 2o digito verificador
@@ -38,7 +38,7 @@ function validarCPF(cpf) {
   resto = (soma * 10) % 11;
   if (resto === 10) resto = 0;
   if (resto !== parseInt(c[10], 10)) {
-    return { ok: false, erro: 'CPF invalido (2o digito verificador).' };
+    return { ok: false, erro: "CPF invalido (2o digito verificador)." };
   }
 
   return { ok: true, cpfLimpo: c };
@@ -47,7 +47,7 @@ function validarCPF(cpf) {
 function formatarCPF(cpf) {
   const c = limparCPF(cpf);
   if (c.length !== 11) return cpf;
-  return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
 }
 
 module.exports = { validarCPF, limparCPF, formatarCPF };
