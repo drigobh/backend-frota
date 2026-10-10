@@ -1,4 +1,4 @@
-﻿{
+{
     "name":  "projeto-caderninho-frota",
     "version":  "2.0.0",
     "description":  "Sistema Corporativo de Gestao de Frota - Caderninho de Motorista",
@@ -69,6 +69,5 @@
     "engines":  {
                     "node":  "\u003e=20.0.0",
                     "npm":  "\u003e=10.0.0"
-                },
-    "type":  "module"
+                }
 }
