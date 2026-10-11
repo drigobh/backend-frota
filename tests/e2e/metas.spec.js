@@ -1,4 +1,4 @@
-﻿// tests/e2e/metas.spec.js
+// tests/e2e/metas.spec.js
 // [FIX_67] Testes E2E para Metas
 const { test, expect } = require('@playwright/test');
 

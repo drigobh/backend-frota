@@ -1,4 +1,4 @@
-﻿// tests/e2e/resumo.spec.js
+// tests/e2e/resumo.spec.js
 // [FIX_66] Testes E2E para Resumo (Veículos)
 const { test, expect } = require('@playwright/test');
 

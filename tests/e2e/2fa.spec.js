@@ -1,4 +1,4 @@
-﻿// tests/e2e/2fa.spec.js
+// tests/e2e/2fa.spec.js
 // [FIX_61 v5] Testes E2E para 2FA (pula se 2FA estiver inativo)
 const { test, expect } = require('@playwright/test');
 

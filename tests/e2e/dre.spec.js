@@ -1,4 +1,4 @@
-﻿// tests/e2e/dre.spec.js
+// tests/e2e/dre.spec.js
 // [FIX_65] Testes E2E para DRE Consolidada (estrutura + dados)
 const { test, expect } = require('@playwright/test');
 

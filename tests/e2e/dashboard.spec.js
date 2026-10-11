@@ -1,4 +1,4 @@
-﻿// tests/e2e/dashboard.spec.js
+// tests/e2e/dashboard.spec.js
 // [FIX_63] Testes E2E para o Dashboard
 
 const { test, expect } = require('@playwright/test');

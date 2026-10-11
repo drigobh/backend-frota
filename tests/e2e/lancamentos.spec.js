@@ -1,4 +1,4 @@
-﻿// tests/e2e/lancamentos.spec.js
+// tests/e2e/lancamentos.spec.js
 // [FIX_64 v9] Testes E2E para Lançamentos (chama abrirModalLancamento direto)
 const { test, expect } = require('@playwright/test');
 

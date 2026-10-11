@@ -1,4 +1,4 @@
-﻿// tests/e2e/diagnostico.spec.js
+// tests/e2e/diagnostico.spec.js
 const { test, expect } = require('@playwright/test');
 
 const TEST_EMAIL = 'drigobh@gmail.com';
