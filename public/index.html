@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="UTF-8">
@@ -81,7 +81,8 @@
           <span class="input-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           </span>
-          <input type="email" id="login-email" name="email" class="login-new-input" placeholder="E-mail" required autocomplete="username" autofocus>
+          <form id="login-form" onsubmit="event.preventDefault(); executarLoginNaNuvem();">
+<input type="email" id="login-email" name="email" class="login-new-input" placeholder="E-mail" required autocomplete="username" autofocus>
         </div>
 
         <div class="login-new-input-wrap">
@@ -89,6 +90,7 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </span>
           <input type="password" id="login-senha" name="senha" class="login-new-input" placeholder="Senha" required autocomplete="current-password">
+</form>
           <button type="button" class="input-toggle-senha" onclick="toggleSenhaLogin()" title="Mostrar/ocultar senha" aria-label="Mostrar ou ocultar senha">
             <svg id="icon-olho" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
@@ -2513,10 +2515,45 @@
     // Lí“GICA DE LOGIN
     // =========================================================================
     async function executarLoginNaNuvem() {
-  if (window.__loginEmAndamento) {
-    console.log('[FASE_10] Login ja em andamento, ignorando clique duplicado');
+  const emailInput = document.getElementById('login-email');
+  const senhaInput = document.getElementById('login-senha');
+
+  const email = emailInput ? emailInput.value.trim() : '';
+  const senha = senhaInput ? senhaInput.value : '';
+
+  console.log('🔍 [LOGIN] Tentando:', { email, senha_length: senha.length });
+
+  if (!email || !senha) {
+    alert('Preencha email e senha.');
     return;
   }
+
+  try {
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('❌ [LOGIN] Erro:', data);
+      alert(data.erro || data.message || 'Email ou senha inválidos.');
+      return;
+    }
+
+    console.log('✅ [LOGIN] Sucesso:', data.usuario.nome);
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('usuario', JSON.stringify(data.usuario));
+
+    window.location.reload();
+
+  } catch (error) {
+    console.error('❌ [LOGIN] Erro de rede:', error);
+    alert('Erro ao conectar com o servidor.');
+  }
+}
   window.__loginEmAndamento = true;
 
   try {

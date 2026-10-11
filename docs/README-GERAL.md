@@ -1,49 +1,43 @@
-# 🚛 Caderninho de Frota
+﻿# Caderninho de Frota - Documentação Geral
 
-Sistema integrado de gestão de frota com controle de veículos, motoristas, abastecimentos, quilometragem, financeiro e auditoria.
+## 📋 Visão Geral
+Sistema Corporativo de Gestão de Frota - Caderninho de Motorista.
 
-## 🌐 Ambientes
+## 🔐 Credenciais de Teste
+- **Email:** drigobh@gmail.com
+- **Senha:** Admin@2026!Frota
+- **2FA:** Ativo (código de 6 dígitos do app autenticador)
 
-| Ambiente | URL | Status |
-|----------|-----|--------|
-| **Produção** | https://backend-frota-72ni.onrender.com | 🟢 Live |
-| **Health Check** | https://backend-frota-72ni.onrender.com/health | 🟢 OK |
-| **Swagger UI** | https://backend-frota-72ni.onrender.com/api/docs | 🟢 OK |
+## 🔧 Configuração do 2FA
+1. Acesse o painel administrativo.
+2. Vá em **Configurações > Segurança > 2FA**.
+3. Clique em **Ativar 2FA**.
+4. Escaneie o QR Code com o Google Authenticator (ou similar).
+5. Guarde os códigos de recuperação.
 
-## 🔗 Serviços externos
-
-| Serviço | Propósito | Painel |
-|---------|-----------|--------|
-| **Render** | Hospedagem | https://dashboard.render.com |
-| **Neon** | PostgreSQL gerenciado | https://console.neon.tech |
-| **UptimeRobot** | Monitoramento 24/7 | https://uptimerobot.com |
-| **Sentry** | Error tracking | https://sentry.io |
-| **Resend** | Email transacional | https://resend.com |
-| **GitHub** | Repositório | https://github.com/drigobh/backend-frota |
-
-## 📦 Stack
-
-- **Backend:** Node.js 20+, Fastify 5
-- **Banco:** PostgreSQL 16 (Neon)
-- **Auth:** JWT + bcrypt + 2FA TOTP
-- **Frontend:** HTML/JS vanilla (PWA)
-- **Deploy:** Render
-- **CI/CD:** GitHub Actions
-
-## 📚 Documentação
-
-- [Backend — README detalhado](./backend/README.md)
-- [Swagger/OpenAPI](https://backend-frota-72ni.onrender.com/api/docs)
-
-## 🚀 Quick start
-
+## 🧪 Testes E2E (Playwright)
 ```bash
-git clone https://github.com/drigobh/backend-frota.git
-cd backend-frota/backend
-npm install
-cp .env.example .env
-# Editar .env com valores reais
-npm start
-# Acessar http://localhost:3000
+# Rodar testes
+npm run test:e2e
 
-text
+# Rodar com interface
+npm run test:e2e:ui
+```
+
+## 🚀 Scripts Disponíveis
+- `npm start` - Inicia o servidor.
+- `npm run dev` - Inicia em modo desenvolvimento.
+- `npm test` - Roda testes unitários.
+- `npm run test:matricula` - Roda testes de matrícula.
+- `npm run test:ci` - Roda testes no CI.
+- `npm run lint` - Roda ESLint.
+- `npm run format` - Formata código com Prettier.
+
+## 📊 CI/CD
+- Workflow: `CI - Lint e Testes`
+- Status: ✅ Passando (após correção `FIX_60`)
+
+## 📝 Histórico de Correções
+- `FIX_60` - Adiciona testes E2E com Playwright.
+- `FIX_60` - Remove `type:module` + renomeia Playwright para `.mjs`.
+- `FASE_3A` - Fix dos cards instalado.
