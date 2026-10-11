@@ -1,6 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
 <head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
   <meta charset="UTF-8">
   <meta name="theme-color" content="#0f2a4a">
   <link rel="manifest" href="/manifest.json">
@@ -14,6 +17,7 @@
   <!-- FASE_13_VERSION_DINAMICA -->
   <meta name="versao-sistema" content="{{VERSAO_SISTEMA}}">
   <title>Caderninho de Motorista — Gestão de Frota</title>
+<!-- Versao: v20261010220231 -->
   <!-- Basecoat CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/basecoat-css@1.0.2/dist/basecoat.cdn.min.css">
   <!-- Google Fonts -->
@@ -5268,7 +5272,11 @@ ${btnReset2FA}
           if (!porModulo[x.modulo]) porModulo[x.modulo] = [];
           porModulo[x.modulo].push(x);
         });
-        var h = '<html><head><title>Perfil</title><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
+        var h = '<html><head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0"><title>Perfil</title>
+<!-- Versao: v20261010220231 --><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
         h += '<h1>Caderninho de Motorista - Perfil de Acesso</h1>';
         h += '<p><strong>Nome:</strong> ' + p.nome + '</p>';
         h += '<p><strong>Descricao:</strong> ' + (p.descricao || '-') + '</p>';
@@ -5293,7 +5301,11 @@ ${btnReset2FA}
     function imprimirListaPerfis() {
       var tabela = document.getElementById('table-perfis');
       if (!tabela) return;
-      var h = '<html><head><title>Lista de Perfis</title><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
+      var h = '<html><head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0"><title>Lista de Perfis</title>
+<!-- Versao: v20261010220231 --><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
       h += '<h1>Lista de Perfis de Acesso</h1>';
       h += '<p>Emitido em: ' + new Date().toLocaleString('pt-BR') + '</p>';
       var clone = tabela.cloneNode(true);
@@ -5510,7 +5522,11 @@ ${btnReset2FA}
     function imprimirDre() {
       if (!__dreDadosAtuais) { alert("Nenhum dado para imprimir."); return; }
       var d = __dreDadosAtuais;
-      var h = '<html><head><title>DRE - ' + d.veiculo.placa + '</title>';
+      var h = '<html><head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0"><title>DRE - ' + d.veiculo.placa + '</title>
+<!-- Versao: v20261010220231 -->';
       h += '<!-- [FIX_53] CSS extraido para /css/ -->';
       h += "</head><body>";
       h += "<h1>Caderninho de Motorista - DRE</h1>";
@@ -5687,7 +5703,11 @@ ${btnReset2FA}
         alert("Nada para imprimir.");
         return;
       }
-      var h = '<html><head><title>Ranking da Frota</title><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
+      var h = '<html><head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0"><title>Ranking da Frota</title>
+<!-- Versao: v20261010220231 --><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
       h += "<h1>Caderninho de Motorista - Ranking da Frota</h1>";
       h += "<p><strong>Mes:</strong> " + __rankingCache.mes + " | <strong>Emitido:</strong> " + new Date().toLocaleString("pt-BR") + "</p>";
       h += "<table><tr><th>Pos</th><th>Veiculo</th><th>Receita</th><th>Despesa</th><th>Resultado</th><th>Margem</th><th>KM</th><th>KM/L</th><th>R$/KM</th><th>Custo/KM</th></tr>";
@@ -5925,7 +5945,11 @@ ${btnReset2FA}
 
     function imprimirMetas() {
       if (!__metasCache || !__metasCache.metas || __metasCache.metas.length === 0) { alert("Nada para imprimir."); return; }
-      var h = '<html><head><title>Metas</title><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
+      var h = '<html><head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0"><title>Metas</title>
+<!-- Versao: v20261010220231 --><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
       h += "<h1>Caderninho de Motorista - Metas</h1>";
       h += "<p><strong>Mes:</strong> " + __metasCache.mes + " | <strong>Emitido:</strong> " + new Date().toLocaleString("pt-BR") + "</p>";
       h += "<table><tr><th>Veiculo</th><th>Tipo</th><th>Meta</th><th>Realizado</th><th>Atingimento</th><th>Status</th></tr>";
@@ -6804,7 +6828,11 @@ ${btnReset2FA}
         return;
       }
 
-      var h = '<html><head><title>Categorias Financeiras</title><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
+      var h = '<html><head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0"><title>Categorias Financeiras</title>
+<!-- Versao: v20261010220231 --><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
       h += '<h1>Caderninho de Motorista - Categorias Financeiras</h1>';
       h += '<p>Emitido em: ' + new Date().toLocaleString('pt-BR') + '</p>';
       h += '<p><strong>Total:</strong> ' + __categoriasListaCache.length + ' categorias</p>';
@@ -6998,7 +7026,11 @@ ${btnReset2FA}
         alert('Nada para imprimir.');
         return;
       }
-      var h = '<html><head><title>Centros de Custo</title><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
+      var h = '<html><head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0"><title>Centros de Custo</title>
+<!-- Versao: v20261010220231 --><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
       h += '<h1>Caderninho de Motorista - Centros de Custo</h1>';
       h += '<p>Emitido em: ' + new Date().toLocaleString('pt-BR') + '</p>';
       h += '<p><strong>Total:</strong> ' + __centrosCustoCache.length + ' centros</p>';
@@ -7171,7 +7203,11 @@ ${btnReset2FA}
       if (!__dreConsolidadaCache) { alert('Nada para imprimir.'); return; }
       var d = __dreConsolidadaCache;
 
-      var h = '<html><head><title>DRE Consolidada - ' + d.mes + '</title><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
+      var h = '<html><head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0"><title>DRE Consolidada - ' + d.mes + '</title>
+<!-- Versao: v20261010220231 --><!-- [FIX_53] CSS extraido para /css/ --></head><body>';
       h += '<h1>Caderninho de Motorista - DRE Consolidada</h1>';
       h += '<p><strong>Mês:</strong> ' + d.mes + ' | <strong>Emitido:</strong> ' + new Date().toLocaleString('pt-BR') + '</p>';
       h += '<div class="kpi"><strong>Receita:</strong> ' + formatBRL(d.totais.receita) + '</div>';
@@ -8290,8 +8326,12 @@ function renderHistorico(data) {
     var dh = new Date().toLocaleString("pt-BR");
     var u = getUsuário();
     var p = [];
-    p.push("<!DOCTYPE html><html><head><meta charset=\"UTF-8\">");
-    p.push("<title>" + secao.titulo + " - Caderninho</title>");
+    p.push("<!DOCTYPE html><html><head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0"><meta charset=\"UTF-8\">");
+    p.push("<title>" + secao.titulo + " - Caderninho</title>
+<!-- Versao: v20261010220231 -->");
     p.push("<!-- [FIX_53] CSS extraido para /css/ -->");
 
     
@@ -9349,8 +9389,12 @@ function renderHistorico(data) {
     var u = (typeof getUsuário === "function") ? getUsuário() : "Sistema";
     var meta = montarCabecalhoEmpresa(cfg || {});
     var p = [];
-    p.push('<!DOCTYPE html><html><head><meta charset="UTF-8">');
-    p.push('<title>' + titulo + '</title>');
+    p.push('<!DOCTYPE html><html><head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0"><meta charset="UTF-8">');
+    p.push('<title>' + titulo + '</title>
+<!-- Versao: v20261010220231 -->');
     p.push('<!-- [FIX_53] CSS extraido para /css/ -->');
     p.push('</head><body>');
     // Cabecalho
