@@ -64,6 +64,10 @@ const path = require("path");
 const fs = require("fs");
 const db = require("./database");
 
+const { initSentry } = require('./sentry');
+
+// [FIX_84] Inicializa o Sentry (monitoramento de erros)
+initSentry();
 // =========================================================================
 // CONFIGURAÇÃO DE AMBIENTE
 // =========================================================================
