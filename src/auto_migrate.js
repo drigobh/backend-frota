@@ -1,4 +1,4 @@
-﻿const { Pool } = require("pg");
+const { Pool } = require("pg");
 
 let migrationRan = false;
 
@@ -37,7 +37,7 @@ async function autoMigrate(pool) {
         nome VARCHAR(100) NOT NULL,
         email VARCHAR(150) NOT NULL UNIQUE,
         senha_hash VARCHAR(255),
-        senha VARCHAR(255),
+
         perfil_id INT,
         perfil VARCHAR(50) DEFAULT 'Administrador',
         ativo BOOLEAN DEFAULT true,
