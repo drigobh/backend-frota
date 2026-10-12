@@ -1066,7 +1066,38 @@ const start = async () => {
       console.warn("AVISO: [BOOT] auto_migrate falhou:", e.message);
     }
     console.log("[BOOT] Chamando fastify.listen...");
-    await fastify.listen({ port: Number(PORT), host: HOST });
+    await // [FIX_87] Endpoint para disparar backup automatico via cron externo
+fastify.get('/api/backup/disparar', async (req, reply) => {
+  // Verificar token de seguranca (opcional)
+  const token = req.query.token;
+  const TOKEN_ESPERADO = process.env.BACKUP_TOKEN || 'backup-token-padrao';
+  
+  if (token !== TOKEN_ESPERADO) {
+    return reply.status(401).send({ erro: 'Token invalido' });
+  }
+  
+  try {
+    const { exec } = require('child_process');
+    const path = require('path');
+    
+    exec('node scripts/backup_automatico.js', { cwd: path.join(__dirname, '..') }, (error, stdout, stderr) => {
+      if (error) {
+        console.error('Erro no backup:', error.message);
+      } else {
+        console.log('Backup executado:', stdout);
+      }
+    });
+    
+    return reply.send({ 
+      ok: true, 
+      mensagem: 'Backup iniciado em background',
+      timestamp: new Date().toISOString()
+    });
+  } catch (e) {
+    return reply.status(500).send({ erro: e.message });
+  }
+});
+fastify.listen({ port: Number(PORT), host: HOST });
     if (typeof watchdog !== "undefined") clearTimeout(watchdog);
 
     const address = fastify.server.address();
