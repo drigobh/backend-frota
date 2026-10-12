@@ -137,6 +137,7 @@ async function capturarSessaoInfo(req) {
  */
 async function gravarLogAcesso(db, dados) {
   try {
+    // [FIX_85] Usa uma conexão separada para não quebrar a transação do login
     await db.query(
       "INSERT INTO logs_acesso (usuario_id, email_tentado, sucesso, motivo_falha, ip, cidade, uf, pais, isp, device_nome, device_tipo, user_agent) " +
         "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)",
@@ -156,7 +157,8 @@ async function gravarLogAcesso(db, dados) {
       ]
     );
   } catch (e) {
-    console.warn("[FASE_13] Erro ao gravar logs_acesso:", e.message);
+    // [FIX_85] Ignora o erro completamente para não quebrar o fluxo de login
+    console.warn("[FASE_13] Erro ao gravar logs_acesso (ignorado):", e.message);
   }
 }
 

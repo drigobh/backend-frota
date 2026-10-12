@@ -49,6 +49,12 @@ async function routes(fastify, options) {
       }
 
       const { email, senha } = req.body || {};
+
+    // [DEBUG_LOGIN] Log para investigar o erro 401
+    console.log('[DEBUG_LOGIN] Body recebido:', JSON.stringify(req.body));
+    console.log('[DEBUG_LOGIN] Email recebido:', JSON.stringify(email));
+    console.log('[DEBUG_LOGIN] Email length:', email ? email.length : 0);
+    console.log('[DEBUG_LOGIN] Senha length:', senha ? senha.length : 0);
       if (!email || !senha) {
         await gravarLogAcesso(
           db,
