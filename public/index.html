@@ -1988,6 +1988,106 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--premium-primary-light);
 }
+
+/* ============================================================ */
+/* [FASE_2_CARDS_PREMIUM] Cards com Glassmorphism + Hover      */
+/* ============================================================ */
+
+/* Cards de resumo premium */
+.card-resumo, .card, .stat-card, [class*="card-"] {
+  position: relative;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 251, 0.9) 100%);
+  border: 1px solid var(--premium-glass-border);
+  border-radius: var(--premium-radius-lg);
+  padding: var(--premium-space-5);
+  box-shadow: var(--premium-shadow-sm);
+  transition: all var(--premium-transition-base);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Barra de acento no topo */
+.card-resumo::before, .card::before, .stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--premium-gradient-blue);
+  opacity: 0;
+  transition: opacity var(--premium-transition-base);
+}
+
+.card-resumo:hover::before, .card:hover::before, .stat-card:hover::before {
+  opacity: 1;
+}
+
+/* Hover effect premium */
+.card-resumo:hover, .card:hover, .stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--premium-shadow-lg);
+  border-color: var(--premium-primary-light);
+}
+
+/* Dark mode */
+[data-theme="dark"] .card-resumo,
+[data-theme="dark"] .card,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] [class*="card-"] {
+  background: linear-gradient(135deg, rgba(22, 27, 34, 0.95) 0%, rgba(13, 17, 23, 0.9) 100%);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .card-resumo:hover,
+[data-theme="dark"] .card:hover,
+[data-theme="dark"] .stat-card:hover {
+  border-color: var(--premium-primary-light);
+  box-shadow: var(--premium-shadow-glow);
+}
+
+/* Animacao de entrada staggered */
+.card-resumo, .card, .stat-card {
+  animation: cardFadeIn 0.5s ease-out both;
+}
+
+.card-resumo:nth-child(1), .card:nth-child(1) { animation-delay: 0.05s; }
+.card-resumo:nth-child(2), .card:nth-child(2) { animation-delay: 0.1s; }
+.card-resumo:nth-child(3), .card:nth-child(3) { animation-delay: 0.15s; }
+.card-resumo:nth-child(4), .card:nth-child(4) { animation-delay: 0.2s; }
+.card-resumo:nth-child(5), .card:nth-child(5) { animation-delay: 0.25s; }
+.card-resumo:nth-child(6), .card:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Titulos de cards */
+.card-resumo .titulo, .card .titulo {
+  font-size: var(--premium-font-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--premium-space-2);
+}
+
+/* Valores de cards */
+.card-resumo .valor, .card .valor {
+  font-size: var(--premium-font-3xl);
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
 </style>
   
   <style>
@@ -3398,6 +3498,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 <!-- [FIX_UX_04] Contraste: variaveis CSS em vez de cores hardcoded -->
 <!-- [FIX_UX_05] Responsividade mobile -->
 <!-- [DESIGN_SYSTEM_PREMIUM] Design System Premium -->
+<!-- [FASE_2_CARDS_PREMIUM] Cards com Glassmorphism -->
 </head>
 <body>
 
