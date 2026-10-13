@@ -3279,7 +3279,8 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
       <p class="login-subtitle">Fa&ccedil;a login com sua conta para acessar o sistema</p>
 
       <div id="login-form">
-        <div class="login-new-input-wrap">
+        <form id="login-form-real" onsubmit="event.preventDefault(); executarLoginNaNuvem();">
+<div class="login-new-input-wrap">
           <span class="input-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           </span>
@@ -3299,6 +3300,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
         <button type="button" class="login-btn-new" id="btn-login-novo" onclick="executarLoginNaNuvem()">
           <span id="btn-login-txt">Entrar no Sistema</span>
         </button>
+</form>
 
         <a class="login-link-esqueci" onclick="abrirRecuperarSenhaEmBreve()">Esqueci minha senha</a>
       </div>
