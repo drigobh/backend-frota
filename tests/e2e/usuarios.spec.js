@@ -1,39 +1,12 @@
 // tests/e2e/usuarios.spec.js
 // [FIX_68] Testes E2E para Usuarios
 const { test, expect } = require('@playwright/test');
+const { fazerLogin, fazerLoginComToken } = require('./helpers/auth');
 
 const TEST_EMAIL = 'drigobh@gmail.com';
 const TEST_PASSWORD = 'Admin@2026!Frota';
 
-async function fazerLogin(page) {
-  const response = await page.request.post('/api/login', {
-    data: { email: TEST_EMAIL, senha: TEST_PASSWORD }
-  });
-  if (!response.ok()) throw new Error('Falha no login via API: ' + response.status());
-  const data = await response.json();
-  const token = data.token;
-  if (!token) throw new Error('API nao retornou token');
-
-  await page.goto('/');
-  await page.waitForLoadState('domcontentloaded');
-  await page.evaluate((t) => {
-    localStorage.setItem('token', t);
-    localStorage.setItem('authToken', t);
-    localStorage.setItem('usuario', JSON.stringify({
-      nome: 'Admin Teste',
-      email: 'drigobh@gmail.com',
-      perfil: 'Administrador'
-    }));
-  }, token);
-  await page.reload();
-  await page.waitForLoadState('domcontentloaded');
-  await page.waitForTimeout(2000);
-  await page.evaluate(() => {
-    const loginScreen = document.getElementById('login-screen');
-    if (loginScreen) loginScreen.style.display = 'none';
-  });
-  await page.waitForTimeout(500);
-}
+// fazerLogin importado de ./helpers/auth
 
 async function abrirAbaUsuarios(page) {
   await page.evaluate(() => {
