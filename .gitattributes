@@ -1,18 +1,10 @@
-# Força quebras de linha LF para todos os arquivos de texto
-* text=auto eol=lf
-
-# Arquivos JSON sempre LF, sem conversão
-*.json text eol=lf
-
-# JavaScript sempre LF
+# Nao forca conversao global - apenas para arquivos especificos
 *.js text eol=lf
-
-# YAML sempre LF
+*.json text eol=lf
 *.yml text eol=lf
 *.yaml text eol=lf
-
-# Markdown sempre LF
 *.md text eol=lf
 
 # Desabilita LFS para arquivos de texto (evita BOM)
 package.json -filter -text
+package-lock.json -filter -text
