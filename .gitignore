@@ -92,3 +92,6 @@ public/*.br
 public/*.gz
 public/*.meta.json
 
+
+# Script de backup automatico
+!scripts/backup_automatico.js
