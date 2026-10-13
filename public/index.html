@@ -2088,6 +2088,71 @@ body {
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
+
+/* ============================================================ */
+/* [FASE_3_SPARKLINES] Mini-graficos (Sparklines) nos Cards     */
+/* ============================================================ */
+
+/* Container da sparkline */
+.sparkline-container {
+  position: absolute;
+  bottom: var(--premium-space-3);
+  right: var(--premium-space-3);
+  width: 80px;
+  height: 30px;
+  opacity: 0.7;
+  transition: opacity var(--premium-transition-base);
+}
+
+.card-resumo:hover .sparkline-container,
+.card:hover .sparkline-container,
+.stat-card:hover .sparkline-container {
+  opacity: 1;
+}
+
+/* SVG da sparkline */
+.sparkline {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.sparkline path {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sparkline .sparkline-area {
+  fill: url(#sparklineGradient);
+  stroke: none;
+}
+
+.sparkline .sparkline-line {
+  stroke: var(--premium-primary);
+}
+
+.sparkline .sparkline-dot {
+  fill: var(--premium-primary);
+  stroke: white;
+  stroke-width: 1.5;
+}
+
+/* Cores por tipo de card */
+.sparkline.success .sparkline-line { stroke: var(--premium-success); }
+.sparkline.success .sparkline-dot { fill: var(--premium-success); }
+.sparkline.warning .sparkline-line { stroke: var(--premium-warning); }
+.sparkline.warning .sparkline-dot { fill: var(--premium-warning); }
+.sparkline.danger .sparkline-line { stroke: var(--premium-danger); }
+.sparkline.danger .sparkline-dot { fill: var(--premium-danger); }
+
+/* Gradiente para o preenchimento */
+.sparkline-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
 </style>
   
   <style>
@@ -3499,8 +3564,19 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 <!-- [FIX_UX_05] Responsividade mobile -->
 <!-- [DESIGN_SYSTEM_PREMIUM] Design System Premium -->
 <!-- [FASE_2_CARDS_PREMIUM] Cards com Glassmorphism -->
+<!-- [FASE_3_SPARKLINES] Mini-graficos -->
 </head>
 <body>
+<!-- [FASE_3_SPARKLINES] SVG defs para gradientes -->
+<svg class="sparkline-defs" aria-hidden="true">
+  <defs>
+    <linearGradient id="sparklineGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--premium-primary)" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="var(--premium-primary)" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+</svg>
+
 
   <!-- Tela de Login Inicial -->
     <div id="login-screen">
