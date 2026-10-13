@@ -3221,19 +3221,19 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 <style>
 /* [FIX_27] Bloco 2FA no login */
 #login-2fa-block { display:none; }
-#login-2fa-block.visible { display:block; }
+#login-2fa-block.visible { display: block !important; }
 #login-2fa-block .login-2fa-title { color:#ffffff; font-size:1.1rem; font-weight:700; margin:0 0 0.5rem; text-align:center; }
 #login-2fa-block .login-2fa-subtitle { color:#cbd5e1; font-size:0.85rem; margin:0 0 1.5rem; text-align:center; line-height:1.5; }
 #login-2fa-codigo { letter-spacing:8px; text-align:center; font-family:monospace; font-size:1.3rem; }
 .login-2fa-actions { display:flex; flex-direction:column; gap:8px; margin-top:1rem; }
 .login-2fa-back { background:transparent; border:none; color:#cbd5e1; font-size:0.8rem; cursor:pointer; padding:6px; text-decoration:underline; }
 .login-2fa-back:hover { color:#ffffff; }
-#login-form.hidden { display:none; }
+#login-form.hidden { display: none !important; }
 </style>
 <style>
 /* [FIX_29c-4] Bloco setup 2FA no login */
 #login-2fa-setup-block { display:none; }
-#login-2fa-setup-block.visible { display:block; }
+#login-2fa-setup-block.visible { display: block !important; }
 #login-2fa-setup-block .setup-title { color:#ffffff; font-size:1.05rem; font-weight:700; margin:0 0 0.5rem; text-align:center; }
 #login-2fa-setup-block .setup-subtitle { color:#cbd5e1; font-size:0.8rem; margin:0 0 1rem; text-align:center; line-height:1.5; }
 #login-2fa-setup-block .setup-qr { display:flex; justify-content:center; margin:12px 0; }
@@ -3242,8 +3242,8 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 #login-2fa-setup-block .setup-label { color:#cbd5e1; font-size:0.8rem; margin:12px 0 6px; text-align:center; }
 #login-2fa-codigo-setup { letter-spacing:8px; text-align:center; font-family:monospace; font-size:1.3rem; }
 #login-2fa-setup-block .setup-actions { display:flex; flex-direction:column; gap:8px; margin-top:1rem; }
-#login-form.hidden-setup { display:none; }
-#login-2fa-block.hidden-setup { display:none; }
+#login-form.hidden-setup { display: none !important; }
+#login-2fa-block.hidden-setup { display: none !important; }
 </style>
 </head>
 <body>
@@ -5720,8 +5720,8 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             window._tokenTempSetup2FA = data.token;
             var blocoSetup = document.getElementById('login-2fa-setup-block');
             var blocoMain = document.getElementById('login-form');
-            if (blocoSetup) blocoSetup.classList.add('visible');
-            if (blocoMain) blocoMain.classList.add('hidden-setup');
+            if (blocoSetup) { blocoSetup.style.display = ''; blocoSetup.classList.add('visible'); }
+            if (blocoMain) { blocoMain.style.display = ''; blocoMain.classList.add('hidden-setup'); }
             return;
         }
 
@@ -5731,8 +5731,8 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             window._tokenTemp2FA = data.token_temp;
             var bloco2fa = document.getElementById('login-2fa-block');
             var blocoMain2 = document.getElementById('login-form');
-            if (bloco2fa) bloco2fa.classList.add('visible');
-            if (blocoMain2) blocoMain2.classList.add('hidden');
+            if (bloco2fa) { bloco2fa.style.display = ''; bloco2fa.classList.add('visible'); }
+            if (blocoMain2) { blocoMain2.style.display = ''; blocoMain2.classList.add('hidden'); }
             return;
         }
 
@@ -15294,10 +15294,12 @@ function _mostrarBloco2FA() {
 function voltarLogin() {
   _tokenTemp2FA = null;
   window._tokenTemp2FA = null;
-  var main = document.getElementById('login-form');
   var bloco = document.getElementById('login-2fa-block');
-  if (bloco) bloco.style.display = 'none';
-  if (main) main.style.display = 'block';
+  if (bloco) { bloco.classList.remove('visible'); bloco.style.display = ''; }
+  var main = document.getElementById('login-form');
+  if (main) { main.classList.remove('hidden', 'hidden-setup'); main.style.display = ''; }
+  var setup = document.getElementById('login-2fa-setup-block');
+  if (setup) { setup.classList.remove('visible'); setup.style.display = ''; }
   window.__loginEmAndamento = false;
   var emailInput = document.getElementById('login-email');
   if (emailInput) emailInput.focus();
@@ -15446,7 +15448,7 @@ function _mostrarBlocoSetup2FA() {
   var blocoSetup = document.getElementById('login-2fa-setup-block');
   if (main) main.classList.add('hidden-setup');
   if (blocoLogin) blocoLogin.classList.add('hidden-setup');
-  if (blocoSetup) blocoSetup.classList.add('visible');
+  if (blocoSetup) { blocoSetup.style.display = ''; blocoSetup.classList.add('visible'); }
   var input = document.getElementById('login-2fa-codigo-setup');
   if (input) { input.value = ''; setTimeout(function() { input.focus(); }, 200); }
   var btn = document.getElementById('btn-setup-2fa');
