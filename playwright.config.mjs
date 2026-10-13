@@ -10,6 +10,7 @@ export default defineConfig({
   reporter: "html",
   timeout: 60000,
   use: {
+    serviceWorkers: 'block',
     baseURL: process.env.BASE_URL || "http://localhost:3000",
     trace: "on-first-retry",
     screenshot: "only-on-failure",

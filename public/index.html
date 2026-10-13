@@ -5692,6 +5692,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
     // Lí“GICA DE LOGIN
     // =========================================================================
     async function executarLoginNaNuvem() {
+    console.log('[DEBUG] executarLoginNaNuvem CHAMADA!');
     const email = document.getElementById('login-email').value.trim();
     const senha = document.getElementById('login-senha').value;
     const errorDiv = document.getElementById('login-error');
@@ -5713,29 +5714,28 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             throw new Error(data.erro || data.message || 'Erro desconhecido no login.');
         }
 
-        // CENARIO A: 2FA obrigatorio mas nao ativado
         if (data.requer_2fa_setup) {
             console.log('[FIX_27] Backend pediu SETUP de 2FA.');
-            localStorage.setItem('token_temp', data.token); window._tokenTempSetup2FA = data.token;
+            localStorage.setItem('token_temp', data.token);
+            window._tokenTempSetup2FA = data.token;
             var blocoSetup = document.getElementById('login-2fa-setup-block');
             var blocoMain = document.getElementById('login-form');
-            if (blocoSetup) blocoSetup.style.display = 'block';
-            if (blocoMain) blocoMain.style.display = 'none';
+            if (blocoSetup) blocoSetup.classList.add('visible');
+            if (blocoMain) blocoMain.classList.add('hidden-setup');
             return;
         }
 
-        // CENARIO B: 2FA ativo - precisa validar codigo
         if (data.requer_2fa) {
             console.log('[FIX_27] Backend pediu 2FA.');
-            localStorage.setItem('token_temp', data.token_temp); window._tokenTemp2FA = data.token_temp;
+            localStorage.setItem('token_temp', data.token_temp);
+            window._tokenTemp2FA = data.token_temp;
             var bloco2fa = document.getElementById('login-2fa-block');
             var blocoMain2 = document.getElementById('login-form');
-            if (bloco2fa) bloco2fa.style.display = 'block';
-            if (blocoMain2) blocoMain2.style.display = 'none';
+            if (bloco2fa) bloco2fa.classList.add('visible');
+            if (blocoMain2) blocoMain2.classList.add('hidden');
             return;
         }
 
-        // CENARIO C: Login normal (sem 2FA)
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuario', JSON.stringify(data.usuario));
         window.location.href = '/dashboard';
@@ -5751,42 +5751,10 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
     } finally {
         if (btnLogin) { btnLogin.disabled = false; btnLogin.textContent = 'Entrar no Sistema'; }
     }
-});
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.erro || data.message || 'Erro desconhecido no login.');
-        }
-
-        if (data.requires2FA) {
-            console.log('[FIX_27] Backend pediu 2FA.');
-            const step2FA = document.getElementById('login-2fa-block');
-            const stepLogin = document.getElementById('login-form');
-            if (step2FA) step2FA.style.display = 'block';
-            if (stepLogin) stepLogin.style.display = 'none';
-            return;
-        }
-
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('usuario', JSON.stringify(data.usuario));
-        window.location.href = '/dashboard';
-
-    } catch (error) {
-        console.error('Erro no login:', error);
-        if (errorDiv) {
-            errorDiv.textContent = error.message;
-            errorDiv.style.display = 'block';
-        } else {
-            alert(error.message);
-        }
-    } finally {
-        if (btnLogin) { btnLogin.disabled = false; btnLogin.textContent = 'Entrar'; }
-    }
 }
-  
-}
-    function fazerLogout() {
+window.executarLoginNaNuvem = executarLoginNaNuvem;
+
+function fazerLogout() {
       // [FIX_28] Reset completo do estado de login
       try {
         // 1. Limpa tokens/sessao
