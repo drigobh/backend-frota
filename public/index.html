@@ -5692,71 +5692,53 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
     // Lí“GICA DE LOGIN
     // =========================================================================
     async function executarLoginNaNuvem() {
-  // FASE_10_FIX_LOGIN - evita duplo clique
-  if (window.__loginEmAndamento) {
-    console.log('[FASE_10] Login ja em andamento, ignorando clique duplicado');
-    return;
-  }
-  window.__loginEmAndamento = true;
-  try {
-const email = document.getElementById('login-email').value;
-      const senha = document.getElementById('login-senha').value;
-      
-      try {
-        const res = await fetch(`${API_URL}/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, senha })
+    const email = document.getElementById('login-email').value.trim();
+    const senha = document.getElementById('login-senha').value;
+    const errorDiv = document.getElementById('login-error');
+    const btnLogin = document.getElementById('btn-login');
+
+    if (errorDiv) { errorDiv.style.display = 'none'; errorDiv.textContent = ''; }
+    if (btnLogin) { btnLogin.disabled = true; btnLogin.textContent = 'Entrando...'; }
+
+    try {
+        const response = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, senha })
         });
-        
-        const data = await res.json();
-        
-        if (!res.ok) {
-          throw new Error(data.erro || 'Falha no login');
-        }
-        // [FIX_29c-4] Verifica se backend pediu SETUP obrigatorio de 2FA
-        if (data.requer_2fa_setup === true) {
-          console.log('[FIX_29c-4] Backend exigiu SETUP de 2FA. Mostrando bloco de ativacao...');
-          _tokenTempSetup2FA = data.token;
-          _mostrarBlocoSetup2FA();
-          setTimeout(iniciarSetup2FA, 300);
-          window.__loginEmAndamento = false;
-          return;
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.erro || data.message || 'Erro desconhecido no login.');
         }
 
-        // [FIX_27] Verifica se backend pediu 2FA
-        if (data.requer_2fa === true) {
-          console.log('[FIX_27] Backend pediu 2FA. Mostrando bloco de codigo...');
-          _tokenTemp2FA = data.token_temp;
-          _mostrarBloco2FA();
-          window.__loginEmAndamento = false;
-          return;
+        if (data.requires2FA) {
+            console.log('[FIX_27] Backend pediu 2FA.');
+            const step2FA = document.getElementById('2fa-step');
+            const stepLogin = document.getElementById('login-step');
+            if (step2FA) step2FA.style.display = 'block';
+            if (stepLogin) stepLogin.style.display = 'none';
+            return;
         }
 
         localStorage.setItem('token', data.token);
-        state.user = data.usuario;
-        document.getElementById('current-user-badge').textContent = `👤 ${state.user.nome} (${state.user.perfil})`;
-        document.getElementById('login-screen').style.display = 'none';
-        
-        initApp();
-        if (typeof verificarStatus2FA === 'function') setTimeout(verificarStatus2FA, 500);
+        localStorage.setItem('usuario', JSON.stringify(data.usuario));
+        window.location.href = '/dashboard';
 
-// [FIX_22] Recarrega o iframe de empresas (que carregou antes do login)
-try {
-  var _iframeEmp = document.querySelector('iframe[src*="empresas.html"]');
-  if (_iframeEmp) {
-    console.log('[FIX_22] Recarregando iframe de empresas...');
-    _iframeEmp.contentWindow.location.reload();
-  }
-} catch (e) {
-  console.warn('[FIX_22] Erro ao recarregar iframe:', e.message);
-}
-      } catch (err) {
-        alert('Erro: ' + err.message);
-      }
+    } catch (error) {
+        console.error('Erro no login:', error);
+        if (errorDiv) {
+            errorDiv.textContent = error.message;
+            errorDiv.style.display = 'block';
+        } else {
+            alert(error.message);
+        }
     } finally {
-    window.__loginEmAndamento = false;
-  }
+        if (btnLogin) { btnLogin.disabled = false; btnLogin.textContent = 'Entrar'; }
+    }
+}
+  
 }
     function fazerLogout() {
       // [FIX_28] Reset completo do estado de login
