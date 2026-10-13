@@ -1839,6 +1839,29 @@
     }
 
     @page { margin: 10mm; }
+
+/* [FIX_UX_01] Spinner no botao de login */
+.login-btn-new.loading {
+  position: relative;
+  color: transparent !important;
+  pointer-events: none;
+}
+.login-btn-new.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spinner-rotate 0.8s linear infinite;
+}
+@keyframes spinner-rotate {
+  to { transform: rotate(360deg); }
+}
 </style>
   
   <style>
@@ -5699,7 +5722,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
     const btnLogin = document.getElementById('btn-login-novo');
 
     if (errorDiv) { errorDiv.style.display = 'none'; errorDiv.textContent = ''; }
-    if (btnLogin) { btnLogin.disabled = true; btnLogin.textContent = 'Entrando...'; }
+    if (btnLogin) { btnLogin.disabled = true; btnLogin.classList.add('loading'); }
 
     try {
         const response = await fetch('/api/login', {
@@ -5749,7 +5772,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             alert(error.message);
         }
     } finally {
-        if (btnLogin) { btnLogin.disabled = false; btnLogin.textContent = 'Entrar no Sistema'; }
+        if (btnLogin) { btnLogin.disabled = false; btnLogin.classList.remove('loading'); }
     }
 }
 window.executarLoginNaNuvem = executarLoginNaNuvem;
