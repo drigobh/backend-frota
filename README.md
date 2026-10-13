@@ -288,3 +288,23 @@ Issues: https://github.com/drigobh/backend-frota/issues
 - `tests/e2e/*.spec.js` — 50 testes de CRUD/telas
 
 **Usuário de teste:** `admin-teste@frota.com` / `Admin@2026!Frota` (sem 2FA)
+
+
+---
+
+## 🎨 Melhorias de UX (FIX_UX_01 a FIX_UX_05)
+
+| # | Melhoria | Detalhes |
+|---|----------|----------|
+| 1 | **Spinner no login** | Feedback visual durante autenticacao |
+| 2 | **Validacao de formulario** | Inputs envolvidos em `<form>` |
+| 3 | **Acessibilidade** | 12 `aria-label` + 21 `aria-hidden` |
+| 4 | **Contraste do modo escuro** | 235 cores hardcoded substituidas por variaveis CSS |
+| 5 | **Responsividade mobile** | Breakpoints: 375px, 480px, 640px, toque em mobile |
+
+**Commits:**
+- `20bfc08` - Spinner no login
+- `980171e` - Validacao de formulario
+- `9b49983` - Acessibilidade
+- `13e59b7` - Contraste do modo escuro
+- `37c1ce4` - Responsividade mobile
