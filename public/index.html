@@ -2093,61 +2093,93 @@ body {
 /* [FASE_3_SPARKLINES] Mini-graficos (Sparklines) nos Cards     */
 /* ============================================================ */
 
-/* Container da sparkline */
+/* [FASE_3_SPARKLINES] Sparkline integrada ao card */
+.kpi-card {
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 3.5rem !important;
+  min-height: 140px;
+  transition: transform var(--premium-transition-base), box-shadow var(--premium-transition-base);
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--premium-shadow-lg);
+}
+
+/* Sparkline ocupa toda a base do card */
 .sparkline-container {
   position: absolute;
-  bottom: var(--premium-space-3);
-  right: var(--premium-space-3);
-  width: 80px;
-  height: 30px;
-  opacity: 0.7;
-  transition: opacity var(--premium-transition-base);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 50px;
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity var(--premium-transition-base), transform var(--premium-transition-base);
 }
 
-.card-resumo:hover .sparkline-container,
-.card:hover .sparkline-container,
-.stat-card:hover .sparkline-container {
+.kpi-card:hover .sparkline-container {
   opacity: 1;
+  transform: scaleY(1.08);
+  transform-origin: bottom;
 }
 
-/* SVG da sparkline */
 .sparkline {
   width: 100%;
   height: 100%;
   overflow: visible;
+  display: block;
 }
 
 .sparkline path {
   fill: none;
-  stroke-width: 2;
+  stroke-width: 2.5;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.sparkline .sparkline-area {
-  fill: url(#sparklineGradient);
-  stroke: none;
+.sparkline .sparkline-line {
+  stroke: var(--premium-primary, #3b82f6);
+  filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.5));
 }
 
-.sparkline .sparkline-line {
-  stroke: var(--premium-primary);
+.sparkline.success .sparkline-line { 
+  stroke: var(--premium-success, #22c55e); 
+  filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.5));
+}
+.sparkline.warning .sparkline-line { 
+  stroke: var(--premium-warning, #f59e0b); 
+  filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.5));
+}
+.sparkline.danger .sparkline-line { 
+  stroke: var(--premium-danger, #ef4444); 
+  filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.5));
 }
 
 .sparkline .sparkline-dot {
-  fill: var(--premium-primary);
+  fill: currentColor;
   stroke: white;
-  stroke-width: 1.5;
+  stroke-width: 2;
 }
 
-/* Cores por tipo de card */
-.sparkline.success .sparkline-line { stroke: var(--premium-success); }
-.sparkline.success .sparkline-dot { fill: var(--premium-success); }
-.sparkline.warning .sparkline-line { stroke: var(--premium-warning); }
-.sparkline.warning .sparkline-dot { fill: var(--premium-warning); }
-.sparkline.danger .sparkline-line { stroke: var(--premium-danger); }
-.sparkline.danger .sparkline-dot { fill: var(--premium-danger); }
+.sparkline.success .sparkline-dot { fill: var(--premium-success, #22c55e); }
+.sparkline.warning .sparkline-dot { fill: var(--premium-warning, #f59e0b); }
+.sparkline.danger .sparkline-dot { fill: var(--premium-danger, #ef4444); }
+.sparkline.primary .sparkline-dot { fill: var(--premium-primary, #3b82f6); }
 
-/* Gradiente para o preenchimento */
+/* Ponto pulsante no último valor */
+@keyframes sparklinePulse {
+  0%, 100% { opacity: 1; r: 3; }
+  50% { opacity: 0.6; r: 4.5; }
+}
+
+.sparkline .sparkline-dot {
+  animation: sparklinePulse 2s ease-in-out infinite;
+}
+
 .sparkline-defs {
   position: absolute;
   width: 0;
@@ -3324,6 +3356,88 @@ body {
     
 
     // FASE_7_AUDITORIA_REMOVIDA: modal removido
+
+// ============================================================
+// [FASE_3_SPARKLINES] Renderizador de sparklines
+// ============================================================
+window.renderSparkline = function(element, data, color) {
+    if (!element || !data || data.length < 2) return;
+    var svg = element.querySelector('.sparkline');
+    if (!svg) return;
+    var line = svg.querySelector('.sparkline-line');
+    var area = svg.querySelector('.sparkline-area');
+    var dot = svg.querySelector('.sparkline-dot');
+    if (!line || !area || !dot) return;
+
+    // Dimensões do SVG (full width do card)
+    var width = 300, height = 50, padding = 2;
+    svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+    svg.setAttribute('preserveAspectRatio', 'none');
+
+    var max = Math.max.apply(null, data);
+    var min = Math.min.apply(null, data);
+    var range = max - min || 1;
+
+    var points = [];
+    for (var i = 0; i < data.length; i++) {
+        var x = padding + (i / (data.length - 1)) * (width - 2 * padding);
+        var y = height - padding - ((data[i] - min) / range) * (height - 2 * padding - 5);
+        points.push({ x: x, y: y });
+    }
+
+    // Linha suave (curva de Bézier)
+    var linePath = 'M' + points[0].x + ',' + points[0].y;
+    for (var j = 1; j < points.length; j++) {
+        var p0 = points[j - 1];
+        var p1 = points[j];
+        var cx = (p0.x + p1.x) / 2;
+        linePath += ' C' + cx + ',' + p0.y + ' ' + cx + ',' + p1.y + ' ' + p1.x + ',' + p1.y;
+    }
+    line.setAttribute('d', linePath);
+
+    // Área (preenchimento gradiente)
+    var last = points[points.length - 1];
+    var first = points[0];
+    var areaPath = linePath + ' L' + last.x + ',' + height + ' L' + first.x + ',' + height + ' Z';
+    area.setAttribute('d', areaPath);
+
+    // Ponto final
+    dot.setAttribute('cx', last.x);
+    dot.setAttribute('cy', last.y);
+    dot.setAttribute('r', '3');
+
+    svg.setAttribute('class', 'sparkline ' + (color || 'primary'));
+};
+
+window.gerarSparklines = function() {
+    var sparkData = {
+        veiculos: [2, 3, 3, 4, 4, 4, 4],
+        motoristas: [1, 2, 2, 2, 3, 3, 3],
+        acoplados: [0, 1, 1, 2, 2, 2, 2],
+        km: [200, 350, 500, 650, 800, 900, 1000]
+    };
+    var colors = {
+        veiculos: "primary",
+        motoristas: "success",
+        acoplados: "warning",
+        km: "primary"
+    };
+    var keys = Object.keys(sparkData);
+    for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
+        var container = document.querySelector(".sparkline-container[data-sparkline=\"" + key + "\"]");
+        if (container) {
+            window.renderSparkline(container, sparkData[key], colors[key]);
+        }
+    }
+};
+
+// Executa apos o DOM carregar
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function() { setTimeout(window.gerarSparklines, 500); });
+} else {
+    setTimeout(window.gerarSparklines, 500);
+}
 </script>
 
 
@@ -3813,21 +3927,49 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
           <div class="kpi-card kpi-accent">
             <div class="kpi-card-title">Veículos Ativos</div>
             <div class="kpi-card-val" id="dash-veiculos">0</div>
+            <div class="sparkline-container" data-sparkline="veiculos">
+              <svg class="sparkline primary" viewBox="0 0 80 30" preserveAspectRatio="none">
+                <path class="sparkline-area" d=""></path>
+                <path class="sparkline-line" d=""></path>
+                <circle class="sparkline-dot" cx="0" cy="0" r="2"></circle>
+              </svg>
+            </div>
             <div class="kpi-card-sub">Frota tratora cadastrada</div>
           </div>
           <div class="kpi-card kpi-accent">
             <div class="kpi-card-title">Motoristas Ativos</div>
             <div class="kpi-card-val" id="dash-motoristas">0</div>
+            <div class="sparkline-container" data-sparkline="motoristas">
+              <svg class="sparkline success" viewBox="0 0 80 30" preserveAspectRatio="none">
+                <path class="sparkline-area" d=""></path>
+                <path class="sparkline-line" d=""></path>
+                <circle class="sparkline-dot" cx="0" cy="0" r="2"></circle>
+              </svg>
+            </div>
             <div class="kpi-card-sub">Quadro efetivo</div>
           </div>
           <div class="kpi-card kpi-warning">
             <div class="kpi-card-title">Em Operação (Acoplados)</div>
             <div class="kpi-card-val" id="dash-acoplados">0</div>
+            <div class="sparkline-container" data-sparkline="acoplados">
+              <svg class="sparkline warning" viewBox="0 0 80 30" preserveAspectRatio="none">
+                <path class="sparkline-area" d=""></path>
+                <path class="sparkline-line" d=""></path>
+                <circle class="sparkline-dot" cx="0" cy="0" r="2"></circle>
+              </svg>
+            </div>
             <div class="kpi-card-sub">Conjuntos rodando no mês</div>
           </div>
           <div class="kpi-card kpi-accent">
             <div class="kpi-card-title">Quilometragem Total</div>
             <div class="kpi-card-val" id="dash-km">0 km</div>
+            <div class="sparkline-container" data-sparkline="km">
+              <svg class="sparkline primary" viewBox="0 0 80 30" preserveAspectRatio="none">
+                <path class="sparkline-area" d=""></path>
+                <path class="sparkline-line" d=""></path>
+                <circle class="sparkline-dot" cx="0" cy="0" r="2"></circle>
+              </svg>
+            </div>
             <div class="kpi-card-sub">Distância percorrida</div>
           </div>
         </div>
@@ -6198,6 +6340,11 @@ function fazerLogout() {
         document.getElementById('dash-motoristas').textContent = data.totalMotoristas;
         document.getElementById('dash-acoplados').textContent = data.totalAcoplamentos;
         document.getElementById('dash-km').textContent = `${formatNum(data.kmTotal)} km`;
+
+        // [FASE_3_SPARKLINES] Renderiza as sparklines apos carregar os dados
+        if (typeof window.gerarSparklines === 'function') {
+          window.gerarSparklines(data);
+        }
         document.getElementById('dash-faturamento').textContent = formatBRL(data.faturamentoTotal);
         
         let combustivel = 0;
@@ -12120,7 +12267,7 @@ function renderHistorico(data) {
     btn.className = "ds-pdf-fab no-print";
     btn.type = "button";
     btn.title = "Exportar PDF (arraste para mover)";
-    btn.innerHTML = "<svg aria-hidden="true" viewBox=\"0 0 24 24\"><path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v2H8v-2zm0 4h8v2H8v-2z\"/></svg>";
+    btn.innerHTML = "<svg aria-hidden=\"true\" viewBox=\"0 0 24 24\"><path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v2H8v-2zm0 4h8v2H8v-2z\"/></svg>";
 
     // Aplica posicao salva
     var posSalva = null;
