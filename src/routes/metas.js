@@ -73,53 +73,72 @@ module.exports = async function (fastify, options) {
       });
 
       const reaisPorVeiculo = {};
-      for (const vid of veiculoIds) {
-        const lancRes = await db.query(
-          `
-          SELECT tipo, COALESCE(SUM(valor), 0) AS total
-          FROM lancamentos_financeiros
-          WHERE veiculo_id = $1
-            AND DATE_TRUNC('month', data_lancamento) = $2::date
-            AND deleted_at IS NULL
-          GROUP BY tipo
-        `,
-          [vid, mes]
-        );
-        let receita = 0,
-          despesa = 0;
-        lancRes.rows.forEach(function (r) {
-          if (r.tipo === "Receita") receita = parseFloat(r.total) || 0;
-          if (r.tipo === "Despesa") despesa = parseFloat(r.total) || 0;
+      if (veiculoIds.length > 0) {
+        // [FIX_PERF_N1] Queries agregadas — elimina N+1 (3 queries em vez de 3*N)
+        const [lancAgg, abAgg, kmAgg] = await Promise.all([
+          db.query(
+            `
+            SELECT veiculo_id, tipo, COALESCE(SUM(valor), 0) AS total
+            FROM lancamentos_financeiros
+            WHERE veiculo_id = ANY($1::uuid[])
+              AND DATE_TRUNC('month', data_lancamento) = $2::date
+              AND deleted_at IS NULL
+            GROUP BY veiculo_id, tipo
+          `,
+            [veiculoIds, mes]
+          ),
+          db.query(
+            `
+            SELECT veiculo_id, COALESCE(SUM(valor_total), 0) AS total
+            FROM abastecimentos
+            WHERE veiculo_id = ANY($1::uuid[])
+              AND DATE_TRUNC('month', data_abastecimento) = $2::date
+              AND deleted_at IS NULL
+            GROUP BY veiculo_id
+          `,
+            [veiculoIds, mes]
+          ),
+          db.query(
+            `
+            SELECT veiculo_id, COALESCE(SUM(GREATEST(0, km_final - km_inicial)), 0) AS km
+            FROM controle_km
+            WHERE veiculo_id = ANY($1::uuid[]) AND mes_referencia = $2::date
+            GROUP BY veiculo_id
+          `,
+            [veiculoIds, mes]
+          )
+        ]);
+
+        // Mapear resultados agregados
+        const lancMap = {};
+        lancAgg.rows.forEach(function (r) {
+          if (!lancMap[r.veiculo_id]) lancMap[r.veiculo_id] = { receita: 0, despesa: 0 };
+          if (r.tipo === "Receita") lancMap[r.veiculo_id].receita = parseFloat(r.total) || 0;
+          if (r.tipo === "Despesa") lancMap[r.veiculo_id].despesa = parseFloat(r.total) || 0;
         });
 
-        const abRes = await db.query(
-          `
-          SELECT COALESCE(SUM(valor_total), 0) AS total
-          FROM abastecimentos
-          WHERE veiculo_id = $1
-            AND DATE_TRUNC('month', data_abastecimento) = $2::date
-            AND deleted_at IS NULL
-        `,
-          [vid, mes]
-        );
-        const comb = parseFloat(abRes.rows[0].total) || 0;
+        const abMap = {};
+        abAgg.rows.forEach(function (r) {
+          abMap[r.veiculo_id] = parseFloat(r.total) || 0;
+        });
 
-        const kmRes = await db.query(
-          `
-          SELECT COALESCE(SUM(GREATEST(0, km_final - km_inicial)), 0) AS km
-          FROM controle_km
-          WHERE veiculo_id = $1 AND mes_referencia = $2::date
-        `,
-          [vid, mes]
-        );
-        const kmRodado = parseInt(kmRes.rows[0].km) || 0;
+        const kmMap = {};
+        kmAgg.rows.forEach(function (r) {
+          kmMap[r.veiculo_id] = parseInt(r.km) || 0;
+        });
 
-        const despesaTotal = despesa + comb;
-        reaisPorVeiculo[vid] = {
-          receita: receita,
-          resultado: receita - despesaTotal,
-          km: kmRodado
-        };
+        // Consolidar por veiculo
+        veiculoIds.forEach(function (vid) {
+          const lanc = lancMap[vid] || { receita: 0, despesa: 0 };
+          const comb = abMap[vid] || 0;
+          const kmRodado = kmMap[vid] || 0;
+          const despesaTotal = lanc.despesa + comb;
+          reaisPorVeiculo[vid] = {
+            receita: lanc.receita,
+            resultado: lanc.receita - despesaTotal,
+            km: kmRodado
+          };
+        });
       }
 
       const acompanhamento = metasRes.rows.map(function (m) {
