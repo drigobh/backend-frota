@@ -1994,7 +1994,7 @@ body {
 /* ============================================================ */
 
 /* Cards de resumo premium */
-.card-resumo, .card, .stat-card, [class*="card-"] {
+.card-resumo, .card, .stat-card, .kpi-card, [class*="card-"] {
   position: relative;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 249, 251, 0.9) 100%);
   border: 1px solid var(--premium-glass-border);
@@ -2008,7 +2008,7 @@ body {
 }
 
 /* Barra de acento no topo */
-.card-resumo::before, .card::before, .stat-card::before {
+.card-resumo::before, .card::before, .stat-card::before, .kpi-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -2020,12 +2020,12 @@ body {
   transition: opacity var(--premium-transition-base);
 }
 
-.card-resumo:hover::before, .card:hover::before, .stat-card:hover::before {
+.card-resumo:hover::before, .card:hover::before, .stat-card:hover::before, .kpi-card:hover::before {
   opacity: 1;
 }
 
 /* Hover effect premium */
-.card-resumo:hover, .card:hover, .stat-card:hover {
+.card-resumo:hover, .card:hover, .stat-card:hover, .kpi-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--premium-shadow-lg);
   border-color: var(--premium-primary-light);
