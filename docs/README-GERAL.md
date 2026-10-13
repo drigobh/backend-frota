@@ -35,7 +35,29 @@ npm run test:e2e:ui
 
 ## 📊 CI/CD
 - Workflow: `CI - Lint e Testes`
-- Status: ✅ Passando (após correção `FIX_60`)
+- Status: ✅ Passando (após correção `FIX_69` - BOM no package.json)
+- URL: https://github.com/drigobh/backend-frota/actions
+
+## 📝 Histórico de Correções (atualizado)
+
+### Correções críticas
+- `FIX_69` - Remove BOM do `package.json` no índice do Git (causava erro no Jest)
+- `FIX_68` - Adiciona `.gitattributes` para normalizar line endings
+- `FIX_67` - Força normalização do `package.json` sem BOM
+- `FIX_66` - Corrige input de email e função de login no código-fonte
+- `FIX_60` - Adiciona testes E2E com Playwright
+- `FIX_60` - Remove `type:module` + renomeia Playwright para `.mjs`
+
+### Correções de 2FA (FIX_71)
+- Padroniza funções de 2FA para usar `style.display`
+- Corrige variáveis globais `_tokenTemp2FA` e `_tokenTempSetup2FA`
+- Corrige função `executarLoginNaNuvem` para tratar 3 cenários:
+  - `requer_2fa` (2FA ativo)
+  - `requer_2fa_setup` (2FA obrigatório mas não ativado)
+  - Login normal
+
+### Fases anteriores
+- `FASE_3A` - Fix dos cards instalado
 
 ## 📝 Histórico de Correções
 - `FIX_60` - Adiciona testes E2E com Playwright.

@@ -3,6 +3,9 @@
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)](https://www.postgresql.org)
 [![License](https://img.shields.io/badge/license-Private-red)]()
+[![CI](https://github.com/drigobh/backend-frota/actions/workflows/ci.yml/badge.svg)](https://github.com/drigobh/backend-frota/actions/workflows/ci.yml)
+[![Testes E2E](https://img.shields.io/badge/E2E-Playwright-blue)]()
+[![2FA](https://img.shields.io/badge/2FA-TOTP-green)]()
 
 API REST + frontend PWA para gestão de frota.
 
@@ -15,6 +18,8 @@ API REST + frontend PWA para gestão de frota.
 - [Testes](#-testes)
 - [Deploy](#-deploy)
 - [Monitoramento](#-monitoramento)
+- [Autenticação em 2 Fatores (2FA)](#-autenticação-em-2-fatores-2fa)
+- [Credenciais de teste](#-credenciais-de-teste)
 - [Troubleshooting](#-troubleshooting)
 
 ## 🚀 Rodando localmente
@@ -117,6 +122,91 @@ URL de produção: https://backend-frota-72ni.onrender.com
 - Sentry: error tracking
 - Logs do Render: stream em tempo real
 
+## 🔐 Autenticação em 2 Fatores (2FA)
+
+O sistema usa **TOTP (Time-based One-Time Password)** via `speakeasy` e QR Code.
+
+### Fluxo de ativação (setup)
+
+1. Faça login com um usuário que **não tenha 2FA ativo**.
+2. No painel, vá em **Configurações > Segurança > 2FA**.
+3. Clique em **Ativar 2FA**.
+4. Escaneie o QR Code com o **Google Authenticator**, **Authy** ou similar.
+5. Digite o código de 6 dígitos para confirmar.
+6. **Guarde os 10 códigos de recuperação** exibidos (cada um só pode ser usado uma vez).
+
+### Fluxo de login (com 2FA ativo)
+
+1. Faça login com email + senha.
+2. O backend responde `{ requer_2fa: true, token_temp: "..." }`.
+3. O frontend exibe o bloco de 2FA (`#login-2fa-block`).
+4. Digite o código de 6 dígitos do app autenticador.
+5. O backend valida e emite o JWT final.
+
+### Fluxo de setup obrigatório (perfil exige 2FA)
+
+Se o perfil do usuário tem `totp_obrigatorio = true` e ele ainda não ativou:
+
+1. Faça login com email + senha.
+2. O backend responde `{ requer_2fa_setup: true, token: "..." }`.
+3. O frontend exibe o bloco de setup (`#login-2fa-setup-block`).
+4. Usuário escaneia o QR Code e confirma o código.
+5. Só então o JWT final é emitido.
+
+### Desativar 2FA
+
+```bash
+POST /api/auth/2fa/desativar
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "senha": "sua_senha_atual",
+  "codigo": "123456"
+}
+```
+
+### Resetar 2FA (admin)
+
+Se um usuário perdeu o celular, o admin pode resetar:
+
+```bash
+PUT /api/usuarios/:id/resetar-2fa
+Authorization: Bearer <token_admin>
+```
+
+### Endpoints de 2FA
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/api/auth/2fa/setup` | Gera segredo + QR Code |
+| POST | `/api/auth/2fa/verificar` | Confirma código e ativa 2FA |
+| POST | `/api/auth/2fa/desativar` | Desativa 2FA (senha + código) |
+| GET | `/api/auth/2fa/status` | Verifica se 2FA está ativo |
+| POST | `/api/login/2fa` | Valida código TOTP no login |
+| PUT | `/api/usuarios/:id/resetar-2fa` | Admin reseta 2FA de um usuário |
+
+## 🔑 Credenciais de teste
+
+> ⚠️ **ATENÇÃO:** Estas credenciais são para **ambiente de desenvolvimento/teste**. **NUNCA** use em produção.
+
+| Usuário | Email | Senha | Perfil | 2FA |
+|---------|-------|-------|--------|-----|
+| Admin principal | `drigobh@gmail.com` | `Admin@2026!Frota` | Administrador | Ativo |
+| Admin de teste | `admin-teste@frota.com` | (seed `32_seed_admin_teste.js`) | Administrador | Inativo |
+| Operador de teste | `teste@tes.com` | (seed `32_seed_admin_teste.js`) | Operador | Inativo |
+
+### Seed de teste
+
+O script `scripts/32_seed_admin_teste.js` cria/atualiza automaticamente:
+
+- `admin-teste@frota.com` (Administrador, 2FA inativo)
+- `teste@tes.com` (Operador, 2FA inativo)
+
+Ele roda **automaticamente antes dos testes** (`pretest` no `package.json`).
+
+---
+
 ## 🔧 Troubleshooting
 
 ### Servidor não sobe com [WATCHDOG]
@@ -136,6 +226,23 @@ Regenera o lockfile:
 ### Email não envia com API key is invalid
 
 Atualiza a env var `RESEND_API_KEY` no Render com a chave completa.
+
+### 2FA não aparece na tela de login
+
+Verifica se:
+1. O usuário tem `totp_ativo = true` no banco.
+2. O backend está respondendo `{ requer_2fa: true, token_temp: "..." }`.
+3. O frontend tem os blocos `#login-2fa-block` e `#login-2fa-setup-block` no `index.html`.
+4. As funções `voltarLogin` e `voltarLoginSetup` usam `style.display` (não `classList`).
+
+### Perdi o acesso ao app autenticador
+
+1. **Se você tem códigos de recuperação:** use um deles no lugar do código de 6 dígitos.
+2. **Se não tem:** peça para outro admin resetar seu 2FA via `PUT /api/usuarios/:id/resetar-2fa`.
+3. **Se você é o único admin:** acesse o banco direto e execute:
+   ```sql
+   UPDATE usuarios SET totp_ativo = false, totp_secret = NULL WHERE email = 'seu@email.com';
+   ```
 
 ### CI/CD falha no GitHub Actions
 
