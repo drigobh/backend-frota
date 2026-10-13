@@ -3268,6 +3268,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 #login-form.hidden-setup { display: none !important; }
 #login-2fa-block.hidden-setup { display: none !important; }
 </style>
+<!-- [FIX_UX_03] Acessibilidade: aria-labels e aria-hidden -->
 </head>
 <body>
 
@@ -3282,18 +3283,18 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
         <form id="login-form-real" onsubmit="event.preventDefault(); executarLoginNaNuvem();">
 <div class="login-new-input-wrap">
           <span class="input-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           </span>
           <input type="email" id="login-email" name="email" class="login-new-input" placeholder="E-mail" required autocomplete="username" autofocus>
         </div>
 
         <div class="login-new-input-wrap">
           <span class="input-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </span>
           <input type="password" id="login-senha" name="senha" class="login-new-input" placeholder="Senha" required autocomplete="current-password">
           <button type="button" class="input-toggle-senha" onclick="toggleSenhaLogin()" title="Mostrar/ocultar senha" aria-label="Mostrar ou ocultar senha">
-            <svg id="icon-olho" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg aria-hidden="true" id="icon-olho" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           </button>
         </div>
 
@@ -3310,7 +3311,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
         <p class="login-2fa-subtitle">Digite o codigo de 6 digitos do seu Google Authenticator:</p>
         <div class="login-new-input-wrap" style="margin-bottom:0.75rem;">
           <span class="input-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </span>
           <input type="text" id="login-2fa-codigo" class="login-new-input" placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
         </div>
@@ -3335,7 +3336,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
         <p class="setup-label">Digite o codigo de 6 digitos que o app mostra:</p>
         <div class="login-new-input-wrap" style="margin-bottom:0.75rem;">
           <span class="input-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           </span>
           <input type="text" id="login-2fa-codigo-setup" class="login-new-input" placeholder="000000" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code">
         </div>
@@ -3415,7 +3416,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
         <button class="nav-tab-btn" data-tab="tab-perfis" id="nav-tab-perfis" onclick="setTimeout(loadPerfisDaAPI, 100)"><span>&#128737;</span><span class="nav-label">Perfis</span></button>
         <button class="nav-tab-btn" data-tab="tab-backup" id="nav-tab-backup" onclick="setTimeout(loadBackupsDaAPI, 200)"><span>&#128190;</span><span class="nav-label">Backup</span></button>
         <!-- FASE_7_AUDITORIA_REMOVIDA: botao removido -->
-        <button class="nav-tab-btn" id="nav-btn-atualizar" onclick="abrirModalAtualizar()"><span>&#128260;</span><span class="nav-label">Atualizar App</span></button>
+        <button class="nav-tab-btn" id="nav-btn-atualizar" onclick="abrirModalAtualizar()" aria-label="Atualizar aplicativo"><span>&#128260;</span><span class="nav-label">Atualizar App</span></button>
         <button class="nav-tab-btn" data-tab="tab-empresas" id="nav-tab-empresas"><span>&#127970;</span><span class="nav-label">Empresas</span></button>
         <button class="nav-tab-btn" data-tab="tab-configuracoes" id="nav-tab-configuracoes"><span>&#9881;&#65039;</span><span class="nav-label">Configura&ccedil;&otilde;es</span></button>
         <button class="nav-tab-btn" data-tab="tab-ajuda" id="nav-tab-ajuda"><span>&#10067;</span><span class="nav-label">Ajuda</span></button>
@@ -3434,13 +3435,13 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
         <div class="user-badge" id="current-user-badge">👤 Conectado</div>
         <!-- FASE_3A_THEME_HEADER --><button class="theme-toggle-btn" data-theme-toggle type="button" title="Alternar tema"><span class="theme-toggle-icon">🌙</span><span class="theme-toggle-label">Escuro</span></button>
                 <!-- FASE_3A_THEME_HEADER --><button class="header-btn" type="button" onclick="abrirModalTrocarSenha()" title="Trocar minha senha">🔑 Trocar Senha</button>
-        <button class="header-btn" id="btn-2fa-header" onclick="abrirModal2FA()" title="Ativar autenticacao em 2 fatores">🔐 Ativar 2FA</button>
+        <button class="header-btn" id="btn-2fa-header" onclick="abrirModal2FA()" title="Ativar autenticacao em 2 fatores" aria-label="Configurar autenticacao em 2 fatores">🔐 Ativar 2FA</button>
         <button class="header-btn" onclick="fazerLogout()" title="Sair do sistema">
           Sair
         </button>
         <!-- FASE_8_DROPDOWN_RELATORIOS -->
         <div class="dropdown-relatorio-wrap">
-          <button class="header-btn" id="btn-print-report" title="Exportar Relatorio em PDF">
+          <button class="header-btn" id="btn-print-report" title="Exportar Relatorio em PDF" aria-label="Imprimir relatorio">
             <span>&#128424;&#65039;</span> Exportar Relat&oacute;rio <span class="dropdown-caret">&#9662;</span>
           </button>
           <div class="dropdown-relatorio-menu" id="dropdown-relatorio-menu" style="display:none;">
@@ -3482,7 +3483,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             <span id="badge-status-mes" class="lock-badge unlocked" style="padding:4px 10px; border-radius:6px; font-weight:700; font-size:0.85rem; background:#dcfce7; color:#166534; border:1px solid #86efac;">🔒 Mês Aberto</span>
           </div>
           <div>
-            <button id="btn-toggle-fechamento" onclick="toggleFechamentoMes()" class="btn-action" style="background:#0f2a4a; color:#ffffff; font-weight:600; padding:0.45rem 1.1rem; border-radius:6px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+            <button id="btn-toggle-fechamento" onclick="toggleFechamentoMes()" class="btn-action" style="background:#0f2a4a; color:#ffffff; font-weight:600; padding:0.45rem 1.1rem; border-radius:6px; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:6px;" aria-label="Alternar fechamento do mes">
               <span>🔓</span> Congelar Mês
             </button>
           </div>
@@ -3680,7 +3681,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             <button class="btn-action btn-action-secondary" id="btn-novo-mes-km">+ Novo Mês</button>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-secondary" id="btn-export-km"><span>⬇️</span> Exportar Excel (CSV)</button>
+            <button class="btn-action btn-action-secondary" id="btn-export-km" aria-label="Exportar KM para CSV"><span>⬇️</span> Exportar Excel (CSV)</button>
           </div>
         </div>
 
@@ -3716,7 +3717,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             <select class="select-month select-mes-global" id="select-mes-abastecimentos"></select>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-secondary" id="btn-export-abast"><span>⬇️</span> Exportar CSV</button>
+            <button class="btn-action btn-action-secondary" id="btn-export-abast" aria-label="Exportar abastecimentos para CSV"><span>⬇️</span> Exportar CSV</button>
             <button class="btn-action btn-action-primary" id="btn-add-abastecimento">+ Novo Abastecimento</button>
           </div>
         </div>
@@ -3838,7 +3839,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             <span class="label-month-select">Gestão de Manutenção:</span>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-secondary" id="btn-export-manut"><span>⬇️</span> Exportar CSV</button>
+            <button class="btn-action btn-action-secondary" id="btn-export-manut" aria-label="Exportar manutencoes para CSV"><span>⬇️</span> Exportar CSV</button>
             <button class="btn-action btn-action-primary" id="btn-add-manutencao">+ Registrar Manutenção</button>
           </div>
         </div>
@@ -3873,7 +3874,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             <span class="label-month-select">Vencimentos & Licenças:</span>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-secondary" id="btn-export-doc"><span>⬇️</span> Exportar CSV</button>
+            <button class="btn-action btn-action-secondary" id="btn-export-doc" aria-label="Exportar documentos para CSV"><span>⬇️</span> Exportar CSV</button>
             <button class="btn-action btn-action-primary" id="btn-add-documento">+ Novo Documento</button>
           </div>
         </div>
@@ -5046,7 +5047,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 
         <!-- Grafico de tipos -->
         <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:0.75rem 1rem;margin-bottom:0.75rem;display:flex;align-items:center;gap:1rem;">
-          <svg id="chart-backup-tipos" width="120" height="120" viewBox="0 0 120 120" style="flex-shrink:0;">
+          <svg aria-hidden="true" id="chart-backup-tipos" width="120" height="120" viewBox="0 0 120 120" style="flex-shrink:0;">
             <circle cx="60" cy="60" r="45" fill="none" stroke="#e2e8f0" stroke-width="20"/>
             <circle id="donut-dados" cx="60" cy="60" r="45" fill="none" stroke="#2563eb" stroke-width="20" stroke-dasharray="0 283" transform="rotate(-90 60 60)" stroke-linecap="butt"/>
             <circle id="donut-completo" cx="60" cy="60" r="45" fill="none" stroke="#8b5cf6" stroke-width="20" stroke-dasharray="0 283" transform="rotate(-90 60 60)" stroke-linecap="butt"/>
@@ -5209,7 +5210,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
           <div class="ajuda-card ajuda-sessao-premium" id="ajuda-sessao-card">
             <div class="ajuda-sessao-header">
               <div class="ajuda-sessao-icon">
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
                   <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
                   <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
@@ -5230,7 +5231,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             <div class="ajuda-sessao-grid">
               <div class="ajuda-sessao-item">
                 <div class="ajuda-sessao-item-label">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                  <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                   IP
                 </div>
                 <div class="ajuda-sessao-item-valor" id="ajuda-sessao-ip">--</div>
@@ -5238,7 +5239,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 
               <div class="ajuda-sessao-item">
                 <div class="ajuda-sessao-item-label">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
                   Local
                 </div>
                 <div class="ajuda-sessao-item-valor" id="ajuda-sessao-local">--</div>
@@ -5246,7 +5247,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 
               <div class="ajuda-sessao-item">
                 <div class="ajuda-sessao-item-label">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                  <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                   Provedor
                 </div>
                 <div class="ajuda-sessao-item-valor" id="ajuda-sessao-isp">--</div>
@@ -5254,7 +5255,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 
               <div class="ajuda-sessao-item">
                 <div class="ajuda-sessao-item-label">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                  <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                   Dispositivo
                 </div>
                 <div class="ajuda-sessao-item-valor" id="ajuda-sessao-device">--</div>
@@ -8930,7 +8931,7 @@ ${btnReset2FA}
         card.className = "meta-card " + statusClass;
         card.innerHTML =
           '<div class="meta-circle">' +
-            '<svg viewBox="0 0 80 80">' +
+            '<svg aria-hidden="true" viewBox="0 0 80 80">' +
               '<circle class="bg" cx="40" cy="40" r="32"></circle>' +
               '<circle class="fg" cx="40" cy="40" r="32" stroke="' + cor + '" stroke-dasharray="' + circunferencia + '" stroke-dashoffset="' + offset + '"></circle>' +
             '</svg>' +
@@ -11813,7 +11814,7 @@ function renderHistorico(data) {
     btn.className = "ds-pdf-fab no-print";
     btn.type = "button";
     btn.title = "Exportar PDF (arraste para mover)";
-    btn.innerHTML = "<svg viewBox=\"0 0 24 24\"><path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v2H8v-2zm0 4h8v2H8v-2z\"/></svg>";
+    btn.innerHTML = "<svg aria-hidden="true" viewBox=\"0 0 24 24\"><path d=\"M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 13h8v2H8v-2zm0 4h8v2H8v-2z\"/></svg>";
 
     // Aplica posicao salva
     var posSalva = null;
@@ -13681,9 +13682,9 @@ function renderHistorico(data) {
         '<td>' + data + '</td>' +
         '<td class="col-center">' +
 /* FASE_11_BOTOES_SVG */
-          '<button class="btn-row-acao btn-row-testar" onclick="testarBackup(' + b.id + ')" title="Testar integridade">' + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>' + '</button> ' +
-          '<button class="btn-row-acao btn-row-baixar" onclick="baixarBackup(' + b.id + ')" title="Baixar arquivo">' + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' + '</button> ' +
-          '<button class="btn-row-acao btn-row-apagar" onclick="excluirBackup(' + b.id + ')" title="Excluir backup">' + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>' + '</button>' +
+          '<button class="btn-row-acao btn-row-testar" onclick="testarBackup(' + b.id + ')" title="Testar integridade">' + '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>' + '</button> ' +
+          '<button class="btn-row-acao btn-row-baixar" onclick="baixarBackup(' + b.id + ')" title="Baixar arquivo">' + '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>' + '</button> ' +
+          '<button class="btn-row-acao btn-row-apagar" onclick="excluirBackup(' + b.id + ')" title="Excluir backup">' + '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>' + '</button>' +
         '</td>';
       tbody.appendChild(tr);
     });
@@ -14592,9 +14593,9 @@ window.audAbrirHistoricoCompleto = function() { /* FASE_19_HIST */
 
         container.style.cssText = "display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px;";
         container.innerHTML =
-          '<div class="aud-card-premium aud-card-total"><div class="aud-card-icon-svg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="aud-card-label">Total de Registros</div><div class="aud-card-valor">' + total + '</div><div class="aud-card-sub">Ações registradas</div></div>' +
-          '<div class="aud-card-premium aud-card-tabelas"><div class="aud-card-icon-svg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div><div class="aud-card-label">Tabelas Monitoradas</div><div class="aud-card-valor">' + tabelas + '</div><div class="aud-card-sub">Com triggers ativos</div></div>' +
-          '<div class="aud-card-premium aud-card-acoes"><div class="aud-card-icon-svg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="aud-card-label">Tipos de Ação</div><div class="aud-card-valor">' + acoes + '</div><div class="aud-card-sub">Criar, Editar, Excluir, Login</div></div>';
+          '<div class="aud-card-premium aud-card-total"><div class="aud-card-icon-svg"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><div class="aud-card-label">Total de Registros</div><div class="aud-card-valor">' + total + '</div><div class="aud-card-sub">Ações registradas</div></div>' +
+          '<div class="aud-card-premium aud-card-tabelas"><div class="aud-card-icon-svg"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></div><div class="aud-card-label">Tabelas Monitoradas</div><div class="aud-card-valor">' + tabelas + '</div><div class="aud-card-sub">Com triggers ativos</div></div>' +
+          '<div class="aud-card-premium aud-card-acoes"><div class="aud-card-icon-svg"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div class="aud-card-label">Tipos de Ação</div><div class="aud-card-valor">' + acoes + '</div><div class="aud-card-sub">Criar, Editar, Excluir, Login</div></div>';
 
         window.renderAuditoriaGraficos();
       };
@@ -14625,7 +14626,7 @@ window.audAbrirHistoricoCompleto = function() { /* FASE_19_HIST */
         var totalGeral = 0;
         Object.keys(porAção).forEach(function(a) { totalGeral += porAção[a]; });
         var raio = 40, circ = 2 * Math.PI * raio, offset = 0;
-        var svg = '<svg class="aud-donut" width="110" height="110" viewBox="0 0 110 110">';
+        var svg = '<svg aria-hidden="true" class="aud-donut" width="110" height="110" viewBox="0 0 110 110">';
         svg += '<circle cx="55" cy="55" r="' + raio + '" fill="none" stroke="#e2e8f0" stroke-width="16"/>';
         Object.keys(porAção).forEach(function(a) {
           var v = porAção[a];
