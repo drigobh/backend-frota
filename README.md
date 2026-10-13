@@ -4,7 +4,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)](https://www.postgresql.org)
 [![License](https://img.shields.io/badge/license-Private-red)]()
 [![CI](https://github.com/drigobh/backend-frota/actions/workflows/ci.yml/badge.svg)](https://github.com/drigobh/backend-frota/actions/workflows/ci.yml)
-[![Testes E2E](https://img.shields.io/badge/E2E-Playwright-blue)]()
+[![Testes E2E](https://img.shields.io/badge/E2E-60%2F60%20passing-brightgreen)]()
 [![2FA](https://img.shields.io/badge/2FA-TOTP-green)]()
 
 API REST + frontend PWA para gestão de frota.
@@ -256,3 +256,35 @@ Causas comuns:
 ## 📞 Suporte
 
 Issues: https://github.com/drigobh/backend-frota/issues
+
+---
+
+## ✅ Status do Projeto (atualizado em 13/10/2026)
+
+| Item | Status |
+|------|--------|
+| CI/CD (GitHub Actions) | ✅ Verde |
+| Login + 2FA | ✅ Funcional |
+| Testes E2E (Playwright) | ✅ **60/60 passando** |
+| Testes Jest (unitários) | ✅ Passando |
+| Documentação | ✅ Atualizada |
+| Backups antigos | ✅ Limpos |
+| `package.json` | ✅ Saudável (10/10 scripts) |
+
+### Últimos marcos
+
+- **FIX_77** - 60/60 testes E2E passando (helper auth + admin-teste sem 2FA)
+- **FIX_75** - 2FA funcional + cache pré-comprimido resolvido
+- **FIX_74** - Causa raiz do 2FA (cache pré-comprimido)
+- **FIX_73** - Documentação completa de 2FA
+- **FIX_71** - Padronização das funções de 2FA
+- **FIX_69** - BOM no `package.json` removido
+
+### Estrutura de Testes E2E
+
+- `tests/e2e/helpers/auth.js` — Helper compartilhado de autenticação
+- `tests/e2e/2fa.spec.js` — 6 testes do fluxo de 2FA
+- `tests/e2e/login.spec.mjs` — 4 testes de login
+- `tests/e2e/*.spec.js` — 50 testes de CRUD/telas
+
+**Usuário de teste:** `admin-teste@frota.com` / `Admin@2026!Frota` (sem 2FA)
