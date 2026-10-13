@@ -1862,6 +1862,39 @@
 @keyframes spinner-rotate {
   to { transform: rotate(360deg); }
 }
+
+/* [FIX_UX_05] Responsividade: breakpoints para mobile */
+@media (max-width: 375px) {
+  .login-new-input { font-size: 0.85rem; padding: 0.6rem; }
+  .login-btn-new { font-size: 0.9rem; padding: 0.7rem; }
+  .login-title { font-size: 1.3rem; }
+  .header-btn { padding: 0.4rem 0.6rem; font-size: 0.75rem; }
+  .nav-tab-btn { padding: 0.5rem 0.6rem; font-size: 0.75rem; }
+  .card-resumo { padding: 0.6rem; }
+  .card-resumo .valor { font-size: 1.2rem; }
+}
+
+@media (max-width: 480px) {
+  .login-2fa-title { font-size: 1rem; }
+  .login-2fa-subtitle { font-size: 0.75rem; }
+  .login-2fa-block { padding: 1rem; }
+  .modal-content { padding: 1rem; margin: 0.5rem; }
+  table { font-size: 0.75rem; }
+  .table-wrapper { overflow-x: auto; }
+}
+
+@media (max-width: 640px) {
+  .cards-grid { grid-template-columns: 1fr; }
+  .header-actions { flex-wrap: wrap; gap: 0.3rem; }
+}
+
+/* Melhorar toque em mobile */
+@media (hover: none) and (pointer: coarse) {
+  button, a, .nav-tab-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
 </style>
   
   <style>
@@ -3270,6 +3303,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 </style>
 <!-- [FIX_UX_03] Acessibilidade: aria-labels e aria-hidden -->
 <!-- [FIX_UX_04] Contraste: variaveis CSS em vez de cores hardcoded -->
+<!-- [FIX_UX_05] Responsividade mobile -->
 </head>
 <body>
 
