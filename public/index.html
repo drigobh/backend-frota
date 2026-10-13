@@ -2185,6 +2185,62 @@ body {
   width: 0;
   height: 0;
 }
+
+/* ============================================================ */
+/* [FASE_4_TREND] Indicadores de Tendencia (Uparrow/Downarrow)  */
+/* ============================================================ */
+
+.trend-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--premium-space-1);
+  font-size: var(--premium-font-xs);
+  font-weight: 600;
+  padding: var(--premium-space-1) var(--premium-space-2);
+  border-radius: var(--premium-radius-full);
+  margin-top: var(--premium-space-2);
+}
+
+.trend-indicator.up {
+  color: var(--premium-success);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.trend-indicator.down {
+  color: var(--premium-danger);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.trend-indicator.neutral {
+  color: var(--text-muted);
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.trend-indicator .trend-arrow {
+  font-size: 0.9em;
+  line-height: 1;
+}
+
+.trend-indicator .trend-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.trend-indicator .trend-label {
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: var(--premium-space-1);
+}
+
+/* Dark mode */
+[data-theme="dark"] .trend-indicator.up {
+  background: rgba(16, 185, 129, 0.15);
+}
+[data-theme="dark"] .trend-indicator.down {
+  background: rgba(239, 68, 68, 0.15);
+}
+[data-theme="dark"] .trend-indicator.neutral {
+  background: rgba(148, 163, 184, 0.15);
+}
 </style>
   
   <style>
@@ -3679,6 +3735,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 <!-- [DESIGN_SYSTEM_PREMIUM] Design System Premium -->
 <!-- [FASE_2_CARDS_PREMIUM] Cards com Glassmorphism -->
 <!-- [FASE_3_SPARKLINES] Mini-graficos -->
+<!-- [FASE_4_TREND] Indicadores de tendencia -->
 </head>
 <body>
 <!-- [FASE_3_SPARKLINES] SVG defs para gradientes -->
