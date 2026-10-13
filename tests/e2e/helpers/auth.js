@@ -3,7 +3,7 @@
 // Usa o usuario admin-teste@frota.com (sem 2FA) para testes CRUD
 
 const TEST_EMAIL = 'admin-teste@frota.com';
-const TEST_PASSWORD = 'Admin@2026!Frota';
+const TEST_PASSWORD = 'TesteRBAC@2026';
 
 /**
  * Faz login via API e retorna o token JWT.
