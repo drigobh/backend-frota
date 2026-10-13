@@ -1895,6 +1895,99 @@
     min-width: 44px;
   }
 }
+
+/* ============================================================ */
+/* [DESIGN_SYSTEM_PREMIUM] FASE 1 - Design System Premium      */
+/* ============================================================ */
+
+:root {
+  /* Cores Primarias */
+  --premium-primary: #3b82f6;
+  --premium-primary-dark: #2563eb;
+  --premium-primary-light: #60a5fa;
+  --premium-accent: #8b5cf6;
+  --premium-accent-dark: #7c3aed;
+
+  /* Cores de Status */
+  --premium-success: #10b981;
+  --premium-warning: #f59e0b;
+  --premium-danger: #ef4444;
+  --premium-info: #06b6d4;
+
+  /* Superficies com Glassmorphism */
+  --premium-glass: rgba(255, 255, 255, 0.08);
+  --premium-glass-border: rgba(255, 255, 255, 0.12);
+  --premium-glass-hover: rgba(255, 255, 255, 0.12);
+
+  /* Sombras em Camadas (Elevation) */
+  --premium-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --premium-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --premium-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --premium-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --premium-shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
+
+  /* Gradientes Premium */
+  --premium-gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  --premium-gradient-purple: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  --premium-gradient-green: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --premium-gradient-orange: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  --premium-gradient-red: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+
+  /* Espacamento (Grid 8px) */
+  --premium-space-1: 0.25rem;  /* 4px */
+  --premium-space-2: 0.5rem;   /* 8px */
+  --premium-space-3: 0.75rem;  /* 12px */
+  --premium-space-4: 1rem;     /* 16px */
+  --premium-space-5: 1.25rem;  /* 20px */
+  --premium-space-6: 1.5rem;   /* 24px */
+  --premium-space-8: 2rem;     /* 32px */
+  --premium-space-10: 2.5rem;  /* 40px */
+
+  /* Tipografia */
+  --premium-font-xs: 0.75rem;
+  --premium-font-sm: 0.875rem;
+  --premium-font-base: 1rem;
+  --premium-font-lg: 1.125rem;
+  --premium-font-xl: 1.25rem;
+  --premium-font-2xl: 1.5rem;
+  --premium-font-3xl: 1.875rem;
+  --premium-font-4xl: 2.25rem;
+
+  /* Bordas */
+  --premium-radius-sm: 6px;
+  --premium-radius-md: 10px;
+  --premium-radius-lg: 16px;
+  --premium-radius-xl: 24px;
+  --premium-radius-full: 9999px;
+
+  /* Transicoes */
+  --premium-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --premium-transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --premium-transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Aplicar font smoothing */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Scrollbar Premium */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--premium-glass-border);
+  border-radius: var(--premium-radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--premium-primary-light);
+}
 </style>
   
   <style>
@@ -3304,6 +3397,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 <!-- [FIX_UX_03] Acessibilidade: aria-labels e aria-hidden -->
 <!-- [FIX_UX_04] Contraste: variaveis CSS em vez de cores hardcoded -->
 <!-- [FIX_UX_05] Responsividade mobile -->
+<!-- [DESIGN_SYSTEM_PREMIUM] Design System Premium -->
 </head>
 <body>
 
