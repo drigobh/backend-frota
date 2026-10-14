@@ -2446,6 +2446,64 @@ body {
 [data-theme="dark"] .empty-state-icon {
   color: var(--ds-text-muted);
 }
+
+/* ============================================================ */
+/* [FASE_8_STICKY_BADGES] Sticky Headers + Badges Coloridos    */
+/* ============================================================ */
+.table-wrapper {
+  max-height: 600px;
+  overflow-y: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface, #fff);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+[data-theme="dark"] table thead th {
+  background: #161b22;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.badge-success { background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+.badge-warning { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+.badge-danger  { background: rgba(239, 68, 68, 0.12);  color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+.badge-info    { background: rgba(6, 182, 212, 0.12);  color: #06b6d4; border: 1px solid rgba(6, 182, 212, 0.2); }
+.badge-neutral { background: rgba(148, 163, 184, 0.12); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
+.badge-primary { background: rgba(59, 130, 246, 0.12); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+.badge-dot::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+[data-theme="dark"] .badge-success { background: rgba(16, 185, 129, 0.18); }
+[data-theme="dark"] .badge-warning { background: rgba(245, 158, 11, 0.18); }
+[data-theme="dark"] .badge-danger  { background: rgba(239, 68, 68, 0.18); }
+[data-theme="dark"] .badge-info    { background: rgba(6, 182, 212, 0.18); }
+[data-theme="dark"] .badge-primary { background: rgba(59, 130, 246, 0.18); }
+table tbody tr { transition: background-color 0.2s; }
+table tbody tr:hover { background: rgba(59, 130, 246, 0.04); }
+[data-theme="dark"] table tbody tr:hover { background: rgba(59, 130, 246, 0.08); }
+table thead th[data-sortable] { cursor: pointer; user-select: none; position: relative; }
+table thead th[data-sortable]:hover { color: #3b82f6; }
 </style>
   
   <style>
@@ -6158,6 +6216,27 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
   </div>
 
   <script type="text/javascript">
+// [FIX_ISADMIN] Funcao auxiliar para extrair perfil do token
+function getPerfilDoToken() {
+  try {
+    var token = localStorage.getItem('token');
+    if (!token) return null;
+    var payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.perfil || null;
+  } catch (e) {
+    console.error('[FIX_ISADMIN] Erro ao decodificar token:', e);
+    return null;
+  }
+}
+function isUsuarioAdmin() {
+  var perfil = getPerfilDoToken();
+  if (perfil) return /admin/i.test(perfil);
+  if (window.state && window.state.user && window.state.user.perfil) {
+    return /admin/i.test(window.state.user.perfil);
+  }
+  return false;
+}
+
 // @ts-nocheck
     // FASE_10_FIX_LOGIN
     const API_URL = '/api';
@@ -6233,7 +6312,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
 
       const mesAtual = state?.currentMonth || '';
       const fechado = isMesFechado(mesAtual);
-      const isAdmin = state?.user?.perfil === 'Administrador';
+      const isAdmin = isUsuarioAdmin();
 
       if (fechado) {
         badge.className = 'lock-badge locked';
@@ -6412,7 +6491,7 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
     // CONTROLE DE PERMISSÕES NA INTERFACE
     // =========================================================================
     function applyPermissions() {
-      const isAdmin = state.user && state.user.perfil === 'Administrador';
+      const isAdmin = isUsuarioAdmin();
       
       const dreTab = document.getElementById('nav-tab-dre');
       const resumoTab = document.getElementById('nav-tab-resumo');
@@ -6700,7 +6779,7 @@ function fazerLogout() {
     function renderCadastroCavalos() {
       const tbody = document.getElementById('tbody-cavalos');
       tbody.innerHTML = '';
-      const isAdmin = state.user && state.user.perfil === 'Administrador';
+      const isAdmin = isUsuarioAdmin();
       
       state.cavalos.forEach((c, idx) => {
         const tr = document.createElement('tr');
@@ -6734,16 +6813,68 @@ function fazerLogout() {
       });
 
       tbody.querySelectorAll('input').forEach(input => {
-        input.addEventListener('change', e => {
-          const id = e.target.getAttribute('data-id');
-          const field = e.target.getAttribute('data-field');
-          let val = e.target.value.trim();
-          if (field === 'placa') val = val.toUpperCase();
-          const item = state.cavalos.find(x => x.id === id);
-          if (item) {
-            item[field] = val;
-            updateCadastro('veiculos', id, item);
-            if (field === 'placa') syncPlatesAcrossSystem();
+        // Guarda o valor original
+        input.dataset.original = input.value;
+        
+        // Detecta alteracao (sem salvar)
+        input.addEventListener('input', e => {
+          const val = e.target.value.trim();
+          const original = e.target.dataset.original;
+          const row = e.target.closest('tr');
+          const actionsCell = row.querySelector('.col-center');
+          
+          // Remove botoes antigos (se existirem)
+          const oldBtns = actionsCell.querySelector('.confirm-btns');
+          if (oldBtns) oldBtns.remove();
+          
+          if (val !== original) {
+            // Campo "sujo" — mostra botoes de confirmar/cancelar
+            e.target.style.borderColor = '#10b981';
+            e.target.style.borderWidth = '2px';
+            
+            const btns = document.createElement('div');
+            btns.className = 'confirm-btns';
+            btns.style.cssText = 'display:inline-flex; gap:4px; margin-left:8px; vertical-align:middle;';
+            btns.innerHTML = 
+              '<button class="btn-confirm" title="Salvar" style="background:#10b981;color:#fff;border:none;border-radius:4px;width:24px;height:24px;cursor:pointer;font-size:14px;">✓</button>' +
+              '<button class="btn-cancel" title="Cancelar" style="background:#ef4444;color:#fff;border:none;border-radius:4px;width:24px;height:24px;cursor:pointer;font-size:14px;">✕</button>';
+            
+            actionsCell.appendChild(btns);
+            
+            // Botao Salvar
+            btns.querySelector('.btn-confirm').addEventListener('click', async () => {
+              const id = e.target.getAttribute('data-id');
+              const field = e.target.getAttribute('data-field');
+              let val = e.target.value.trim();
+              if (field === 'placa') { val = val.toUpperCase(); e.target.value = val; }
+              const item = state.cavalos.find(x => x.id === id);
+              if (item) {
+                item[field] = val;
+                await updateCadastro('veiculos', id, item);
+                if (field === 'placa') syncPlatesAcrossSystem();
+                e.target.dataset.original = val;
+                e.target.style.borderColor = '';
+                e.target.style.borderWidth = '';
+                btns.remove();
+                if (typeof mostrarToastPremium === 'function') {
+                  mostrarToastPremium('Salvo!', 'Alteracao salva com sucesso.', 'success');
+                }
+              }
+            });
+            
+            // Botao Cancelar
+            btns.querySelector('.btn-cancel').addEventListener('click', () => {
+              e.target.value = e.target.dataset.original;
+              e.target.style.borderColor = '';
+              e.target.style.borderWidth = '';
+              btns.remove();
+            });
+          } else {
+            // Campo voltou ao original — remove botoes
+            e.target.style.borderColor = '';
+            e.target.style.borderWidth = '';
+            const btns = actionsCell.querySelector('.confirm-btns');
+            if (btns) btns.remove();
           }
         });
       });
@@ -6752,7 +6883,7 @@ function fazerLogout() {
     function renderCadastroCarretas() {
       const tbody = document.getElementById('tbody-carretas');
       tbody.innerHTML = '';
-      const isAdmin = state.user && state.user.perfil === 'Administrador';
+      const isAdmin = isUsuarioAdmin();
       
       state.carretas.forEach((c, idx) => {
         const tr = document.createElement('tr');
@@ -6798,7 +6929,7 @@ function fazerLogout() {
     function renderCadastroMotoristas() {
       const tbody = document.getElementById('tbody-motoristas');
       tbody.innerHTML = '';
-      const isAdmin = state.user && state.user.perfil === 'Administrador';
+      const isAdmin = isUsuarioAdmin();
       
       state.motoristas.forEach((m, idx) => {
         const tr = document.createElement('tr');
@@ -6933,7 +7064,7 @@ function fazerLogout() {
     function renderAcoplamento() {
       const tbody = document.getElementById('tbody-acoplamento');
       tbody.innerHTML = '';
-      const isAdmin = state.user && state.user.perfil === 'Administrador';
+      const isAdmin = isUsuarioAdmin();
       const list = state.acoplamentos[state.currentMonth] || [];
       
       if (list.length === 0) {
@@ -7492,7 +7623,7 @@ function fazerLogout() {
     function renderDre() {
       const tabs = document.getElementById('dre-plate-tabs');
       tabs.innerHTML = '';
-      const isAdmin = state.user && state.user.perfil === 'Administrador';
+      const isAdmin = isUsuarioAdmin();
       
       state.cavalos.forEach(c => {
         const button = document.createElement('button');
@@ -8261,9 +8392,79 @@ function fazerLogout() {
     // =========================================================================
     // LISTENERS & BOOTSTRAP
     // =========================================================================
+    
+// [FIX_DASHBOARD_INIT] Carrega todos os dados do dashboard
+async function carregarDashboardCompleto() {
+    console.log('[FIX_DASHBOARD_INIT] Carregando dados do dashboard...');
+    
+    // [FIX_LOGIN_SCREEN] Esconde a tela de login se o token existe
+    var loginScreen = document.getElementById('login-screen');
+    if (loginScreen) {
+        loginScreen.style.display = 'none';
+        console.log('[FIX_LOGIN_SCREEN] Tela de login escondida.');
+    }
+    
+    try {
+        // Carrega dados basicos (cavalos, carretas, motoristas)
+        if (typeof loadCavalosDaAPI === 'function') await loadCavalosDaAPI();
+        if (typeof loadCarretasDaAPI === 'function') await loadCarretasDaAPI();
+        if (typeof loadMotoristasDaAPI === 'function') await loadMotoristasDaAPI();
+        
+        // Carrega dados do dashboard (KPIs)
+        const monthKey = (typeof getFirstDayOfMonth === 'function') 
+            ? getFirstDayOfMonth(state.currentMonth) 
+            : '2026-08-01';
+        const res = await apiFetch('/dashboard/' + monthKey);
+        if (res.ok) {
+            const data = await res.json();
+            console.log('[FIX_DASHBOARD_INIT] Dados do dashboard:', data);
+            
+            // Renderiza os KPIs
+            if (document.getElementById('dash-veiculos')) {
+                document.getElementById('dash-veiculos').textContent = data.totalVeiculos || 0;
+            }
+            if (document.getElementById('dash-motoristas')) {
+                document.getElementById('dash-motoristas').textContent = data.totalMotoristas || 0;
+            }
+            if (document.getElementById('dash-acoplados')) {
+                document.getElementById('dash-acoplados').textContent = data.totalAcoplamentos || 0;
+            }
+            if (document.getElementById('dash-km')) {
+                document.getElementById('dash-km').textContent = (typeof formatNum === 'function' ? formatNum(data.kmTotal) : data.kmTotal) + ' km';
+            }
+            
+            // Renderiza sparklines (FASE 3)
+            if (typeof window.gerarSparklines === 'function') {
+                window.gerarSparklines(data);
+            }
+        }
+        
+        // Carrega outros dados
+        if (typeof loadAcoplamentosDaAPI === 'function') loadAcoplamentosDaAPI();
+        if (typeof loadKmDaAPI === 'function') loadKmDaAPI();
+        if (typeof loadLancamentosDaAPI === 'function') loadLancamentosDaAPI();
+        if (typeof loadAbastecimentosDaAPI === 'function') loadAbastecimentosDaAPI();
+        if (typeof loadManutencoesDaAPI === 'function') loadManutencoesDaAPI();
+        if (typeof loadDocumentosDaAPI === 'function') loadDocumentosDaAPI();
+        
+        console.log('[FIX_DASHBOARD_INIT] Dashboard carregado com sucesso!');
+    } catch (e) {
+        console.error('[FIX_DASHBOARD_INIT] Erro:', e);
+    }
+}
+
     document.addEventListener('DOMContentLoaded', () => {
       // FASE_10_FIX_401 - guard: so carrega se estiver logado
       var __logado = !!localStorage.getItem("token");
+      
+      // [FIX_DASHBOARD_INIT] Carrega dados se estiver logado
+      if (__logado) {
+        setTimeout(function() {
+          if (typeof carregarDashboardCompleto === 'function') {
+            carregarDashboardCompleto();
+          }
+        }, 300);
+      }
       document.querySelectorAll('.nav-tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.nav-tab-btn').forEach(b => b.classList.remove('active'));
@@ -16543,6 +16744,25 @@ window.gerarTableEmpty = function(mensagem) {
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
     '<p>' + (mensagem || 'Nenhum registro encontrado') + '</p>' +
   '</div>';
+};
+</script>
+
+<script>
+/* [FASE_8_STICKY_BADGES] Funcoes para badges */
+window.criarBadge = function(texto, tipo, comPonto) {
+  tipo = tipo || 'neutral';
+  var classes = 'badge badge-' + tipo;
+  if (comPonto) classes += ' badge-dot';
+  return '<span class="' + classes + '">' + texto + '</span>';
+};
+window.badgeStatus = function(status) {
+  var s = String(status || '').toLowerCase();
+  if (s === 'ativo' || s === 'verde' || s === 'sucesso') return window.criarBadge('Ativo', 'success', true);
+  if (s === 'inativo' || s === 'cinza') return window.criarBadge('Inativo', 'neutral', true);
+  if (s === 'pendente' || s === 'amarelo' || s === 'aguardando') return window.criarBadge('Pendente', 'warning', true);
+  if (s === 'erro' || s === 'vermelho' || s === 'falha') return window.criarBadge('Erro', 'danger', true);
+  if (s === 'info' || s === 'azul') return window.criarBadge('Info', 'info', true);
+  return window.criarBadge(status || 'Desconhecido', 'neutral', true);
 };
 </script>
 </body>
