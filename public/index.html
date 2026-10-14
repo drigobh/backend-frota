@@ -2241,6 +2241,83 @@ body {
 [data-theme="dark"] .trend-indicator.neutral {
   background: rgba(148, 163, 184, 0.15);
 }
+
+/* ============================================================ */
+/* [FASE_5_TOASTS] Toasts Premium - Versao Limpa              */
+/* ============================================================ */
+.toast-container {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+  max-width: 420px;
+}
+.toast-premium {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: auto;
+  animation: toastSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  min-width: 320px;
+}
+.toast-premium::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: #3b82f6;
+}
+.toast-premium.success::before { background: #10b981; }
+.toast-premium.warning::before { background: #f59e0b; }
+.toast-premium.danger::before { background: #ef4444; }
+.toast-premium.info::before { background: #3b82f6; }
+.toast-premium .toast-icon { font-size: 1.5rem; line-height: 1; flex-shrink: 0; }
+.toast-premium .toast-content { flex: 1; min-width: 0; }
+.toast-premium .toast-title { font-size: 0.875rem; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+.toast-premium .toast-message { font-size: 0.875rem; color: #64748b; line-height: 1.5; word-wrap: break-word; }
+.toast-premium .toast-close {
+  background: transparent; border: none; color: #94a3b8; cursor: pointer;
+  padding: 4px; border-radius: 4px; transition: all 0.2s; font-size: 1.2rem; line-height: 1; flex-shrink: 0;
+}
+.toast-premium .toast-close:hover { background: rgba(148, 163, 184, 0.1); color: #1e293b; }
+.toast-premium .toast-progress {
+  position: absolute; bottom: 0; left: 0; height: 2px;
+  background: #3b82f6; animation: toastProgress linear forwards;
+}
+.toast-premium.success .toast-progress { background: #10b981; }
+.toast-premium.warning .toast-progress { background: #f59e0b; }
+.toast-premium.danger .toast-progress { background: #ef4444; }
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes toastProgress {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+[data-theme="dark"] .toast-premium {
+  background: rgba(22, 27, 34, 0.98);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .toast-premium .toast-title { color: #f1f5f9; }
+[data-theme="dark"] .toast-premium .toast-message { color: #94a3b8; }
+@media (max-width: 480px) {
+  .toast-container { top: 12px; right: 12px; left: 12px; max-width: none; }
+  .toast-premium { min-width: auto; padding: 12px 16px; }
+}
 </style>
   
   <style>
@@ -16262,5 +16339,35 @@ window.resetar2FAUsuario = resetar2FAUsuario;
 </div>
 <!-- /[FIX_26a] Modal 2FA -->
 
+
+<!-- [FASE_5_TOASTS] Container de Toasts Premium -->
+<div class="toast-container" id="toast-container-premium" role="region" aria-live="polite" aria-label="Notificacoes"></div>
+<script>
+/* [FASE_5_TOASTS] Funcao global de Toast Premium */
+window.mostrarToastPremium = function(titulo, mensagem, tipo, duracao) {
+  tipo = tipo || 'info';
+  duracao = duracao || 4000;
+  var container = document.getElementById('toast-container-premium');
+  if (!container) return;
+  var icones = { success: '&#10004;', warning: '&#9888;', danger: '&#10060;', info: '&#8505;' };
+  var toast = document.createElement('div');
+  toast.className = 'toast-premium ' + tipo;
+  toast.innerHTML =
+    '<div class="toast-icon">' + (icones[tipo] || icones.info) + '</div>' +
+    '<div class="toast-content">' +
+      '<div class="toast-title">' + titulo + '</div>' +
+      '<div class="toast-message">' + (mensagem || '') + '</div>' +
+    '</div>' +
+    '<button class="toast-close" aria-label="Fechar notificacao">&times;</button>' +
+    '<div class="toast-progress" style="animation-duration: ' + duracao + 'ms"></div>';
+  container.appendChild(toast);
+  var remover = function() {
+    toast.style.animation = 'toastSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) reverse';
+    setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+  };
+  toast.querySelector('.toast-close').addEventListener('click', remover);
+  setTimeout(remover, duracao);
+};
+</script>
 </body>
 </html>
