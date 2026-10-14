@@ -15,9 +15,9 @@ module.exports = async function (fastify, options) {
     },
     async (request, reply) => {
       const { rows } = await db.query(`
-      SELECT id, placa, modelo, ano, obs 
-      FROM veiculos 
-      WHERE status = 'ATIVO' 
+      SELECT id, placa, modelo, ano, obs, status
+      FROM veiculos
+      WHERE deleted_at IS NULL
       ORDER BY created_at ASC
     `);
       return rows;
@@ -91,37 +91,35 @@ module.exports = async function (fastify, options) {
       schema: {
         body: {
           type: "object",
-          required: ["placa"],
           additionalProperties: true,
           properties: {
-            placa: {
-              type: "string",
-              minLength: 7,
-              maxLength: 8
-            },
-            modelo: {
-              type: "string",
-              maxLength: 100
-            },
-            ano: {
-              type: "string",
-              maxLength: 10
-            },
-            obs: {
-              type: "string",
-              maxLength: 1000
-            }
+            placa: { type: "string", minLength: 7, maxLength: 8 },
+            modelo: { type: "string", maxLength: 100 },
+            ano: { type: "string", maxLength: 10 },
+            obs: { type: "string", maxLength: 1000 },
+            status: { type: "string", enum: ["ATIVO", "INATIVO"] }
           }
         }
       },
       preHandler: [fastify.autenticar]
     },
     fastify.comAuditoria(async (request, reply) => {
-      const { id } = request.params;
-      const { placa, modelo, ano, obs } = request.body;
+            const { id } = request.params;
+      const { placa, modelo, ano, obs, status } = request.body;
+      
+      // [FIX_INATIVAR] Se status foi enviado, atualiza apenas o status
+      if (status) {
+        await db.query(
+          `UPDATE veiculos SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
+          [status, id]
+        );
+        return { sucesso: true, status };
+      }
+      
+      // Caso contrario, atualiza os campos normais
       await db.query(
-        `UPDATE veiculos SET placa = $1, modelo = $2, ano = $3, obs = $4, 
-       updated_at = CURRENT_TIMESTAMP WHERE id = $5`,
+        `UPDATE veiculos SET placa = $1, modelo = $2, ano = $3, obs = $4,
+         updated_at = CURRENT_TIMESTAMP WHERE id = $5`,
         [placa.toUpperCase(), modelo, ano, obs, id]
       );
       return { sucesso: true };

@@ -6785,8 +6785,13 @@ function fazerLogout() {
         const tr = document.createElement('tr');
         
         let btnExcluir = '';
+        let btnInativar = '';
         if (isAdmin) {
+          const statusAtual = c.status || 'ATIVO';
+          const labelInativar = statusAtual === 'INATIVO' ? 'Reativar' : 'Inativar';
+          const corInativar = statusAtual === 'INATIVO' ? '#10b981' : '#f59e0b';
           btnExcluir = `<button class="btn-action btn-action-danger" onclick="deleteItem('veiculos', '${c.id}')">Excluir</button>`;
+          btnInativar = `<button class="btn-action" style="background:${corInativar};color:#fff;margin-left:4px;" onclick="inativarItem('veiculos', '${c.id}', '${statusAtual}')">${labelInativar}</button>`;
         } else {
           btnExcluir = `<span style="font-size:11px;color: var(--ds-text-muted, #94a3b8);">Bloqueado</span>`;
         }
@@ -6805,7 +6810,9 @@ function fazerLogout() {
           <td>
             <input type="text" class="input-yellow" value="${c.obs || ''}" data-id="${c.id}" data-field="obs">
           </td>
+          <td style="text-align:center;">${typeof window.criarBadge === 'function' ? window.criarBadge('Ativo', 'success', true) : 'Ativo'}</td>
           <td class="col-center">
+            ${btnInativar}
             ${btnExcluir}
           </td>
         `;
@@ -8485,6 +8492,43 @@ async function carregarDashboardCompleto() {
         console.error('[FIX_DASHBOARD_INIT] Erro:', e);
     }
 }
+
+    
+// [FIX_INATIVAR] Funcao para inativar/reativar veiculos
+window.inativarItem = async function(tipo, id, statusAtual) {
+    const novoStatus = statusAtual === 'INATIVO' ? 'ATIVO' : 'INATIVO';
+    const acao = novoStatus === 'INATIVO' ? 'inativar' : 'reativar';
+
+    if (!confirm('Deseja ' + acao + ' este ' + tipo + '?')) return;
+
+    try {
+        // [FIX_INATIVAR_V2] Chamada explicita para PUT (nao DELETE)
+        const token = localStorage.getItem('token');
+        const res = await fetch('/api/' + tipo + '/' + id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ status: novoStatus })
+        });
+
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.erro || 'Erro ao ' + acao);
+        }
+
+        if (typeof mostrarToastPremium === 'function') {
+            mostrarToastPremium('Sucesso!', 'Item ' + (novoStatus === 'INATIVO' ? 'inativado' : 'reativado') + ' com sucesso.', 'success');
+        }
+
+        // Recarrega os dados
+        if (typeof loadCadastrosDaAPI === 'function') await loadCadastrosDaAPI();
+    } catch (e) {
+        console.error('[FIX_INATIVAR] Erro:', e);
+        alert('Erro: ' + e.message);
+    }
+};
 
     document.addEventListener('DOMContentLoaded', () => {
       // FASE_10_FIX_401 - guard: so carrega se estiver logado
