@@ -2369,6 +2369,83 @@ body {
 .skeleton-row > * { height: 1.2em; }
 .skeleton-table { width: 100%; }
 .skeleton-table .skeleton-row:last-child { border-bottom: none; }
+
+/* ============================================================ */
+/* [FASE_7_EMPTY_STATES] Empty States Ilustrados               */
+/* ============================================================ */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--premium-space-10) var(--premium-space-6);
+  text-align: center;
+  min-height: 300px;
+}
+.empty-state-icon {
+  width: 80px;
+  height: 80px;
+  margin-bottom: var(--premium-space-5);
+  color: var(--text-muted);
+  opacity: 0.5;
+}
+.empty-state-icon svg {
+  width: 100%;
+  height: 100%;
+  stroke-width: 1.5;
+}
+.empty-state-title {
+  font-size: var(--premium-font-lg);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--premium-space-2);
+}
+.empty-state-description {
+  font-size: var(--premium-font-sm);
+  color: var(--text-muted);
+  max-width: 400px;
+  line-height: 1.6;
+  margin-bottom: var(--premium-space-5);
+}
+.empty-state-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--premium-space-2);
+  padding: var(--premium-space-3) var(--premium-space-5);
+  background: var(--premium-gradient-blue);
+  color: white;
+  border: none;
+  border-radius: var(--premium-radius-md);
+  font-size: var(--premium-font-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--premium-transition-base);
+  box-shadow: var(--premium-shadow-md);
+}
+.empty-state-action:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--premium-shadow-lg);
+}
+.table-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--premium-space-8);
+  color: var(--text-muted);
+}
+.table-empty svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--premium-space-3);
+  opacity: 0.4;
+}
+.table-empty p {
+  font-size: var(--premium-font-sm);
+  margin: 0;
+}
+[data-theme="dark"] .empty-state-icon {
+  color: var(--ds-text-muted);
+}
 </style>
   
   <style>
@@ -16443,6 +16520,28 @@ window.gerarSkeletonCard = function() {
     '<div class="skeleton skeleton-text full"></div>' +
     '<div class="skeleton skeleton-text lg"></div>' +
     '<div class="skeleton skeleton-text md"></div>' +
+  '</div>';
+};
+</script>
+
+<script>
+/* [FASE_7_EMPTY_STATES] Funcao para gerar empty states */
+window.gerarEmptyState = function(titulo, descricao, icone, acaoTexto, acaoFn) {
+  var iconeSVG = icone || '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+  var html = '<div class="empty-state">' +
+    '<div class="empty-state-icon">' + iconeSVG + '</div>' +
+    '<div class="empty-state-title">' + (titulo || 'Nenhum dado encontrado') + '</div>' +
+    '<div class="empty-state-description">' + (descricao || 'Nao ha registros para exibir no momento.') + '</div>';
+  if (acaoTexto && acaoFn) {
+    html += '<button class="empty-state-action" onclick="' + acaoFn + '">' + acaoTexto + '</button>';
+  }
+  html += '</div>';
+  return html;
+};
+window.gerarTableEmpty = function(mensagem) {
+  return '<div class="table-empty">' +
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
+    '<p>' + (mensagem || 'Nenhum registro encontrado') + '</p>' +
   '</div>';
 };
 </script>
