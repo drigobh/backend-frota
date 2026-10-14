@@ -4363,6 +4363,10 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
         <div id="subtab-cavalos" class="subtab-content">
           <div class="section-title-wrap">
             <h2 class="section-title"><span>🚛</span> Cavalos Cadastrados (Frota Tratora)</h2>
+        <label style="display:inline-flex; align-items:center; gap:6px; margin-left:16px; font-size:0.85rem; cursor:pointer;">
+          <input type="checkbox" id="chk-inativos-cavalos" onchange="toggleInativos('cavalos')">
+          Mostrar inativos
+        </label>
             <button class="btn-action btn-action-primary" id="btn-add-cavalo">+ Adicionar Cavalo</button>
           </div>
           <div class="table-container">
@@ -4385,6 +4389,10 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
         <div id="subtab-carretas" class="subtab-content" style="display:none;">
           <div class="section-title-wrap">
             <h2 class="section-title"><span>🚚</span> Carretas e Implementos Cadastrados</h2>
+        <label style="display:inline-flex; align-items:center; gap:6px; margin-left:16px; font-size:0.85rem; cursor:pointer;">
+          <input type="checkbox" id="chk-inativos-carretas" onchange="toggleInativos('carretas')">
+          Mostrar inativos
+        </label>
             <button class="btn-action btn-action-primary" id="btn-add-carreta">+ Adicionar Carreta</button>
           </div>
           <div class="table-container">
@@ -4406,6 +4414,10 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
         <div id="subtab-motoristas" class="subtab-content" style="display:none;">
           <div class="section-title-wrap">
             <h2 class="section-title"><span>👤</span> Quadro de Motoristas</h2>
+        <label style="display:inline-flex; align-items:center; gap:6px; margin-left:16px; font-size:0.85rem; cursor:pointer;">
+          <input type="checkbox" id="chk-inativos-motoristas" onchange="toggleInativos('motoristas')">
+          Mostrar inativos
+        </label>
             <button class="btn-action btn-action-primary" id="btn-add-motorista">+ Adicionar Motorista</button>
           </div>
           <div class="table-container">
@@ -6781,7 +6793,12 @@ function fazerLogout() {
       tbody.innerHTML = '';
       const isAdmin = isUsuarioAdmin();
       
-      state.cavalos.forEach((c, idx) => {
+      // [FIX_FILTRO_INATIVOS] Filtra inativos se o checkbox estiver desmarcado
+      var cavalosFiltrados = window.__mostrarInativos && window.__mostrarInativos.cavalos 
+        ? state.cavalos 
+        : state.cavalos.filter(function(c) { return (c.status || 'ATIVO') === 'ATIVO'; });
+      
+      cavalosFiltrados.forEach((c, idx) => {
         const tr = document.createElement('tr');
         
         let btnExcluir = '';
@@ -6892,7 +6909,12 @@ function fazerLogout() {
       tbody.innerHTML = '';
       const isAdmin = isUsuarioAdmin();
       
-      state.carretas.forEach((c, idx) => {
+      // [FIX_FILTRO_INATIVOS] Filtra inativos se o checkbox estiver desmarcado
+      var carretasFiltradas = window.__mostrarInativos && window.__mostrarInativos.carretas 
+        ? state.carretas 
+        : state.carretas.filter(function(c) { return (c.status || 'ATIVO') === 'ATIVO'; });
+      
+      carretasFiltradas.forEach((c, idx) => {
         const tr = document.createElement('tr');
         
         let btnExcluir = '';
@@ -6945,7 +6967,12 @@ function fazerLogout() {
       tbody.innerHTML = '';
       const isAdmin = isUsuarioAdmin();
       
-      state.motoristas.forEach((m, idx) => {
+      // [FIX_FILTRO_INATIVOS] Filtra inativos se o checkbox estiver desmarcado
+      var motoristasFiltrados = window.__mostrarInativos && window.__mostrarInativos.motoristas 
+        ? state.motoristas 
+        : state.motoristas.filter(function(m) { return (m.status || 'ATIVO') === 'ATIVO'; });
+      
+      motoristasFiltrados.forEach((m, idx) => {
         const tr = document.createElement('tr');
         
         let btnExcluir = '';
@@ -8542,6 +8569,25 @@ window.inativarItem = async function(tipo, id, statusAtual) {
         console.error('[FIX_INATIVAR] Erro:', e);
         alert('Erro: ' + e.message);
     }
+};
+
+    
+// [FIX_FILTRO_INATIVOS] Alterna a visualizacao de inativos nas tabelas
+window.__mostrarInativos = {
+    cavalos: false,
+    carretas: false,
+    motoristas: false
+};
+
+window.toggleInativos = function(tipo) {
+    var chk = document.getElementById('chk-inativos-' + tipo);
+    window.__mostrarInativos[tipo] = chk ? chk.checked : false;
+    console.log('[FIX_FILTRO_INATIVOS] Mostrar inativos de ' + tipo + ':', window.__mostrarInativos[tipo]);
+    
+    // Re-renderizar a tabela correspondente
+    if (tipo === 'cavalos' && typeof renderCadastroCavalos === 'function') renderCadastroCavalos();
+    if (tipo === 'carretas' && typeof renderCadastroCarretas === 'function') renderCadastroCarretas();
+    if (tipo === 'motoristas' && typeof renderCadastroMotoristas === 'function') renderCadastroMotoristas();
 };
 
     document.addEventListener('DOMContentLoaded', () => {
