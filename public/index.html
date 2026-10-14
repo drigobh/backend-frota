@@ -2318,6 +2318,57 @@ body {
   .toast-container { top: 12px; right: 12px; left: 12px; max-width: none; }
   .toast-premium { min-width: auto; padding: 12px 16px; }
 }
+
+/* ============================================================ */
+/* [FASE_6_SKELETONS] Loading Skeletons                        */
+/* ============================================================ */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.06) 0%,
+    rgba(0, 0, 0, 0.12) 50%,
+    rgba(0, 0, 0, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s ease-in-out infinite;
+  border-radius: var(--premium-radius-sm);
+}
+[data-theme="dark"] .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 100%;
+}
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skeleton-text { height: 1em; margin-bottom: var(--premium-space-2); }
+.skeleton-text.sm { width: 40%; }
+.skeleton-text.md { width: 60%; }
+.skeleton-text.lg { width: 80%; }
+.skeleton-text.full { width: 100%; }
+.skeleton-title { height: 1.5em; width: 50%; margin-bottom: var(--premium-space-4); }
+.skeleton-card {
+  padding: var(--premium-space-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--premium-radius-lg);
+  margin-bottom: var(--premium-space-4);
+}
+.skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
+.skeleton-row {
+  display: flex;
+  gap: var(--premium-space-3);
+  padding: var(--premium-space-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+.skeleton-row > * { height: 1.2em; }
+.skeleton-table { width: 100%; }
+.skeleton-table .skeleton-row:last-child { border-bottom: none; }
 </style>
   
   <style>
@@ -16367,6 +16418,32 @@ window.mostrarToastPremium = function(titulo, mensagem, tipo, duracao) {
   };
   toast.querySelector('.toast-close').addEventListener('click', remover);
   setTimeout(remover, duracao);
+};
+</script>
+
+<script>
+/* [FASE_6_SKELETONS] Funcao para gerar skeletons */
+window.gerarSkeletonsTabela = function(linhas, colunas) {
+  linhas = linhas || 5;
+  colunas = colunas || 4;
+  var html = '';
+  for (var i = 0; i < linhas; i++) {
+    html += '<tr class="skeleton-row">';
+    for (var j = 0; j < colunas; j++) {
+      var width = j === 0 ? '30%' : (j === colunas - 1 ? '15%' : '100%');
+      html += '<td><div class="skeleton skeleton-text" style="width:' + width + '"></div></td>';
+    }
+    html += '</tr>';
+  }
+  return html;
+};
+window.gerarSkeletonCard = function() {
+  return '<div class="skeleton-card">' +
+    '<div class="skeleton skeleton-title"></div>' +
+    '<div class="skeleton skeleton-text full"></div>' +
+    '<div class="skeleton skeleton-text lg"></div>' +
+    '<div class="skeleton skeleton-text md"></div>' +
+  '</div>';
 };
 </script>
 </body>
