@@ -8404,11 +8404,38 @@ async function carregarDashboardCompleto() {
         console.log('[FIX_LOGIN_SCREEN] Tela de login escondida.');
     }
     
+    // [FIX_STATE_USER] Popula o state.user a partir do token
     try {
-        // Carrega dados basicos (cavalos, carretas, motoristas)
-        if (typeof loadCavalosDaAPI === 'function') await loadCavalosDaAPI();
-        if (typeof loadCarretasDaAPI === 'function') await loadCarretasDaAPI();
-        if (typeof loadMotoristasDaAPI === 'function') await loadMotoristasDaAPI();
+        var token = localStorage.getItem('token');
+        if (token) {
+            var payload = JSON.parse(atob(token.split('.')[1]));
+            state.user = {
+                id: payload.id,
+                email: payload.email,
+                nome: payload.nome,
+                perfil: payload.perfil,
+                perfil_id: payload.perfil_id
+            };
+            console.log('[FIX_STATE_USER] state.user populado:', state.user);
+            
+            // Atualiza o badge do usuario
+            var badge = document.getElementById('current-user-badge');
+            if (badge) {
+                badge.textContent = payload.nome + ' (' + payload.perfil + ')';
+            }
+        }
+    } catch (e) {
+        console.error('[FIX_STATE_USER] Erro ao popular state.user:', e);
+    }
+    
+    try {
+        // Carrega dados basicos (cavalos, carretas, motoristas) - FUNCAO CORRETA
+        if (typeof loadCadastrosDaAPI === 'function') {
+            await loadCadastrosDaAPI();
+            console.log('[FIX_DASHBOARD_INIT] Cadastros carregados via loadCadastrosDaAPI');
+        } else {
+            console.warn('[FIX_DASHBOARD_INIT] loadCadastrosDaAPI nao existe!');
+        }
         
         // Carrega dados do dashboard (KPIs)
         const monthKey = (typeof getFirstDayOfMonth === 'function') 
@@ -8448,6 +8475,12 @@ async function carregarDashboardCompleto() {
         if (typeof loadDocumentosDaAPI === 'function') loadDocumentosDaAPI();
         
         console.log('[FIX_DASHBOARD_INIT] Dashboard carregado com sucesso!');
+        
+        // [FIX_PERMISSOES] Carrega permissoes do usuario
+        if (typeof carregarMinhasPermissoes === 'function') {
+            await carregarMinhasPermissoes();
+            console.log('[FIX_PERMISSOES] Permissoes carregadas. __souAdmin:', __souAdmin);
+        }
     } catch (e) {
         console.error('[FIX_DASHBOARD_INIT] Erro:', e);
     }
