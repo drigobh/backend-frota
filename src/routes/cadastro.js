@@ -153,8 +153,10 @@ module.exports = async function (fastify, options) {
     },
     async (request, reply) => {
       const { rows } = await db.query(
-        `SELECT id, codigo, tipo, obs FROM carretas 
-       WHERE status = 'ATIVO' ORDER BY created_at ASC`
+        `SELECT id, codigo, tipo, obs, status
+      FROM carretas
+      WHERE deleted_at IS NULL
+      ORDER BY created_at ASC`
       );
       return rows;
     }
@@ -166,7 +168,6 @@ module.exports = async function (fastify, options) {
       schema: {
         body: {
           type: "object",
-          required: ["codigo"],
           additionalProperties: true,
           properties: {
             codigo: {
@@ -181,6 +182,10 @@ module.exports = async function (fastify, options) {
             obs: {
               type: "string",
               maxLength: 1000
+            },
+            status: {
+              type: "string",
+              enum: ["ATIVO", "INATIVO"]
             }
           }
         }
@@ -189,7 +194,7 @@ module.exports = async function (fastify, options) {
       schema: {
         body: {
           type: "object",
-          required: ["codigo"],
+          // (required removido para permitir inativar)
           properties: {
             codigo: { type: "string" },
             tipo: { type: "string" },
@@ -221,7 +226,7 @@ module.exports = async function (fastify, options) {
       schema: {
         body: {
           type: "object",
-          required: ["codigo"],
+          // (required removido para permitir inativar)
           additionalProperties: true,
           properties: {
             codigo: {
@@ -236,7 +241,8 @@ module.exports = async function (fastify, options) {
             obs: {
               type: "string",
               maxLength: 1000
-            }
+            },
+            status: { type: "string", enum: ["ATIVO", "INATIVO"] }
           }
         }
       },
@@ -244,9 +250,19 @@ module.exports = async function (fastify, options) {
     },
     async (request, reply) => {
       const { id } = request.params;
-      const { codigo, tipo, obs } = request.body;
+      const { codigo, tipo, obs, status } = request.body;
+      
+      // [FIX_INATIVAR] Se status foi enviado, atualiza apenas o status
+      if (status) {
+        await db.query(
+          `UPDATE carretas SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
+          [status, id]
+        );
+        return { sucesso: true, status };
+      }
+      
       await db.query(
-        `UPDATE carretas SET codigo = $1, tipo = $2, obs = $3, 
+        `UPDATE carretas SET codigo = $1, tipo = $2, obs = $3,
        updated_at = CURRENT_TIMESTAMP WHERE id = $4`,
         [codigo.toUpperCase(), tipo, obs, id]
       );
@@ -280,8 +296,10 @@ module.exports = async function (fastify, options) {
     },
     async (request, reply) => {
       const { rows } = await db.query(
-        `SELECT id, nome, cnh, telefone, obs FROM motoristas 
-       WHERE status = 'ATIVO' ORDER BY created_at ASC`
+        `SELECT id, nome, cnh, telefone, obs, status
+      FROM motoristas
+      WHERE deleted_at IS NULL
+      ORDER BY created_at ASC`
       );
       return rows;
     }
@@ -293,7 +311,6 @@ module.exports = async function (fastify, options) {
       schema: {
         body: {
           type: "object",
-          required: ["nome"],
           additionalProperties: true,
           properties: {
             nome: {
@@ -312,6 +329,10 @@ module.exports = async function (fastify, options) {
             obs: {
               type: "string",
               maxLength: 1000
+            },
+            status: {
+              type: "string",
+              enum: ["ATIVO", "INATIVO"]
             }
           }
         }
@@ -320,7 +341,7 @@ module.exports = async function (fastify, options) {
       schema: {
         body: {
           type: "object",
-          required: ["nome"],
+          // (required removido para permitir inativar)
           properties: {
             nome: { type: "string", minLength: 2 },
             cnh: { type: "string" },
@@ -353,7 +374,7 @@ module.exports = async function (fastify, options) {
       schema: {
         body: {
           type: "object",
-          required: ["nome"],
+          // (required removido para permitir inativar)
           additionalProperties: true,
           properties: {
             nome: {
@@ -372,7 +393,8 @@ module.exports = async function (fastify, options) {
             obs: {
               type: "string",
               maxLength: 1000
-            }
+            },
+            status: { type: "string", enum: ["ATIVO", "INATIVO"] }
           }
         }
       },
@@ -380,9 +402,19 @@ module.exports = async function (fastify, options) {
     },
     fastify.comAuditoria(async (request, reply) => {
       const { id } = request.params;
-      const { nome, cnh, telefone, obs } = request.body;
+      const { nome, cnh, telefone, obs, status } = request.body;
+      
+      // [FIX_INATIVAR] Se status foi enviado, atualiza apenas o status
+      if (status) {
+        await db.query(
+          `UPDATE motoristas SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2`,
+          [status, id]
+        );
+        return { sucesso: true, status };
+      }
+      
       await db.query(
-        `UPDATE motoristas SET nome = $1, cnh = $2, telefone = $3, obs = $4, 
+        `UPDATE motoristas SET nome = $1, cnh = $2, telefone = $3, obs = $4,
        updated_at = CURRENT_TIMESTAMP WHERE id = $5`,
         [nome, cnh, telefone, obs, id]
       );

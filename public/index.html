@@ -6810,7 +6810,7 @@ function fazerLogout() {
           <td>
             <input type="text" class="input-yellow" value="${c.obs || ''}" data-id="${c.id}" data-field="obs">
           </td>
-          <td style="text-align:center;">${typeof window.criarBadge === 'function' ? window.criarBadge('Ativo', 'success', true) : 'Ativo'}</td>
+          <td style="text-align:center;">${typeof window.badgeStatus === 'function' ? window.badgeStatus(c.status || 'ATIVO') : (c.status || 'ATIVO')}</td>
           <td class="col-center">
             ${btnInativar}
             ${btnExcluir}
@@ -6896,8 +6896,13 @@ function fazerLogout() {
         const tr = document.createElement('tr');
         
         let btnExcluir = '';
+        let btnInativar = '';
         if (isAdmin) {
+          const statusAtual = c.status || 'ATIVO';
+          const labelInativar = statusAtual === 'INATIVO' ? 'Reativar' : 'Inativar';
+          const corInativar = statusAtual === 'INATIVO' ? '#10b981' : '#f59e0b';
           btnExcluir = `<button class="btn-action btn-action-danger" onclick="deleteItem('carretas', '${c.id}')">Excluir</button>`;
+          btnInativar = `<button class="btn-action" style="background:${corInativar};color:#fff;margin-left:4px;" onclick="inativarItem('carretas', '${c.id}', '${statusAtual}')">${labelInativar}</button>`;
         } else {
           btnExcluir = `<span style="font-size:11px;color: var(--ds-text-muted, #94a3b8);">Bloqueado</span>`;
         }
@@ -6913,7 +6918,9 @@ function fazerLogout() {
           <td>
             <input type="text" class="input-yellow" value="${c.obs || ''}" data-id="${c.id}" data-field="obs">
           </td>
+          <td style="text-align:center;">${typeof window.badgeStatus === 'function' ? window.badgeStatus(c.status || 'ATIVO') : (c.status || 'ATIVO')}</td>
           <td class="col-center">
+            ${btnInativar}
             ${btnExcluir}
           </td>
         `;
@@ -6942,8 +6949,13 @@ function fazerLogout() {
         const tr = document.createElement('tr');
         
         let btnExcluir = '';
+        let btnInativar = '';
         if (isAdmin) {
+          const statusAtual = m.status || 'ATIVO';
+          const labelInativar = statusAtual === 'INATIVO' ? 'Reativar' : 'Inativar';
+          const corInativar = statusAtual === 'INATIVO' ? '#10b981' : '#f59e0b';
           btnExcluir = `<button class="btn-action btn-action-danger" onclick="deleteItem('motoristas', '${m.id}')">Excluir</button>`;
+          btnInativar = `<button class="btn-action" style="background:${corInativar};color:#fff;margin-left:4px;" onclick="inativarItem('motoristas', '${m.id}', '${statusAtual}')">${labelInativar}</button>`;
         } else {
           btnExcluir = `<span style="font-size:11px;color: var(--ds-text-muted, #94a3b8);">Bloqueado</span>`;
         }
@@ -6962,7 +6974,9 @@ function fazerLogout() {
           <td>
             <input type="text" class="input-yellow" value="${m.obs || ''}" data-id="${m.id}" data-field="obs">
           </td>
+          <td style="text-align:center;">${typeof window.badgeStatus === 'function' ? window.badgeStatus(m.status || 'ATIVO') : (m.status || 'ATIVO')}</td>
           <td class="col-center">
+            ${btnInativar}
             ${btnExcluir}
           </td>
         `;
