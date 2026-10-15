@@ -4447,13 +4447,54 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             <button class="btn-action btn-action-secondary" id="btn-novo-mes-acoplamento">+ Novo Mês</button>
           </div>
           <div class="bar-controls-right">
-            <button class="btn-action btn-action-primary" id="btn-add-acoplamento">+ Adicionar Acoplamento</button>
+            <button class="btn-action btn-action-primary" id="btn-add-acoplamento" onclick="abrirModalAcoplamento()">+ Adicionar Acoplamento</button>
+
+<!-- Modal de Novo Acoplamento -->
+<div id="modal-novo-acoplamento" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:var(--surface, #fff); border-radius:12px; padding:24px; width:90%; max-width:500px; box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+    <h2 style="margin:0 0 16px 0; color:var(--text, #1e293b);">🔗 Novo Acoplamento</h2>
+    
+    <div style="margin-bottom:12px;">
+      <label style="display:block; margin-bottom:4px; font-size:0.85rem; color:var(--text-muted, #64748b);">Veículo (Cavalo) *</label>
+      <select id="modal-acop-veiculo" class="input-yellow" style="width:100%; padding:8px; border-radius:6px;">
+        <option value="">-- Selecione --</option>
+      </select>
+    </div>
+    
+    <div style="margin-bottom:12px;">
+      <label style="display:block; margin-bottom:4px; font-size:0.85rem; color:var(--text-muted, #64748b);">Carreta *</label>
+      <select id="modal-acop-carreta" class="input-yellow" style="width:100%; padding:8px; border-radius:6px;">
+        <option value="">-- Selecione --</option>
+      </select>
+    </div>
+    
+    <div style="margin-bottom:16px;">
+      <label style="display:block; margin-bottom:4px; font-size:0.85rem; color:var(--text-muted, #64748b);">Motorista *</label>
+      <select id="modal-acop-motorista" class="input-yellow" style="width:100%; padding:8px; border-radius:6px;">
+        <option value="">-- Selecione --</option>
+      </select>
+    </div>
+    
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <button class="btn-action btn-action-secondary" onclick="fecharModalAcoplamento()">Cancelar</button>
+      <button class="btn-action btn-action-primary" onclick="salvarNovoAcoplamento()">💾 Salvar Acoplamento</button>
+    </div>
+  </div>
+</div>
           </div>
         </div>
 
-        <div class="section-title-wrap">
-          <h2 class="section-title"><span>🔗</span> Relação de Acoplamento do Mês</h2>
+        <div class="subtab-nav" style="display:flex; gap:8px; margin:16px 0;">
+          <button class="btn-action btn-action-primary subtab-acop active" onclick="mostrarAbaAcop('acoplamentos')" id="btn-acop-aba-acoplamentos">🔗 Acoplamentos</button>
+          <button class="btn-action btn-action-secondary subtab-acop" onclick="mostrarAbaAcop('historico')" id="btn-acop-aba-historico">📜 Histórico</button>
         </div>
+
+        <!-- Aba Acoplamentos -->
+        <div id="aba-acop-acoplamentos">
+          <div class="section-title-wrap" style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 class="section-title"><span>🔗</span> Relação de Acoplamento do Mês</h2>
+            <button class="btn-action btn-action-primary" onclick="abrirModalAcoplamento()" style="margin-left:auto;">+ Acoplar Novo</button>
+          </div>
 
         <div class="table-container">
           <table class="data-table" id="table-acoplamento">
@@ -4469,6 +4510,32 @@ body.tab-empresas-ativa #pwa-install-btn { display: none !important; }
             </thead>
             <tbody id="tbody-acoplamento"></tbody>
           </table>
+        </div>
+        </div>
+
+        <!-- Aba Historico -->
+        <div id="aba-acop-historico" style="display:none;">
+          <div class="section-title-wrap">
+            <h2 class="section-title"><span>📜</span> Histórico de Movimentações</h2>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table" id="table-historico-acop">
+              <thead>
+                <tr>
+                  <th style="width: 150px;">Data/Hora</th>
+                  <th style="width: 150px;">Usuário</th>
+                  <th style="width: 120px;">Ação</th>
+                  <th style="width: 130px;">Veículo</th>
+                  <th style="width: 130px;">Carreta</th>
+                  <th>Motorista</th>
+                  <th style="width: 120px;">Mês Ref.</th>
+                  <th>Detalhes</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-historico-acop"></tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -6769,7 +6836,8 @@ function fazerLogout() {
       } catch (error) {
         console.error('Erro ao carregar Cadastros:', error);
       }
-    }
+    }    window.loadCadastrosDaAPI = loadCadastrosDaAPI;
+
 
     function syncPlatesAcrossSystem() {
       const currentPlates = state.cavalos.map(c => c.placa);
@@ -6902,7 +6970,8 @@ function fazerLogout() {
           }
         });
       });
-    }
+    }    window.renderCadastroCavalos = renderCadastroCavalos;
+
 
     function renderCadastroCarretas() {
       const tbody = document.getElementById('tbody-carretas');
@@ -6960,7 +7029,8 @@ function fazerLogout() {
           }
         });
       });
-    }
+    }    window.renderCadastroCarretas = renderCadastroCarretas;
+
 
     function renderCadastroMotoristas() {
       const tbody = document.getElementById('tbody-motoristas');
@@ -7021,7 +7091,8 @@ function fazerLogout() {
           }
         });
       });
-    }
+    }    window.renderCadastroMotoristas = renderCadastroMotoristas;
+
 
     async function updateCadastro(tipo, id, payload) {
       try {
@@ -7043,6 +7114,8 @@ function fazerLogout() {
         loadDashboardData();
       } catch (error) {
         console.error(error);
+      } finally {
+        __updateAcopEmAndamento = false;
       }
     }
 
@@ -7122,22 +7195,25 @@ function fazerLogout() {
       
       list.forEach((item, idx) => {
         let cavalosOptions = `<option value="">-- Selecione o Cavalo --</option>`;
-        state.cavalos.forEach(c => {
+        state.cavalos.filter(c => (c.status || 'ATIVO') === 'ATIVO' || c.id === item.veiculo_id).forEach(c => {
           cavalosOptions += `<option value="${c.id}" ${c.id === item.veiculo_id ? 'selected' : ''}>${c.placa}</option>`;
         });
 
         let carretasOptions = `<option value="">-- Selecione a Carreta --</option>`;
-        state.carretas.forEach(car => {
+        state.carretas.filter(car => (car.status || 'ATIVO') === 'ATIVO' || car.id === item.carreta_id).forEach(car => {
           carretasOptions += `<option value="${car.id}" ${car.id === item.carreta_id ? 'selected' : ''}>${car.codigo}</option>`;
         });
 
         let motoristasOptions = `<option value="">-- Selecione o Motorista --</option>`;
-        state.motoristas.forEach(m => {
+        state.motoristas.filter(m => (m.status || 'ATIVO') === 'ATIVO' || m.id === item.motorista_id).forEach(m => {
           motoristasOptions += `<option value="${m.id}" ${m.id === item.motorista_id ? 'selected' : ''}>${m.nome}</option>`;
         });
 
-        const btnExcluir = isAdmin 
-          ? `<button class="btn-action btn-action-danger" onclick="deleteAcop('${item.id}')">Excluir</button>` 
+        const btnDesacoplar = isAdmin
+          ? `<button class="btn-action" style="background:#f59e0b;color:#fff;" onclick="desacoplarAcop('${item.id}')">🔓 Liberar Acoplamento</button>`
+          : '';
+        const btnExcluir = isAdmin
+          ? `<button class="btn-action btn-action-danger" onclick="deleteAcop('${item.id}')" title="Excluir permanentemente">🗑 Excluir</button>`
           : `<span style="font-size:11px;color: var(--ds-text-muted, #94a3b8);">Bloqueado</span>`;
 
         const tr = document.createElement('tr');
@@ -7145,54 +7221,102 @@ function fazerLogout() {
           <td>${idx + 1}</td>
           <td>${state.currentMonth}</td>
           <td>
-            <select class="input-yellow" data-id="${item.id}" data-field="veiculo_id" onchange="updateAcop(this)">
-              ${cavalosOptions}
-            </select>
+            <div style="display:flex; gap:4px; align-items:center;">
+              <select class="input-yellow" data-id="${item.id}" data-field="veiculo_id" onchange="updateAcop(this)" style="flex:1;">
+                ${cavalosOptions}
+              </select>
+              ${item.veiculo_id ? `<button class="btn-action" style="background:#7c3aed;color:#fff;padding:2px 6px;font-size:0.75rem;border-radius:4px;" onclick="desacoplarCampo('${item.id}', 'veiculo')" title="Desacoplar veiculo">🔗</button>` : ''}
+            </div>
           </td>
           <td>
-            <select class="input-yellow" data-id="${item.id}" data-field="carreta_id" onchange="updateAcop(this)">
-              ${carretasOptions}
-            </select>
+            <div style="display:flex; gap:4px; align-items:center;">
+              <select class="input-yellow" data-id="${item.id}" data-field="carreta_id" onchange="updateAcop(this)" style="flex:1;">
+                ${carretasOptions}
+              </select>
+              ${item.carreta_id ? `<button class="btn-action" style="background:#7c3aed;color:#fff;padding:2px 6px;font-size:0.75rem;border-radius:4px;" onclick="desacoplarCampo('${item.id}', 'carreta')" title="Desacoplar carreta">🔗</button>` : ''}
+            </div>
           </td>
           <td>
-            <select class="input-yellow" data-id="${item.id}" data-field="motorista_id" onchange="updateAcop(this)">
-              ${motoristasOptions}
-            </select>
+            <div style="display:flex; gap:4px; align-items:center;">
+              <select class="input-yellow" data-id="${item.id}" data-field="motorista_id" onchange="updateAcop(this)" style="flex:1;">
+                ${motoristasOptions}
+              </select>
+              ${item.motorista_id ? `<button class="btn-action" style="background:#7c3aed;color:#fff;padding:2px 6px;font-size:0.75rem;border-radius:4px;" onclick="desacoplarCampo('${item.id}', 'motorista')" title="Desacoplar motorista">🔗</button>` : ''}
+            </div>
           </td>
-          <td class="col-center">
+          <td class="col-center" style="display:flex; gap:4px; justify-content:center;">
+            ${btnDesacoplar}
             ${btnExcluir}
           </td>
         `;
         tbody.appendChild(tr);
       });
-    }
+    }    window.renderAcoplamento = renderAcoplamento;
+
+
+    // [FIX_TRAVA] Evitar chamada dupla do updateAcop
+    var __updateAcopEmAndamento = false;
 
     async function updateAcop(selectElement) {
+      if (__updateAcopEmAndamento) {
+        console.log('[FIX_TRAVA] updateAcop ja em andamento, ignorando.');
+        return;
+      }
+      __updateAcopEmAndamento = true;
+
       const id = selectElement.getAttribute('data-id');
       const field = selectElement.getAttribute('data-field');
       const val = selectElement.value;
-      
+
       const match = state.acoplamentos[state.currentMonth].find(x => x.id === id);
       const oldVal = match[field];
+
+      // [FIX_CAMPO] Mapear o campo para o nome que o backend espera
+      var campoAlterado = null;
+      if (field === 'veiculo_id') campoAlterado = 'veiculo';
+      if (field === 'carreta_id') campoAlterado = 'carreta';
+      if (field === 'motorista_id') campoAlterado = 'motorista';
+
+      // Confirmar a troca (com aviso)
+      var nomes = { veiculo_id: 'Veiculo', carreta_id: 'Carreta', motorista_id: 'Motorista' };
+      if (!confirm('Deseja realmente trocar o ' + (nomes[field] || 'campo') + '?\n\nO acoplamento antigo sera desfeito e um novo sera registrado no historico.')) {
+        selectElement.value = oldVal || '';
+        __updateAcopEmAndamento = false;
+        return;
+      }
+
       match[field] = val || null;
-      
+
+      var body = {
+        veiculo_id: match.veiculo_id,
+        carreta_id: match.carreta_id,
+        motorista_id: match.motorista_id,
+        campo_alterado: campoAlterado
+      };
+
       try {
         const res = await apiFetch(`/acoplamentos/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(match)
+          body: JSON.stringify(body)
         });
-        
+
         if (!res.ok) {
           const err = await res.json();
           alert(err.erro || 'Erro ao acoplar');
           match[field] = oldVal;
           renderAcoplamento();
         } else {
+          if (typeof mostrarToastPremium === 'function') {
+            mostrarToastPremium('Sucesso!', 'Campo alterado e registrado no historico.', 'success');
+          }
           loadDashboardData();
+          loadAcoplamentosDaAPI();
         }
       } catch (error) {
         console.error(error);
+      } finally {
+        __updateAcopEmAndamento = false;
       }
     }
 
@@ -7204,6 +7328,8 @@ function fazerLogout() {
         loadDashboardData();
       } catch (error) {
         console.error(error);
+      } finally {
+        __updateAcopEmAndamento = false;
       }
     }
 
@@ -7358,6 +7484,8 @@ function fazerLogout() {
         renderKm();
       } catch (error) {
         console.error(error);
+      } finally {
+        __updateAcopEmAndamento = false;
       }
     }
 
@@ -7770,6 +7898,8 @@ function fazerLogout() {
         loadDashboardData();
       } catch (error) {
         console.error(error);
+      } finally {
+        __updateAcopEmAndamento = false;
       }
     }
 
@@ -7782,6 +7912,8 @@ function fazerLogout() {
         loadDashboardData();
       } catch (error) {
         console.error(error);
+      } finally {
+        __updateAcopEmAndamento = false;
       }
     }
 
@@ -8556,7 +8688,16 @@ window.inativarItem = async function(tipo, id, statusAtual) {
 
         if (!res.ok) {
             const errData = await res.json().catch(() => ({}));
-            throw new Error(errData.erro || 'Erro ao ' + acao);
+            const msg = errData.erro || errData.message || 'Erro ao ' + acao;
+            
+            // [FIX_VALIDACAO] Mostrar mensagem de erro detalhada
+            if (typeof mostrarToastPremium === 'function') {
+                mostrarToastPremium('Erro', msg, 'danger');
+            } else {
+                alert('Erro: ' + msg);
+            }
+            
+            throw new Error(msg);
         }
 
         if (typeof mostrarToastPremium === 'function') {
@@ -8565,6 +8706,16 @@ window.inativarItem = async function(tipo, id, statusAtual) {
 
         // Recarrega os dados
         if (typeof loadCadastrosDaAPI === 'function') await loadCadastrosDaAPI();
+        
+        // [FIX_SINCRONIZAR] Re-renderiza as tabelas de cadastros
+        if (tipo === 'veiculos' && typeof window.renderCadastroCavalos === 'function') window.renderCadastroCavalos();
+        if (tipo === 'carretas' && typeof window.renderCadastroCarretas === 'function') window.renderCadastroCarretas();
+        if (tipo === 'motoristas' && typeof window.renderCadastroMotoristas === 'function') window.renderCadastroMotoristas();
+        
+        // [FIX_SINCRONIZAR] Re-renderiza a tabela de acoplamentos (atualiza dropdowns)
+        if (typeof window.renderAcoplamento === 'function') window.renderAcoplamento();
+        
+        console.log('[FIX_SINCRONIZAR] Tabelas re-renderizadas apos ' + acao + '.');
     } catch (e) {
         console.error('[FIX_INATIVAR] Erro:', e);
         alert('Erro: ' + e.message);
@@ -8588,6 +8739,263 @@ window.toggleInativos = function(tipo) {
     if (tipo === 'cavalos' && typeof renderCadastroCavalos === 'function') renderCadastroCavalos();
     if (tipo === 'carretas' && typeof renderCadastroCarretas === 'function') renderCadastroCarretas();
     if (tipo === 'motoristas' && typeof renderCadastroMotoristas === 'function') renderCadastroMotoristas();
+};
+
+    
+// [FIX_HISTORICO] Alternar entre as abas de Acoplamento e Historico
+window.mostrarAbaAcop = function(aba) {
+    var elAcop = document.getElementById('aba-acop-acoplamentos');
+    var elHist = document.getElementById('aba-acop-historico');
+    var btnAcop = document.getElementById('btn-acop-aba-acoplamentos');
+    var btnHist = document.getElementById('btn-acop-aba-historico');
+    
+    if (aba === 'historico') {
+        if (elAcop) elAcop.style.display = 'none';
+        if (elHist) elHist.style.display = 'block';
+        if (btnHist) btnHist.classList.add('active');
+        if (btnAcop) btnAcop.classList.remove('active');
+        carregarHistoricoAcop();
+    } else {
+        if (elAcop) elAcop.style.display = 'block';
+        if (elHist) elHist.style.display = 'none';
+        if (btnAcop) btnAcop.classList.add('active');
+        if (btnHist) btnHist.classList.remove('active');
+    }
+};
+
+// [FIX_HISTORICO] Carregar o historico de acoplamentos
+window.carregarHistoricoAcop = async function() {
+    var tbody = document.getElementById('tbody-historico-acop');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:1rem; color: var(--text-muted);">Carregando...</td></tr>';
+    
+    try {
+        var res = await fetch('/api/acoplamentos/historico?_t=' + Date.now(), {
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token'), 'Cache-Control': 'no-cache' }
+        });
+        var data = await res.json();
+        
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:1.5rem; color: var(--text-muted);">Nenhuma movimentacao registrada ainda.</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = '';
+        data.forEach(function(h) {
+            var dataHora = h.data_hora ? new Date(h.data_hora).toLocaleString('pt-BR') : '-';
+            var corAcao = h.acao === 'ACOPLADO' ? '#10b981' : '#ef4444';
+            var badgeAcao = '<span style="background:' + corAcao + ';color:#fff;padding:2px 8px;border-radius:4px;font-size:0.75rem;font-weight:600;">' + (h.acao || '-') + '</span>';
+            
+            var tr = document.createElement('tr');
+            tr.innerHTML = 
+                '<td>' + dataHora + '</td>' +
+                '<td>' + (h.usuario_nome || '-') + '</td>' +
+                '<td>' + badgeAcao + '</td>' +
+                '<td>' + (h.veiculo_placa || '-') + '</td>' +
+                '<td>' + (h.carreta_codigo || '-') + '</td>' +
+                '<td>' + (h.motorista_nome || '-') + '</td>' +
+                '<td>' + (h.mes_referencia ? new Date(h.mes_referencia).toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }) : '-') + '</td>' +
+                '<td>' + (h.detalhes || '-') + '</td>';
+            tbody.appendChild(tr);
+        });
+        
+        console.log('[FIX_HISTORICO] Historico carregado:', data.length, 'registros.');
+    } catch (err) {
+        console.error('[FIX_HISTORICO] Erro ao carregar historico:', err);
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:1rem; color: #ef4444;">Erro ao carregar historico.</td></tr>';
+    }
+};
+
+    
+// [FIX_MODAL_ACOP] Abrir modal de novo acoplamento
+window.abrirModalAcoplamento = function() {
+    var modal = document.getElementById('modal-novo-acoplamento');
+    if (!modal) return;
+    
+    // Popular dropdowns com veiculos/carretas/motoristas ATIVOS
+    var selVeic = document.getElementById('modal-acop-veiculo');
+    var selCarr = document.getElementById('modal-acop-carreta');
+    var selMot = document.getElementById('modal-acop-motorista');
+    
+    if (selVeic) {
+        selVeic.innerHTML = '<option value="">-- Selecione --</option>';
+        (state.cavalos || []).filter(function(c) { return (c.status || 'ATIVO') === 'ATIVO'; }).forEach(function(c) {
+            selVeic.innerHTML += '<option value="' + c.id + '">' + c.placa + ' - ' + (c.modelo || '') + '</option>';
+        });
+    }
+    
+    if (selCarr) {
+        selCarr.innerHTML = '<option value="">-- Selecione --</option>';
+        (state.carretas || []).filter(function(c) { return (c.status || 'ATIVO') === 'ATIVO'; }).forEach(function(c) {
+            selCarr.innerHTML += '<option value="' + c.id + '">' + c.codigo + ' - ' + (c.tipo || '') + '</option>';
+        });
+    }
+    
+    if (selMot) {
+        selMot.innerHTML = '<option value="">-- Selecione --</option>';
+        (state.motoristas || []).filter(function(m) { return (m.status || 'ATIVO') === 'ATIVO'; }).forEach(function(m) {
+            selMot.innerHTML += '<option value="' + m.id + '">' + m.nome + '</option>';
+        });
+    }
+    
+    modal.style.display = 'flex';
+};
+
+// [FIX_MODAL_ACOP] Fechar modal
+window.fecharModalAcoplamento = function() {
+    var modal = document.getElementById('modal-novo-acoplamento');
+    if (modal) modal.style.display = 'none';
+};
+
+// [FIX_MODAL_ACOP] Salvar novo acoplamento
+window.salvarNovoAcoplamento = async function() {
+    var veiculo_id = (document.getElementById('modal-acop-veiculo') || {}).value;
+    var carreta_id = (document.getElementById('modal-acop-carreta') || {}).value;
+    var motorista_id = (document.getElementById('modal-acop-motorista') || {}).value;
+    
+    if (!veiculo_id || !carreta_id || !motorista_id) {
+        if (typeof mostrarToastPremium === 'function') {
+            mostrarToastPremium('Atenção', 'Selecione veículo, carreta e motorista.', 'warning');
+        } else {
+            alert('Selecione veículo, carreta e motorista.');
+        }
+        return;
+    }
+    
+    try {
+        var mesRef = (typeof getFirstDayOfMonth === 'function') ? getFirstDayOfMonth(state.currentMonth) : null;
+        
+        var res = await fetch('/api/acoplamentos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify({
+                mes_referencia: mesRef,
+                veiculo_id: veiculo_id,
+                carreta_id: carreta_id,
+                motorista_id: motorista_id
+            })
+        });
+        
+        if (!res.ok) {
+            var errData = await res.json().catch(function() { return {}; });
+            throw new Error(errData.erro || 'Erro ao criar acoplamento.');
+        }
+        
+        if (typeof mostrarToastPremium === 'function') {
+            mostrarToastPremium('Sucesso!', 'Acoplamento criado com sucesso.', 'success');
+        }
+        
+        fecharModalAcoplamento();
+        
+        if (typeof loadAcoplamentosDaAPI === 'function') await loadAcoplamentosDaAPI();
+        if (typeof loadDashboardData === 'function') loadDashboardData();
+        
+    } catch (err) {
+        console.error('[FIX_MODAL_ACOP] Erro:', err);
+        if (typeof mostrarToastPremium === 'function') {
+            mostrarToastPremium('Erro', err.message, 'danger');
+        } else {
+            alert('Erro: ' + err.message);
+        }
+    }
+};
+
+    
+// [FIX_ACOPLAR] Desacoplar (soft delete + historico)
+window.desacoplarAcop = async function(id) {
+    if (!confirm('Deseja LIBERAR este acoplamento?\n\nO conjunto sera desfeito e registrado no historico.')) return;
+    
+    try {
+        const res = await fetch('/api/acoplamentos/' + id, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
+        
+        if (!res.ok) {
+            const errData = await res.json().catch(function() { return {}; });
+            throw new Error(errData.erro || 'Erro ao desacoplar');
+        }
+        
+        if (typeof mostrarToastPremium === 'function') {
+            mostrarToastPremium('Sucesso!', 'Item desacoplado com sucesso.', 'success');
+        }
+        
+        if (typeof loadAcoplamentosDaAPI === 'function') await loadAcoplamentosDaAPI();
+        if (typeof loadDashboardData === 'function') loadDashboardData();
+        
+        // Recarregar historico se a aba estiver visivel
+        if (typeof carregarHistoricoAcop === 'function') carregarHistoricoAcop();
+    } catch (err) {
+        console.error('[FIX_ACOPLAR] Erro:', err);
+        if (typeof mostrarToastPremium === 'function') {
+            mostrarToastPremium('Erro', err.message, 'danger');
+        } else {
+            alert('Erro: ' + err.message);
+        }
+    }
+};
+
+    
+// [FIX_CAMPO] Desacoplar um campo especifico (veiculo, carreta, motorista)
+window.desacoplarCampo = async function(acoplamentoId, campo) {
+    var nomes = { veiculo: 'Veiculo', carreta: 'Carreta', motorista: 'Motorista' };
+    if (!confirm('Deseja desacoplar o ' + (nomes[campo] || campo) + ' deste acoplamento?')) return;
+    
+    try {
+        var match = state.acoplamentos[state.currentMonth].find(function(x) { return x.id === acoplamentoId; });
+        if (!match) {
+            alert('Acoplamento nao encontrado.');
+            return;
+        }
+        
+        // Montar body: manter os outros campos, zerar o campo especificado
+        var body = {
+            veiculo_id: match.veiculo_id,
+            carreta_id: match.carreta_id,
+            motorista_id: match.motorista_id,
+            campo_alterado: campo
+        };
+        
+        if (campo === 'veiculo') body.veiculo_id = null;
+        if (campo === 'carreta') body.carreta_id = null;
+        if (campo === 'motorista') body.motorista_id = null;
+        
+        var res = await fetch('/api/acoplamentos/' + acoplamentoId, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            },
+            body: JSON.stringify(body)
+        });
+        
+        if (!res.ok) {
+            var err = await res.json().catch(function() { return {}; });
+            throw new Error(err.erro || 'Erro ao desacoplar');
+        }
+        
+        if (typeof mostrarToastPremium === 'function') {
+            mostrarToastPremium('Sucesso!', (nomes[campo] || campo) + ' desacoplado com sucesso.', 'success');
+        }
+        
+        // Recarregar
+        if (typeof loadAcoplamentosDaAPI === 'function') await loadAcoplamentosDaAPI();
+        if (typeof loadDashboardData === 'function') loadDashboardData();
+        
+    } catch (err) {
+        console.error('[FIX_CAMPO] Erro:', err);
+        if (typeof mostrarToastPremium === 'function') {
+            mostrarToastPremium('Erro', err.message, 'danger');
+        } else {
+            alert('Erro: ' + err.message);
+        }
+    }
 };
 
     document.addEventListener('DOMContentLoaded', () => {

@@ -130,6 +130,35 @@ async function autoMigrate(pool) {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
+      -- FIX_INATIVAR: adicionar colunas para inativar/reativar
+      ALTER TABLE acoplamentos ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'ATIVO';
+      ALTER TABLE acoplamentos ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+      ALTER TABLE acoplamentos ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
+
+      -- ============================================================
+      -- FIX_HISTORICO: Tabela de historico de acoplamentos
+      -- ============================================================
+      CREATE TABLE IF NOT EXISTS acoplamentos_historico (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        sequencia SERIAL,
+        acoplamento_id UUID,
+        usuario_id UUID,
+        usuario_nome VARCHAR(150),
+        acao VARCHAR(20) NOT NULL,
+        veiculo_id UUID,
+        veiculo_placa VARCHAR(20),
+        carreta_id UUID,
+        carreta_codigo VARCHAR(50),
+        motorista_id UUID,
+        motorista_nome VARCHAR(150),
+        mes_referencia DATE,
+        data_hora TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        detalhes TEXT
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_hist_data_hora ON acoplamentos_historico(data_hora DESC);
+      CREATE INDEX IF NOT EXISTS idx_hist_acoplamento_id ON acoplamentos_historico(acoplamento_id);
+
       -- ============================================================
       -- 7. Quilometragem Mensal
       -- ============================================================
@@ -143,6 +172,11 @@ async function autoMigrate(pool) {
         preco_litro NUMERIC DEFAULT 0,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+
+      -- FIX_INATIVAR: adicionar colunas para inativar/reativar
+      ALTER TABLE km_mensal ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'ATIVO';
+      ALTER TABLE km_mensal ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+      ALTER TABLE km_mensal ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
 
       -- ============================================================
       -- 8. Abastecimentos Detalhados
@@ -161,6 +195,10 @@ async function autoMigrate(pool) {
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
 
+      -- FIX_INATIVAR: adicionar colunas para inativar/reativar
+      ALTER TABLE abastecimentos ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'ATIVO';
+      ALTER TABLE abastecimentos ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+
       -- ============================================================
       -- 9. Financeiro / Lancamentos DRE
       -- ============================================================
@@ -174,6 +212,11 @@ async function autoMigrate(pool) {
         valor NUMERIC DEFAULT 0,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+
+      -- FIX_INATIVAR: adicionar colunas para inativar/reativar
+      ALTER TABLE financeiro ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'ATIVO';
+      ALTER TABLE financeiro ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+      ALTER TABLE financeiro ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
 
       -- ============================================================
       -- 10. Manutencoes
@@ -189,6 +232,11 @@ async function autoMigrate(pool) {
         proxima_manutencao_km NUMERIC DEFAULT 0,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
+
+      -- FIX_INATIVAR: adicionar colunas para inativar/reativar
+      ALTER TABLE manutencoes ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'ATIVO';
+      ALTER TABLE manutencoes ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
+      ALTER TABLE manutencoes ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE;
 
 
       -- ============================================================
